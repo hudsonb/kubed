@@ -1,0 +1,26 @@
+apply plugin: 'maven'
+
+group = 'org.kubed'
+version = '0.1-SNAPSHOT'
+
+jar {
+    baseName = 'kubed-cubed'
+    version = '0.1.0'
+}
+
+configure(install.repositories.mavenInstaller) {
+    pom.project {
+        inceptionYear '2016'
+        packaging 'jar'
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+    }
+}
+
+
+
