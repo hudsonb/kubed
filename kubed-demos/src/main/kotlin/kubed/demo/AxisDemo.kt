@@ -1,7 +1,6 @@
 package kubed.demo
 
 import javafx.application.Application
-import javafx.geometry.Side
 import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Scene
@@ -11,10 +10,10 @@ import kubed.selection.selectAll
 import kubed.shape.circle
 import kubed.shape.text
 import javafx.scene.paint.Color
-import javafx.scene.text.TextAlignment
+import kubed.axis.axisBottom
+import kubed.axis.axisLeft
 import kubed.interpolate.interpolateNumber
 import kubed.scale.LinearScale
-import kubed.shape.TextAnchor
 
 class AxisDemo: Application() {
     override fun start(primaryStage: Stage?) {
@@ -37,7 +36,7 @@ class AxisDemo: Application() {
                            listOf(25, 67),
                            listOf(85, 21),
                            listOf(220, 88),
-                           listOf(600, 500))
+                           listOf(600, 150))
 
         val xScale = LinearScale(::interpolateNumber).domain(listOf(0.0, data.map { it[0].toDouble() }.max() as Double))
                                                      .range(listOf(padding, width - padding * 2))
@@ -57,25 +56,22 @@ class AxisDemo: Application() {
             .enter()
             .append { d, _, _ -> circle(d as List<Int>) }
 
-        val text = text<List<Int>> {
-            text { d -> "${d[0]}, ${d[1]}" }
-            translateX { d -> xScale(d[0].toDouble()) }
-            translateY { d -> yScale(d[1].toDouble()) }
-            fill(Color.RED)
+        val xAxis = axisBottom(xScale) {
+            tickCount = 5
+            formatter = { d -> d.toInt().toString() }
         }
 
-        root.emptySelection()
-                .data(listOf(data))
-                .enter()
-                .append{ d, _, _ -> text(d as List<Int>) }
+        xAxis(root.emptySelection().append(fun(): Node { return Group() })
+                                   .classed("axis")
+                                   .translateY(height - padding))
 
-        val axisSel = root.emptySelection().append(fun(): Node { return Group() })
-        axisSel.classed("axis")
-        axisSel.translateY(height - padding)
-        val xAxis = kubed.axis.Axis(Side.BOTTOM, xScale)
-        xAxis.tickCount = 5
-        xAxis.formatter = { d -> d.toInt().toString() }
-        xAxis(axisSel)
+        val yAxis = axisLeft(yScale) {
+            tickCount = 4
+            formatter = { d -> d.toInt().toString() }
+        }
+        yAxis(root.emptySelection().append(fun(): Node { return Group() })
+                                   .classed("axis")
+                                   .translateX(padding))
 
         val scene = Scene(root)
         primaryStage?.width = width + padding * 2
