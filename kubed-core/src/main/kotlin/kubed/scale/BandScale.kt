@@ -52,9 +52,9 @@ class BandScale<D> : Scale<D, Double> {
         return if(ordinalRange.isEmpty()) unknown else ordinalRange[i]
     }
 
-    override fun ticks(count: Int): List<D> = listOf()
+    override fun ticks(count: Int): List<D> = domain
 
-    fun domain(d: List<D>) {
+    fun domain(d: List<D>): BandScale<D> {
         domain.clear()
         index.clear()
 
@@ -66,26 +66,33 @@ class BandScale<D> : Scale<D, Double> {
         }
 
         rescale()
+
+        return this
     }
 
-    fun range(r: List<Double>) {
+    fun range(r: List<Double>): BandScale<D> {
         range.clear()
         range.addAll(r)
         rescale()
+
+        return this
     }
 
-    fun rangeRound(r: List<Double>) {
+    fun rangeRound(r: List<Double>): BandScale<D> {
         round = true
         range(r)
+        return this
     }
 
-    fun round(value: Boolean) {
+    fun round(value: Boolean): BandScale<D> {
         round = value
         rescale()
+        return this
     }
 
-    fun unknown(unk: Double) {
+    fun unknown(unk: Double): BandScale<D> {
         unknown = unk
+        return this
     }
 
     fun paddingInner(value: Double): BandScale<D> {
