@@ -2,3 +2,5 @@ rootProject.name = "kubed"
 
 include 'kubed-core',
         'kubed-demos'
+rootProject.name = 'kubed'
+

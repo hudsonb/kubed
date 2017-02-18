@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1.0-beta-38'
+    ext.kotlin_version = '1.1.0-rc-91'
     repositories {
         jcenter()
         maven {
@@ -8,7 +8,6 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-M2'
     }
 }
 
@@ -27,4 +26,6 @@ subprojects {
         compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     }
 }
+group 'org.kubed'
+version '0.1-SNAPSHOT'
 

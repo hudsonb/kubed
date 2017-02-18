@@ -3,10 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" group="kubed-core" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core_main.iml" group="kubed-core" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" group="kubed-demos" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos_main.iml" group="kubed-demos" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" />
     </modules>
   </component>
 </project>
