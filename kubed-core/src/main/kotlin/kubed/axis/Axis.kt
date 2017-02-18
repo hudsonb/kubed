@@ -1,15 +1,12 @@
 package kubed.axis
 
-import com.sun.javafx.css.Size
-import com.sun.javafx.css.SizeUnits
+
 import javafx.geometry.Side
+import javafx.geometry.VPos
 import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.paint.Color
-import javafx.scene.shape.HLineTo
-import javafx.scene.shape.MoveTo
-import javafx.scene.shape.Path
-import javafx.scene.shape.VLineTo
+import javafx.scene.shape.*
 import javafx.scene.transform.Translate
 import kubed.scale.BandScale
 import kubed.scale.Scale
@@ -17,6 +14,7 @@ import kubed.selection.Selection
 import kubed.shape.TextAnchor
 import kubed.shape.lineSegment
 import kubed.shape.text
+import snap
 
 class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
     var tickSizeInner = 6.0
@@ -27,8 +25,8 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
     var tickValues: List<D>? = null
 
     val transform: (Double) -> Translate = when(side) {
-        Side.TOP, Side.BOTTOM -> { x -> Translate(x, 0.0) }
-        else -> { y -> Translate(0.0, y) }
+        Side.TOP, Side.BOTTOM -> { x -> Translate(snap(x), 0.0) }
+        else -> { y -> Translate(0.0, snap(y)) }
     }
 
     private val k = when(side) {
@@ -113,68 +111,31 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
 
         
         path = path.merge(path.enter().append(fun(): Node { return Path() })
-                                    .classed("domain")
-                                    .stroke(Color.BLACK))
+                                      .classed("domain")
+                                      .stroke(Color.BLACK))
 
         tick = tick.merge(tickEnter)
 
+        val vertical = side == Side.LEFT || side == Side.RIGHT
         val lineSegment = lineSegment<Unit> {
-            startX {
-                when(side) {
-                    Side.LEFT, Side.RIGHT -> 0.0
-                    else -> 0.5
-                }
-            }
-
-            startY {
-                when(side) {
-                    Side.TOP, Side.BOTTOM -> 0.0
-                    else -> 0.5
-                }
-            }
-
-            endX {
-                when(side) {
-                    Side.LEFT, Side.RIGHT -> k * tickSizeInner
-                    else -> 0.5
-                }
-            }
-
-            endY {
-                when(side) {
-                    Side.TOP, Side.BOTTOM -> k * tickSizeInner
-                    else -> 0.5
-                }
-            }
-
-            stroke(Color.ORANGERED)
+            startX(0.5)
+            startY(0.5)
+            endX(if(vertical) k * tickSizeInner else 0.5)
+            endY(if(vertical) 0.5 else k * tickSizeInner)
+            strokeLineCap(StrokeLineCap.SQUARE)
+            smooth(false)
+            stroke(Color.BLACK)
         }
 
         line = line.merge(tickEnter.append { _, _, _-> lineSegment(Unit)})
 
         val label = text<D> {
             text { d -> formatter(d) }
-            textAnchor { TextAnchor.MIDDLE }
+            textAnchor { if(vertical) TextAnchor.END else TextAnchor.MIDDLE }
+            textOrigin { if(vertical) VPos.CENTER else VPos.TOP }
             fill(Color.BLACK)
-            x {
-                when (side) {
-                    Side.LEFT, Side.RIGHT -> k * spacing
-                    else -> 0.5
-                }
-            }
-            y {
-                when (side) {
-                    Side.TOP, Side.BOTTOM -> k * spacing
-                    else -> 0.5
-                }
-            }
-            translateY {
-                when (side) {
-                    Side.TOP -> 0.0
-                    Side.BOTTOM -> Size(0.71, SizeUnits.EM).pixels()
-                    else -> Size(0.32, SizeUnits.EM).pixels()
-                }
-            }
+            x(if(vertical) k * spacing else 0.5)
+            y(if(vertical) 0.5 else k * spacing)
         }
 
         text = text.merge(tickEnter.append { d, _, _ -> label(d as D) })
