@@ -20,7 +20,7 @@ class Area<T> : PathShape<Area<T>, List<T>>() {
             y0 = value
             y1 = null
         }
-    var y0: (T, Int, List<T>) -> Double = { _, _, _ -> throw IllegalStateException("y0 must be specified") }
+    var y0: (T, Int, List<T>) -> Double = constant(0.0)
     var y1: ((T, Int, List<T>) -> Double)? = null
     var defined: (T, Int, List<T>) -> Boolean = { _, _, _ -> true }
     var curve: (Context) -> Curve = ::LinearCurve
@@ -102,13 +102,14 @@ class Area<T> : PathShape<Area<T>, List<T>>() {
         var defined0 = false
 
         val n = data.size
+        var j = 0
         val x0z = DoubleArray(n)
         val y0z = DoubleArray(n)
-        for(i in 0..data.size) {
+        for(i in 0..n) {
             if(!(i < n && defined(data[i], i, data)) == defined0) {
-                val j = i
                 defined0 = !defined0
                 if(defined0) {
+                    j = i
                     output.areaStart()
                     output.lineStart()
                 }
@@ -135,10 +136,4 @@ class Area<T> : PathShape<Area<T>, List<T>>() {
     }
 
     fun constant(value: Double) = { _: T, _: Int, _: List<T> -> value }
-
-    //private fun arealine(): Line<T> = line<T>(context as PathContext).defined(defined).curve(curve)
-    //private fun lineX0(): Line<T> = arealine().x(x0).y(y0)
-    //private fun lineY0(): Line<T> = arealine().x(x0).y(y0)
-    //private fun lineX1(): Line<T> = arealine().x(x1).y(y0)
-    //private fun lineY1(): Line<T> = arealine().x(x0).y(y1)
 }
