@@ -50,8 +50,8 @@ class CardinalCurve(context: Context, tension: Double = 0.0) : AbstractCardinalC
             3 -> cardinalPoint(x1, y1)
         }
 
-        if(line.isTruthy() || (line != 0.0 && point === 1))
-            context.closePath();
+        if(line.isTruthy() || (line != 0.0 && point == 1))
+            context.closePath()
 
         line = 1 - line
     }
