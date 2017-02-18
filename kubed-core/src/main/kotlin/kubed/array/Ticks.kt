@@ -18,7 +18,9 @@ fun ticks(start: Double, stop: Double, count: Int): List<Double> {
 }
 
 fun tickStep(start: Double, stop: Double, count: Int): Double {
-    val step0 = Math.abs(stop - start) / Math.max(0, count)
+    if(count <= 0) throw IllegalArgumentException("count must be > 0")
+
+    val step0 = Math.abs(stop - start) / count
     var step1 = Math.pow(10.0, Math.floor(Math.log(step0) / LN10))
     val error = step0 / step1
     if(error >= E10) step1 *= 10
