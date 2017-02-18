@@ -107,8 +107,8 @@ class Text<T> : Shape<Text<T>, T>() {
 
     override operator fun invoke(d: T): javafx.scene.shape.Shape {
         val text = javafx.scene.text.Text()
-        text.x = x(d) // Consider: Should we support x?
-        text.y = y(d) // Consider: Should we support y?
+        text.x = x(d)
+        text.y = y(d)
         text.text = text(d)
         text.font = font?.invoke(d) ?: text.font
         text.boundsType = boundsType?.invoke(d) ?: text.boundsType
@@ -124,12 +124,29 @@ class Text<T> : Shape<Text<T>, T>() {
         when(anchor) {
            TextAnchor.MIDDLE -> {
                text.x = text.x - text.layoutBounds.width / 2
+
+               var modifying = false
+               text.layoutBoundsProperty().addListener { _, _, newBounds ->
+                   if(!modifying) {
+                       modifying = true
+                       text.x = text.x + newBounds.width / 2
+                       modifying = false
+                   }
+               }
            }
-           // TextAnchor.END -> text.x = text.x + text.layoutBounds.width
+           TextAnchor.END -> {
+               text.x = text.x - text.layoutBounds.width
+
+               var modifying = false
+               text.layoutBoundsProperty().addListener { _, _, newBounds ->
+                   if(!modifying) {
+                       modifying = true
+                       text.x = text.x - newBounds.width
+                       modifying = false
+                   }
+               }
+           }
         }
-        //text.layoutBoundsProperty().addListener { observable, oldValue, newValue ->
-            //text.x = text.x - text.layoutBounds.width / 2
-        //}
 
         apply(d, text)
 
