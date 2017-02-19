@@ -5,9 +5,8 @@ import kubed.util.isTruthy
 import java.util.*
 
 fun stackOrderNone(): (List<Series<*, *>>) -> List<Int> = { series ->
-    val order = java.util.ArrayList<Int>(series.size)
-    (series.size - 1..0).forEach { order[it] = it }
-    order
+    var i = 0
+    series.map { i++ }
 }
 
 fun stackOrderAscending(): (List<Series<*, *>>) -> List<Int> = { series ->
@@ -47,10 +46,10 @@ fun stackOrderInsideOut(): (List<Series<*, *>>) -> List<Int> = { series ->
 
 private fun sum(series: Series<*, *>): Double {
     var s = 0.0
-    series.points.asSequence()
-                 .map { it.y1 }
-                 .filter(Double::isTruthy)
-                 .forEach { s += it }
+    series.asSequence()
+            .map { it.y1 }
+            .filter(Double::isTruthy)
+            .forEach { s += it }
 
     return s
 }
