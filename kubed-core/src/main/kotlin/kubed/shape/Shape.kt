@@ -1,10 +1,12 @@
 package kubed.shape
 
+import javafx.scene.CacheHint
 import javafx.scene.paint.Paint
 import javafx.scene.shape.StrokeLineCap
 import javafx.scene.shape.StrokeLineJoin
 import javafx.scene.shape.StrokeType
 import kubed.path.Context
+import sun.misc.Cache
 
 abstract class Shape<out S : Shape<S, T>, T> {
     var styleClasses: ((T) -> List<String>)? = null
@@ -22,6 +24,7 @@ abstract class Shape<out S : Shape<S, T>, T> {
     var translateX: ((T) -> Double)? = null
     var translateY: ((T) -> Double)? = null
     var translateZ: ((T) -> Double)? = null
+    var cacheHint: ((T) -> CacheHint)? = null
 
     fun styleClasses(vararg styleClasses: String): S {
         if(styleClasses.isEmpty())
@@ -116,6 +119,12 @@ abstract class Shape<out S : Shape<S, T>, T> {
         return this as S
     }
 
+    fun cacheHint(hint: CacheHint) = cacheHint { hint }
+    fun cacheHint(hint: (T) -> CacheHint): S {
+        this.cacheHint = hint
+        return this as S
+    }
+
     internal fun apply(d: T, shape: javafx.scene.shape.Shape) {
         shape.opacity = opacity?.invoke(d) ?: shape.opacity
         shape.fill = fill?.invoke(d) ?: shape.fill
@@ -130,6 +139,7 @@ abstract class Shape<out S : Shape<S, T>, T> {
         shape.translateX = translateX?.invoke(d) ?: shape.translateX
         shape.translateY = translateY?.invoke(d) ?: shape.translateY
         shape.translateZ = translateZ?.invoke(d) ?: shape.translateZ
+        shape.cacheHint = cacheHint?.invoke(d) ?: shape.cacheHint
     }
 
     abstract operator fun invoke(d: T): javafx.scene.shape.Shape
