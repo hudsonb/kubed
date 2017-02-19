@@ -24,7 +24,10 @@ class Symbol<T> : Shape<Symbol<T>, T>() {
 
     override fun invoke(d: T): javafx.scene.shape.Shape {
         val symbol = type(d)
-        return symbol.create(size(d))
+        val shape = symbol.create(size(d))
+        apply(d, shape)
+
+        return shape
     }
 }
 
