@@ -46,11 +46,18 @@ class NaturalCurve(val context: Context) : Curve {
                 }
             }
         }
+
+        if(line.isTruthy() || (line != 0.0 && n == 1))
+            context.closePath()
+
+        line = 1 - line
+        x.clear()
+        y.clear()
     }
 
     override fun point(x: Double, y: Double) {
-        this.x.add(x)
-        this.y.add(y)
+        this.x += x
+        this.y += y
     }
 
     // See https://www.particleincell.com/2012/bezier-splines/ for derivation.
