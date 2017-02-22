@@ -38,6 +38,9 @@ abstract class AbstractCatmullRomCurve(val context: Context, val alpha: Double =
     }
 
     fun catmullRomPoint(x: Double, y: Double) {
+        val x2a = x2
+        val y2a = y2
+
         if(l01_a > MoreMath.EPSILON) {
             val a = 2 * l01_2a + 3 * l01_a * l12_a + l12_2a
             val n = 3 * l01_a * (l01_a + l12_a)
@@ -52,7 +55,7 @@ abstract class AbstractCatmullRomCurve(val context: Context, val alpha: Double =
             y2 = (y2 * b + y1 * l23_2a - y * l12_2a) / m
         }
 
-        context.bezierCurveTo(x1, y1, x2, y2, x2, y2)
+        context.bezierCurveTo(x1, y1, x2, y2, x2a, y2a)
     }
 }
 
