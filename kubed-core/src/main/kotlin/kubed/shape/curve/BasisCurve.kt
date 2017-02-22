@@ -45,7 +45,10 @@ class BasisCurve(context: Context = PathContext()) : AbstractBasisCurve(context)
     override fun lineEnd() {
        when(point) {
            2 -> context.lineTo(x1, y1)
-           3 -> point(x1, y1)
+           3 -> {
+               point(x1, y1)
+               context.lineTo(x1, y1)
+           }
        }
 
         if(line.isTruthy() || (line != 0.0 && point == 1))
@@ -66,7 +69,7 @@ class BasisCurve(context: Context = PathContext()) : AbstractBasisCurve(context)
             1 -> point = 2
             2 -> {
                 point = 3
-                context.lineTo((5 * x0 + x1) / 6, (5 * y0 + y1) / 6) // proceed
+                context.lineTo((5 * x0 + x1) / 6, (5 * y0 + y1) / 6)
                 basisPoint(x, y)
             }
             else -> basisPoint(x, y)
