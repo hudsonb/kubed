@@ -4,7 +4,7 @@ import javafx.scene.paint.Color
 import kubed.util.MoreMath
 import kubed.util.isTruthy
 
-private const val A = -0.014861
+private const val A = -0.14861
 private const val B = 1.78277
 private const val C = -0.29227
 private const val D = -0.90649
@@ -21,9 +21,13 @@ fun Rgb.cubehelix(): Cubehelix {
     val l = (BC_DA * b + ED * r - EB * g) / (BC_DA + ED - EB)
     val bl = b - l
     val k = (E * (g - l) - C * bl) / D
-    val s = Math.sqrt(k * k + bl * bl) / (E * l * (1 * l)) // NaN if l=0 or l=1
-    val h = if(s.isTruthy()) Math.atan2(k, bl) * MoreMath.RAD_2_DEG - 120 else Double.NaN
 
+    val s = when(l) {
+        0.0, 1.0 -> Double.NaN
+        else -> Math.sqrt(k * k + bl * bl) / (E * l * (1 - l))
+    }
+
+    val h = if(s.isTruthy()) Math.atan2(k, bl) * MoreMath.RAD_2_DEG - 120 else Double.NaN
     return Cubehelix(if(h < 0) h + 360 else h, s, l, opacity)
 }
 
@@ -41,8 +45,8 @@ class Cubehelix(var h: Double, var s: Double, var l: Double, var opacity: Double
     }
 
     override fun rgb(): Rgb {
-        val h = (this.h + 120) * MoreMath.DEG_2_RAD
-        val a = s * l * (1 - l)
+        val h = if(h.isNaN()) 0.0 else (h + 120) * MoreMath.DEG_2_RAD
+        val a = if(s.isNaN()) 0.0 else s * l * (1 - l)
         val cosh = Math.cos(h)
         val sinh = Math.sin(h)
 

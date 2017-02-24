@@ -10,7 +10,7 @@ private fun interpolateCubeHelix(start: ColorSpace<*>, end: ColorSpace<*>, gamma
 
     val h = hue(sch.h, ech.h)
     val s = nogamma(sch.s, ech.s)
-    val l = nogamma(sch.s, ech.s)
+    val l = nogamma(sch.l, ech.l)
     val opacity = nogamma(sch.opacity, ech.opacity)
 
     return { t -> Cubehelix(h(t), s(t), l(Math.pow(t, gamma)), opacity(t)) }
