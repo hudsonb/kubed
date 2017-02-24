@@ -1,6 +1,7 @@
 package kubed.shape
 
 import javafx.scene.CacheHint
+import javafx.scene.Node
 import javafx.scene.paint.Paint
 import javafx.scene.shape.StrokeLineCap
 import javafx.scene.shape.StrokeLineJoin
@@ -27,6 +28,7 @@ abstract class Shape<out S : Shape<S, T>, T> {
     var translateY: ((T) -> Double)? = null
     var translateZ: ((T) -> Double)? = null
     var cacheHint: ((T) -> CacheHint)? = null
+    var clip: ((T) -> Node?)? = null
 
     fun styleClasses(vararg styleClasses: String): S {
         if(styleClasses.isEmpty())
@@ -139,6 +141,12 @@ abstract class Shape<out S : Shape<S, T>, T> {
         return this as S
     }
 
+    fun clip(node: Node?) = clip { node }
+    fun clip(node: (T) -> Node?): S {
+        this.clip = node
+        return this as S
+    }
+
     internal fun apply(d: T, shape: javafx.scene.shape.Shape) {
         shape.opacity = opacity?.invoke(d) ?: shape.opacity
         shape.fill = fill?.invoke(d) ?: shape.fill
@@ -156,6 +164,7 @@ abstract class Shape<out S : Shape<S, T>, T> {
         shape.translateY = translateY?.invoke(d) ?: shape.translateY
         shape.translateZ = translateZ?.invoke(d) ?: shape.translateZ
         shape.cacheHint = cacheHint?.invoke(d) ?: shape.cacheHint
+        shape.clip = clip?.invoke(d) ?: shape.clip
     }
 
     abstract operator fun invoke(d: T): javafx.scene.shape.Shape
