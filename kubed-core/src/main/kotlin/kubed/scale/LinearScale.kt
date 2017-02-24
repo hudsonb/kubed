@@ -17,6 +17,9 @@ open class LinearScale<R>(interpolate: (R, R) -> (Double) -> R,
 
     override fun reinterpolate(a: Double, b: Double): (Double) -> Double = interpolateNumber(a, b)
 
+    override fun domain(d: List<Double>) = super.domain(d) as LinearScale<R>
+    override fun range(r: List<R>) = super.range(r) as LinearScale<R>
+
     fun nice(count: Int = 10): LinearScale<R> {
         val i = domain.size - 1
         val n = count
