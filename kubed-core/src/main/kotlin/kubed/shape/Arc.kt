@@ -1,12 +1,13 @@
 package kubed.shape
 
+import javafx.geometry.Point2D
 import kubed.path.Context
 import kubed.path.PathContext
 import kubed.util.MoreMath
 import kubed.util.isTruthy
 
 class Arc<T> : PathShape<Arc<T>, T>() {
-    var innerRadius: (T) -> Double = { throw IllegalStateException("innerRadius must be specified") }
+    var innerRadius: (T) -> Double = { 0.0 }
     var outerRadius: (T) -> Double = { throw IllegalStateException("outerRadius must be specified") }
     var startAngle: (T) -> Double = { throw IllegalStateException("startAngle must be specified") }
     var endAngle: (T) -> Double = { throw IllegalStateException("endAngle must be specified") }
@@ -56,10 +57,10 @@ class Arc<T> : PathShape<Arc<T>, T>() {
         return this
     }
 
-    fun centroid(d: T): DoubleArray {
+    fun centroid(d: T): Point2D {
         val r = (innerRadius(d) + outerRadius(d)) / 2
         val a = (startAngle(d) + endAngle(d)) / 2.0 - Math.PI / 2.0
-        return doubleArrayOf(Math.cos(a) * r, Math.sin(a) * r)
+        return Point2D(Math.cos(a) * r, Math.sin(a) * r)
     }
 
     override fun generate(d: T): Context {
