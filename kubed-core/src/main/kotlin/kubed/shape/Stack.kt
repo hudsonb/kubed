@@ -3,15 +3,23 @@ package kubed.shape
 import kubed.shape.offset.stackOffsetNone
 import kubed.shape.order.*
 
-fun <T, K> stack() = Stack<T, K>()
-fun <T, K> stack(init: Stack<T, K>.() -> Stack<T, K>) {
-    val stack = Stack<T, K>()
-    stack.init()
+fun <T, K> stack(keys: () -> List<K>, value: (d: T, key: K) -> Double, data: List<T>, order: (List<Series<*, *>>) -> List<Int> = stackOrderNone(),
+                 offset: (List<Series<*, *>>, List<Int>) -> Unit = stackOffsetNone()): List<Series<T, K>> {
+    val stack = Stack(keys, value)
+    stack.order = order
+    stack.offset = offset
+    return stack(data)
 }
 
-class Stack<T, K> {
-    var keys: () -> List<K> = { emptyList<K>() }
-    var value: (d: T, key: K) -> Double = { _, _ -> throw IllegalStateException("value must be specified") }
+fun <T, K> stack(keys: List<K>, value: (d: T, key: K) -> Double, order: (List<Series<*, *>>) -> List<Int> = stackOrderNone(),
+                 offset: (List<Series<*, *>>, List<Int>) -> Unit = stackOffsetNone(), data: List<T>): List<Series<T, K>> {
+    val stack = Stack({ keys }, value)
+    stack.order = order
+    stack.offset = offset
+    return stack(data)
+}
+
+class Stack<T, K>(val keys: () -> List<K>, val value: (d: T, key: K) -> Double) {
     var order = stackOrderNone()
     var offset = stackOffsetNone()
 
@@ -21,12 +29,12 @@ class Stack<T, K> {
 
         for(i in kz.indices) {
             val ki = kz[i]
-            val points = ArrayList<Point<T>>(data.size)
+            val s = Series<T, K>(ki, i)
             for(j in data.indices) {
-                points += Point(data[j], 0.0, value(data[j], ki))
+                s += Point(ki, data[j], 0.0, value(data[j], ki))
             }
 
-            sz += Series(ki, i, points)
+            sz += s
         }
 
         val oz = order(sz)
@@ -37,12 +45,22 @@ class Stack<T, K> {
         offset(sz, oz)
         return sz
     }
+
+    companion object {
+        @JvmStatic
+        fun main(vararg args: String) {
+            val data: List<Map<String, Int>> = listOf(mapOf(Pair("apples", 3840), Pair("bananas", 1920), Pair("cherries", 960), Pair("dates", 400)),
+                              mapOf(Pair("apples", 1600), Pair("bananas", 1440), Pair("cherries", 960), Pair("dates", 400)),
+                              mapOf(Pair("apples", 640), Pair("bananas", 960), Pair("cherries", 640), Pair("dates", 400)),
+                              mapOf(Pair("apples", 320), Pair("bananas", 480), Pair("cherries", 640), Pair("dates", 400)))
+
+            val test = stack<Map<String, Int>, String>({ listOf("apples", "bananas", "cherries", "dates" )}, { d: Map<String, Int>, k: String -> d[k]!!.toDouble() }, data)
+            println("sip")
+        }
+    }
 }
 
-data class Point<T>(val data: T, var y0: Double, var y1: Double)
-data class Series<T, K>(val key: K, var index: Int, val points: List<Point<T>>) {
-    val size = points.size
-    operator fun get(i: Int): Point<T> = points[i]
-}
+data class Point<T, K>(val key: K, val data: T, var y0: Double, var y1: Double)
+data class Series<T, K>(val key: K, var index: Int) : ArrayList<Point<T, K>>()
 
 
