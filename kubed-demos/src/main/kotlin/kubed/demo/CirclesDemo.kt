@@ -1,27 +1,14 @@
 package kubed.demo
 
 import javafx.animation.AnimationTimer
-import javafx.animation.Timeline
 import javafx.application.Application
-import javafx.application.Application.launch
-import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import javafx.util.Duration
-import jdk.nashorn.internal.objects.NativeFunction.function
-import kubed.color.Hsl
-import kubed.color.hcl
-import kubed.interpolate.interpolateHcl
-import kubed.scale.LinearScale
-import kubed.scale.PointScale
 import kubed.selection.selectAll
 import kubed.shape.circle
-import kubed.transition.transition
-import javax.management.Query.attr
-import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 
 class CirclesDemo : Application() {
@@ -36,12 +23,12 @@ class CirclesDemo : Application() {
         val c = circle<Data> {
             translateX(Data::x)
             translateY(Data::y)
-            radius(2.5)
+            radius { 3 * Math.random() + Math.random() }
             fill(Color.BLACK)
         }
 
         val circle = root.selectAll<Node>()
-                .data(listOf((0..1000).map { Data(width * Math.random(), height * Math.random(), Math.random() - 0.5, Math.random() - 0.5) }))
+                .data(listOf((0..5000).map { Data(width * Math.random(), height * Math.random(), Math.random() - 0.5, Math.random() - 0.5) }))
                 .enter().append { d, _, _ -> c(d as Data) }
 
         val timer = object : AnimationTimer() {

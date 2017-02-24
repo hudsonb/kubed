@@ -53,12 +53,11 @@ class AreaDemo: Application() {
             x { _, i, _ -> xScale(i.toDouble()) }
             y1 { d, _, _ -> yScale(d.toDouble()) }
             y0(yScale(0.0))
-            curve(curveCardinal())
+            curve(curveNatural())
             fill(Color.STEELBLUE)
         }
 
         root.children += area(data)
-
 
         val scene = Scene(root)
         primaryStage?.scene = scene
