@@ -70,7 +70,7 @@ class Pie<T> {
         var sum = 0.0
         val index = IntArray(n)
         val values = DoubleArray(n)
-        val wedges = ArrayList<PieWedge<T>>(n)
+        val wedges = Array<PieWedge<T>?>(n, { null })
         var a0 = startAngle()
         val da = Math.min(MoreMath.TAU, Math.max(-MoreMath.TAU, endAngle() - a0))
         val p = Math.min(Math.abs(da) / n, padAngle())
@@ -91,7 +91,7 @@ class Pie<T> {
             index.sortedWith(Comparator { i, j -> sort!!.compare(data[i], data[j]) })
 
         // Compute the arcs! They are stored in the original data's order.
-        val k = if(sum > 0.0) da - n * pa / sum else 0.0
+        val k = if(sum > 0) (da - n * pa) / sum else 0.0
         for(i in index.indices) {
             val j = index[i]
             val v = values[j]
@@ -100,7 +100,7 @@ class Pie<T> {
             a0 = a1
         }
 
-        return wedges
+        return wedges.toList() as List<PieWedge<T>>
     }
 }
 
