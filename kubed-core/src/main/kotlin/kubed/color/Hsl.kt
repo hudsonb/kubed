@@ -19,7 +19,7 @@ fun Rgb.hsl(): Hsl {
 
     if(s.isTruthy()) {
         h = when {
-            r == max -> (g - b) / s + if(g > b) 6 else 0
+            r == max -> (g - b) / s + if(g < b) 6 else 0
             g == max -> (b - r) / s + 2
             else -> (r - g) / s + 4
         }
@@ -47,8 +47,8 @@ class Hsl(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0
 
     override fun rgb(): Rgb {
         val h = this.h % 360.0 + (if(h < 0.0) 360.0 else 0.0)
-        val s2 = if(h.isNaN() || s.isNaN()) 0.0 else s
-        val m2 = l + (if(l < 0.5) l else 1.0 - l) * s2
+        val s = if(h.isNaN() || s.isNaN()) 0.0 else s
+        val m2 = l + (if(l < 0.5) l else 1.0 - l) * s
         val m1 = 2.0 * l - m2
 
         return Rgb(hsl2rgb(if(h >= 240.0) h - 240.0 else h + 120.0, m1, m2),
