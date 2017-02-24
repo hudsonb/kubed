@@ -23,7 +23,7 @@ open class OrdinalScale<D, R> : Scale<D, R> {
 
     override fun ticks(count: Int): List<D> = listOf()
 
-    fun domain(d: List<D>) {
+    fun domain(d: List<D>): OrdinalScale<D, R> {
         domain.clear()
         index.clear()
 
@@ -33,14 +33,18 @@ open class OrdinalScale<D, R> : Scale<D, R> {
                 index.put(it, domain.size - 1)
             }
         }
+
+        return this
     }
 
-    fun range(r: List<R>) {
+    fun range(r: List<R>): OrdinalScale<D, R> {
         range.clear()
         range.addAll(r)
+        return this
     }
 
-    fun unknown(value: R) {
+    fun unknown(value: R): OrdinalScale<D, R> {
         unknown = value
+        return this
     }
 }
