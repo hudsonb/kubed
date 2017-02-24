@@ -21,6 +21,8 @@ abstract class Shape<out S : Shape<S, T>, T> {
     var strokeMiterLimit: ((T) -> Double)? = null
     var strokeDashOffset: ((T) -> Double)? = null
     var strokeDashArray: ((T) -> FloatArray)? = null
+    var layoutX: ((T) -> Double)? = null
+    var layoutY: ((T) -> Double)? = null
     var translateX: ((T) -> Double)? = null
     var translateY: ((T) -> Double)? = null
     var translateZ: ((T) -> Double)? = null
@@ -101,6 +103,18 @@ abstract class Shape<out S : Shape<S, T>, T> {
         return this as S
     }
 
+    fun layoutX(value: Double) = layoutX { value }
+    fun layoutX(value: (T) -> Double): S {
+        this.layoutX = value
+        return this as S
+    }
+
+    fun layoutY(value: Double) = layoutY { value }
+    fun layoutY(value: (T) -> Double): S {
+        this.layoutY = value
+        return this as S
+    }
+
     fun translateX(x: Double) = translateX { x }
     fun translateX(x: (T) -> Double): S {
         this.translateX = x
@@ -136,6 +150,8 @@ abstract class Shape<out S : Shape<S, T>, T> {
         shape.strokeLineCap = strokeLineCap?.invoke(d) ?: shape.strokeLineCap
         shape.strokeMiterLimit = strokeMiterLimit?.invoke(d) ?: shape.strokeMiterLimit
         shape.strokeDashOffset = strokeDashOffset?.invoke(d) ?: shape.strokeDashOffset
+        shape.layoutX = layoutX?.invoke(d) ?: shape.layoutX
+        shape.layoutY = layoutY?.invoke(d) ?: shape.layoutY
         shape.translateX = translateX?.invoke(d) ?: shape.translateX
         shape.translateY = translateY?.invoke(d) ?: shape.translateY
         shape.translateZ = translateZ?.invoke(d) ?: shape.translateZ
