@@ -35,7 +35,7 @@ class PostmanDemo: Application() {
 
         val rings = ArrayList<Shape>()
         root.emptySelection()
-            .data(listOf(r.domain))
+            .data(r.domain)
             .enter().append { d, _, _ ->
                 val p = ring(d as Double)
                 rings += p

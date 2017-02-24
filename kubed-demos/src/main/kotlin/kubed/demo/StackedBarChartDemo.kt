@@ -61,7 +61,7 @@ class StackedBarChartDemo: Application() {
         }
 
         root.selectAll<Node>()
-                .data(listOf(stack({ keys }, { d: Map<String, String>, k: String -> d[k]?.toDouble() as Double}, data)))
+                .data(stack({ keys }, { d: Map<String, String>, k: String -> d[k]?.toDouble() as Double}, data))
                 .enter().append(fun (): Node { return Group() })
                 .selectAll("rect")
                 .data({ d, _, _ -> d as Series<*, *> })

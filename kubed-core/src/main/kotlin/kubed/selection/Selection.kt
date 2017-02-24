@@ -174,17 +174,34 @@ open class Selection() : BaseSelection<Selection> {
     fun selectAll(selector: String?): Selection {
         val sel = Selection()
 
-        groups.flatMap { it }
-              .filterIsInstance<Node>()
-              .forEach {
-                  if(selector != null) {
-                      val group = Group(it)
-                      sel += group
+        for(g in groups) {
+            for(i in g.indices) {
+                val e = g[i]
+                if(e is Node) {
+                    val newGroup = Group(e)
+                    sel.groups += newGroup
 
-                      val nodes = it.lookupAllChildren(selector)
-                      group.addAll(nodes.sortedWith(compareBy(Node::depth, Node::pos)))
-                  }
-              }
+                    if(selector != null) {
+                        val nodes = e.lookupAllChildren(selector)
+                        newGroup.addAll(nodes.sortedWith(compareBy(Node::depth, Node::pos)))
+                    }
+                }
+
+                // Consider: What about Placeholders?
+            }
+        }
+
+//        groups.flatMap { it }
+//              .filterIsInstance<Node>()
+//              .forEach {
+//                  if(selector != null) {
+//                      val group = Group(it)
+//                      sel += group
+//
+//                      val nodes = it.lookupAllChildren(selector)
+//                      group.addAll(nodes.sortedWith(compareBy(Node::depth, Node::pos)))
+//                  }
+//              }
 
         return sel
     }
@@ -243,9 +260,7 @@ open class Selection() : BaseSelection<Selection> {
      *
      * The data is specified *for each group* in the selection.
      */
-    fun data(data: List<List<*>>, key: (d: Any?, i: Int, groupDatum: Any) -> Any = { _, i, _ -> i }) = data( {
-        _, i, _ -> data[i]
-    }, key)
+    fun data(data: List<*>, key: (d: Any?, i: Int, groupDatum: Any) -> Any = { _, i, _ -> i }) = data( { _, _, _ -> data }, key)
 
     fun data(data: (d: Any, i: Int, nodes: List<Node?>) -> List<*>,
              key: (d: Any?, i: Int, groupDatum: Any) -> Any = { _, i, _ -> i }): Selection {
@@ -341,7 +356,7 @@ open class Selection() : BaseSelection<Selection> {
                             val newNode = node()
                             newNode.datum = e.datum
                             append(e, -1, newNode)
-                            newGroup += node
+                            newGroup += newNode
                         }
                         is Placeholder -> {
                             val newNode = node()

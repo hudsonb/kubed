@@ -7,6 +7,8 @@ import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.paint.Color
 import javafx.scene.shape.*
+import javafx.scene.text.Font
+import javafx.scene.text.TextAlignment
 import javafx.scene.transform.Translate
 import kubed.scale.BandScale
 import kubed.scale.Scale
@@ -72,15 +74,11 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
 
     private fun center(scale: BandScale<D>): (d: D) -> R {
         var offset = scale.bandwidth / 2.0
-        if(scale.round)
-            offset = Math.round(offset).toDouble()
+        if(scale.round) offset = Math.round(offset).toDouble()
         return { d -> (scale(d) + offset) as R }
     }
 
-    private fun identity(scale: Scale<D, R>): (d: D) -> R = {
-        d ->
-        scale(d)
-    }
+    private fun identity(scale: Scale<D, R>): (d: D) -> R = { d -> scale(d) }
 
     operator fun invoke(sel: Selection) {
         val values = ArrayList<D>()
@@ -98,8 +96,8 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
         val range0 = range.first().toDouble() + 0.5
         val range1 = range.last().toDouble() + 0.5
         val position = if(scale is BandScale) center(scale) else identity(scale) // TODO: Pass copy of scale
-        var path = sel.selectAll(".domain").data(listOf(listOf(Unit))) // Well this is hideous
-        var tick = sel.selectAll(".tick").data(listOf(values as List<Any>), { d, _, _ -> scale(d as D) })
+        var path = sel.selectAll(".domain").data(listOf(Unit))
+        var tick = sel.selectAll(".tick").data(values as List<Any>, { d, _, _ -> scale(d as D) })
         val tickExit = tick.exit()
         val tickEnter = tick.enter().append(fun(): Node {
             val g = Group()
@@ -108,7 +106,6 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
         })
         var line = tick.select("line")
         var text = tick.select("text")
-
         
         path = path.merge(path.enter().append(fun(): Node { return Path() })
                                       .classed("domain")
@@ -131,8 +128,15 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
 
         val label = text<D> {
             text { d -> formatter(d) }
-            textAnchor { if(vertical) TextAnchor.END else TextAnchor.MIDDLE }
+            textAnchor {
+                when (side) {
+                    Side.RIGHT -> TextAnchor.START
+                    Side.LEFT -> TextAnchor.END
+                    else -> TextAnchor.MIDDLE
+                }
+            }
             textOrigin { if(vertical) VPos.CENTER else VPos.TOP }
+            font(Font("sans-serif", 10.0))
             fill(Color.BLACK)
             x(if(vertical) k * spacing else 0.5)
             y(if(vertical) 0.5 else k * spacing)
@@ -159,7 +163,6 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
             }
         }
 
-        tick.opacity(1.0)
-                .transform { d, _, _ -> listOf(transform(position(d as D).toDouble())) }
+        tick.opacity(1.0).transform { d, _, _ -> listOf(transform(position(d as D).toDouble())) }
     }
 }

@@ -52,7 +52,7 @@ class CyclingTransitionIIDemo : Application() {
                             .fill(Color.LIGHTGREY)
 
         root.selectAll<Node>()
-            .data(listOf(data))
+            .data(data)
             .enter().append { d, _, _ -> r(d as Cell) }
             .transition()
             .interpolator(Interpolator.LINEAR)

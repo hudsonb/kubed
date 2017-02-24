@@ -34,6 +34,7 @@ class SelectionDemo: Application() {
 
     override fun start(primaryStage: Stage?) {
         val root = Group()
+        root.translateY = 200.0
 
         update(root)
 
@@ -53,7 +54,7 @@ class SelectionDemo: Application() {
         val font = Font("Courier New", 32.0)
 
         val sel = root.selectAll<Node>()
-                      .data(listOf(randomChars()), { d, _, _ -> d as Char })
+                      .data(randomChars(), { d, _, _ -> d as Char })
 
         // Exit
         sel.exit().style("-fx-fill", "red")

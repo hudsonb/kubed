@@ -12,12 +12,10 @@ import javafx.scene.transform.Rotate
 import javafx.scene.transform.Translate
 import javafx.stage.Stage
 import kubed.color.Cubehelix
-import kubed.color.Hsl
 import kubed.interpolate.interpolateCubeHelix
 import kubed.scale.LinearScale
 import kubed.selection.selectAll
 import kubed.shape.rect
-import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 class SpiralTriangleDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -35,9 +33,9 @@ class SpiralTriangleDemo: Application() {
         root.children += g
 
         val color = LinearScale<Cubehelix>({ a, b -> interpolateCubeHelix(a, b) }).domain(listOf(0.0, 0.5, 1.0))
-                .range(listOf(Cubehelix.convert(Hsl(-100.0, 0.75, 0.35)),
-                              Cubehelix.convert(Hsl(80.0, 1.5, 0.80)),
-                              Cubehelix.convert(Hsl(260.0, 0.75, 0.35))))
+                .range(listOf(Cubehelix(-100.0, 0.75, 0.35),
+                              Cubehelix(80.0, 1.0, 0.80),
+                              Cubehelix(260.0, 0.75, 0.35)))
 
         val rect = rect<Unit> {
             translateX(-squareSize / 2)
@@ -63,7 +61,7 @@ class SpiralTriangleDemo: Application() {
 
         val square = g.selectAll<Group>()
                       .selectAll("g")
-                      .data(listOf(listOf(0, 1, 2), listOf(2, 0, 1)))
+                      .data({ _, i, _ -> if(i == 0) listOf(0, 1, 2) else listOf(2, 0, 1) })
                       .enter()
                       .append(fun(): Node { return Group() })
                       .transform { d, _, _ -> listOf(Rotate(d as Int * 120.0 + 60.0), Translate(0.0, -triangleSize / Math.sqrt(12.0))) }
@@ -100,6 +98,10 @@ class SpiralTriangleDemo: Application() {
     companion object {
         @JvmStatic
         fun main(vararg args: String) {
+//            val rgb = Cubehelix.convert(Hsl(80.0, 1.5, 0.8)).rgb()
+//            println("r = ${rgb.r}")
+//            println("g = ${rgb.g}")
+//            println("b = ${rgb.b}")
             launch(SpiralTriangleDemo::class.java, *args)
         }
     }

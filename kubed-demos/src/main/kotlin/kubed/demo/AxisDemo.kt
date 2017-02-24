@@ -52,7 +52,7 @@ class AxisDemo: Application() {
                                        .translateY { d -> yScale(d[1].toDouble()) }
 
         root.selectAll<Node>()
-            .data(listOf(data))
+            .data(data)
             .enter()
             .append { d, _, _ -> circle(d as List<Int>) }
 

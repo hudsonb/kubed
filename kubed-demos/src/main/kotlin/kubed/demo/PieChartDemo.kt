@@ -51,7 +51,7 @@ class PieChartDemo: Application() {
         }
 
         val g = root.selectAll(".arc")
-                .data(listOf(pie(data)))
+                .data(pie(data))
                 .enter()
                 .append { _, _, _ -> Group() }
                 .classed("arc")

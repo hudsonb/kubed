@@ -5,6 +5,12 @@ import kubed.interpolate.interpolateNumber
 inline fun <reified R> scaleLinear() {
 }
 
+fun <D> scaleBand() = BandScale<D>()
+fun <D> scaleBand(init: BandScale<D>.() -> Unit) = BandScale<D>().apply { init.invoke(this) }
+
+fun <D, R> scaleOrdinal() = OrdinalScale<D, R>()
+fun <D, R> scaleOrdinal(init: OrdinalScale<D, R>.() -> Unit) = OrdinalScale<D, R>().apply { init.invoke(this) }
+
 inline fun <reified R> interpolator() = when {
     R::class == Number::class -> ::interpolateNumber
     else -> throw IllegalArgumentException()

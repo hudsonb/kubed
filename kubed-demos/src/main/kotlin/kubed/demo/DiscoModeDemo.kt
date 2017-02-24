@@ -35,7 +35,7 @@ class DiscoModeDemo: Application() {
                 .stroke(Color.BLACK)
                 .fill(Color.GREEN)
         root.selectAll<Node>()
-                .data(listOf(x.domain))
+                .data(x.domain)
                 .enter().append { d, _, _ -> c(d as Double) }
                 .bind({ _, _, _ -> translateYProperty() }, primaryStage!!.heightProperty().divide(2).subtract(margin + 25.0 / 2))
                 .transition()

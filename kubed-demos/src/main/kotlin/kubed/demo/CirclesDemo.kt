@@ -28,7 +28,7 @@ class CirclesDemo : Application() {
         }
 
         val circle = root.selectAll<Node>()
-                .data(listOf((0..5000).map { Data(width * Math.random(), height * Math.random(), Math.random() - 0.5, Math.random() - 0.5) }))
+                .data((0..5000).map { Data(width * Math.random(), height * Math.random(), Math.random() - 0.5, Math.random() - 0.5) })
                 .enter().append { d, _, _ -> c(d as Data) }
 
         val timer = object : AnimationTimer() {

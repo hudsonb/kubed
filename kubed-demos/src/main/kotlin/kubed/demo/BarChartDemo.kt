@@ -65,7 +65,7 @@ class BarChartDemo: Application() {
     }
 
     root.selectAll(".bar")
-        .data(listOf(data))
+        .data(data)
         .enter()
         .append { d, _, _ -> bar(d as LetterFrequency) }
 

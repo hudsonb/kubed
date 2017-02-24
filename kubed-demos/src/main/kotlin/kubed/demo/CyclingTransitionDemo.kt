@@ -46,7 +46,7 @@ class CyclingTransitionDemo : Application() {
         }
 
         root.selectAll<Node>()
-             .data(listOf(y.domain))
+             .data(y.domain)
              .enter().append { d, _, _ -> c(d as Double) }
              .transition()
              .delay { d, _, _ -> Duration.millis(d as Double * 40) }

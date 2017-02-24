@@ -99,3 +99,6 @@ fun <T> text(init: Text<T>.() -> Unit): Text<T> {
     text.init()
     return text
 }
+
+fun <T> pie() = Pie<T>()
+fun <T> pie(init: Pie<T>.() -> Unit) = Pie<T>().apply { init.invoke(this) }
