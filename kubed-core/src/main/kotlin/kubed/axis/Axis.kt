@@ -4,11 +4,9 @@ package kubed.axis
 import javafx.geometry.Side
 import javafx.geometry.VPos
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.paint.Color
 import javafx.scene.shape.*
 import javafx.scene.text.Font
-import javafx.scene.text.TextAlignment
 import javafx.scene.transform.Translate
 import kubed.scale.BandScale
 import kubed.scale.Scale
@@ -80,7 +78,7 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
 
     private fun identity(scale: Scale<D, R>): (d: D) -> R = { d -> scale(d) }
 
-    operator fun invoke(sel: Selection) {
+    operator fun <T> invoke(sel: Selection<T>) {
         val values = ArrayList<D>()
         if(tickValues == null)
         {
@@ -96,18 +94,18 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
         val range0 = range.first().toDouble() + 0.5
         val range1 = range.last().toDouble() + 0.5
         val position = if(scale is BandScale) center(scale) else identity(scale) // TODO: Pass copy of scale
-        var path = sel.selectAll(".domain").data(listOf(Unit))
-        var tick = sel.selectAll(".tick").data(values as List<Any>, { d, _, _ -> scale(d as D) })
+        var path = sel.selectAll<Unit>(".domain").data(listOf(Unit))
+        var tick = sel.selectAll<D>(".tick").data(values, { d, _, _ -> scale(d) })
         val tickExit = tick.exit()
-        val tickEnter = tick.enter().append(fun(): Node {
+        val tickEnter = tick.enter().append { _, _, _ ->
             val g = Group()
             g.styleClass += "tick"
-            return g
-        })
+            g
+        }
         var line = tick.select("line")
         var text = tick.select("text")
         
-        path = path.merge(path.enter().append(fun(): Node { return Path() })
+        path = path.merge(path.enter().append { _, _, _ -> Path() }
                                       .classed("domain")
                                       .stroke(Color.BLACK))
 
@@ -124,25 +122,25 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
             stroke(Color.BLACK)
         }
 
-        line = line.merge(tickEnter.append { _, _, _-> lineSegment(Unit)})
+       line = line.merge(tickEnter.append { _, _, _-> lineSegment(Unit)})
 
         val label = text<D> {
-            text { d -> formatter(d) }
-            textAnchor {
-                when (side) {
+            text { d, _ -> formatter(d) }
+            textAnchor { _, _ ->
+                when(side) {
                     Side.RIGHT -> TextAnchor.START
                     Side.LEFT -> TextAnchor.END
                     else -> TextAnchor.MIDDLE
                 }
             }
-            textOrigin { if(vertical) VPos.CENTER else VPos.TOP }
+            textOrigin { _, _ -> if(vertical) VPos.CENTER else VPos.TOP }
             font(Font("sans-serif", 10.0))
             fill(Color.BLACK)
             x(if(vertical) k * spacing else 0.5)
             y(if(vertical) 0.5 else k * spacing)
         }
 
-        text = text.merge(tickEnter.append { d, _, _ -> label(d as D) })
+        text = text.merge(tickEnter.append { d, _, _ -> label(d) })
 
         tickExit.remove()
 
