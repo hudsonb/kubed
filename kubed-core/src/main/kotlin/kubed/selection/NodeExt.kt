@@ -3,14 +3,23 @@ package kubed.selection
 import javafx.scene.Node
 import javafx.scene.Parent
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.comparisons.compareBy
+
+fun <T> Node.selection(): Selection<T> {
+    val sel = Selection<T>()
+    val group = Group(this)
+    sel += group
+
+    return sel
+}
 
 /**
  * Selects the first node that matches the specified selector. If no nodes match the selector, returns an emptySelection selection.
  * If multiple elements match the selector only the first matching element (in scene graph order) will be selected.
  */
-fun Node.select(selector: String): Selection {
-    val sel = Selection()
+fun <T> Node.select(selector: String): Selection<T> {
+    val sel = Selection<T>()
     val group = Group(this)
     sel += group
 
@@ -30,36 +39,25 @@ fun Node.select(selector: String): Selection {
     return sel
 }
 
-/**
- *
- */
-fun Node.select(node: Node): Selection {
-    // Consider: Should we support this? What if the Node has not been added to the Scene or if it is not a descendant
-    //           of this node?
-    TODO("Not yet implemented")
-}
-
-fun Node.emptySelection(): Selection {
-    val sel = Selection()
-    val group = Group(this)
-    sel.plusAssign(group)
-    return sel
-}
-
-inline fun <reified T : Node> Node.selectAll(): Selection {
-    val sel = Selection()
-    val group = Group(this)
-    sel.plusAssign(group)
-    group.addAll(lookupChildrenOfType<T>())
-    return sel
-}
-
-fun Node.selectAll(selector: String): Selection {
-    val sel = Selection()
+fun <T> Node.selectAll(): Selection<T> {
+    val sel = Selection<T>()
     val group = Group(this)
     sel += group
 
-    val nodes = lookupAll(selector)
+    return sel
+}
+
+fun <T> Node.selectAll(selector: String): Selection<T> {
+    val sel = Selection<T>()
+    val group = Group(this)
+    sel += group
+
+    var nodes = lookupAll(selector)
+    if(nodes.contains(this))
+    {
+        nodes = HashSet(nodes)
+        nodes.remove(this)
+    }
     group.addAll(nodes.sortedWith(compareBy(Node::depth, Node::pos)))
 
     return sel
@@ -89,23 +87,35 @@ internal fun Node.lookupAllChildren(selector: String): Set<Node> {
     return set
 }
 
+internal const val DATA_PROPERTY: String = "__data__"
+
 /**
  * The datum associated with this Node, or Selection.UNDEFINED if there is none.
  */
 var Node.datum: Any?
-    get() = properties[Selection.DATA_PROPERTY]
-    set(value) { properties[Selection.DATA_PROPERTY] = value }
+    get() = properties[DATA_PROPERTY]
+    set(value) { properties[DATA_PROPERTY] = value }
+
+
+internal const val KEY_PROPERTY: String = "__key__"
+
+/**
+ * The key associated with this Node.
+ */
+var Node.key: Any?
+    get() = properties[KEY_PROPERTY]
+    set(value) { properties[KEY_PROPERTY] = value }
 
 /**
  * The position of the node within it's parent list of children, or -1 if it is orphaned.
  */
-internal val Node.pos: Int
+val Node.pos: Int
     get() = parent?.childrenUnmodifiable?.indexOf(this) ?: -1
 
 /**
  * The depth of the node in the scene graph, or -1 if it is orphaned.
  */
-internal val Node.depth: Int
+val Node.depth: Int
     get() {
         var depth = -1
 

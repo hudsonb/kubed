@@ -7,25 +7,25 @@ import kubed.shape.Shape
 import kubed.util.MoreMath
 
 class Symbol<T> : Shape<Symbol<T>, T>() {
-    var type: (d: T) -> SymbolType = { symbolCircle() }
-    var size: (d: T) -> Double = { 64.0 }
+    var type: (T, Int) -> SymbolType = { _, _ -> symbolCircle() }
+    var size: (T, Int) -> Double = { _, _ -> 64.0 }
 
-    fun type(value: SymbolType) = type { value }
-    fun type(func: (T) -> SymbolType): Symbol<T> {
+    fun type(value: SymbolType) = type { _, _ -> value }
+    fun type(func: (T, Int) -> SymbolType): Symbol<T> {
         type = func
         return this
     }
 
-    fun size(value: Double) = size { value }
-    fun size(func: (T) -> Double): Symbol<T> {
+    fun size(value: Double) = size { _, _ -> value }
+    fun size(func: (T, Int) -> Double): Symbol<T> {
         size = func
         return this
     }
 
-    override fun invoke(d: T): javafx.scene.shape.Shape {
-        val symbol = type(d)
-        val shape = symbol.create(size(d))
-        apply(d, shape)
+    override fun invoke(d: T, i: Int): javafx.scene.shape.Shape {
+        val symbol = type(d, i)
+        val shape = symbol.create(size(d, i))
+        apply(d, i, shape)
 
         return shape
     }

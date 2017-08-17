@@ -67,5 +67,5 @@ class RadialArea<T> : PathShape<RadialArea<T>, List<T>>() {
         return this
     }
 
-    override fun generate(d: List<T>) = area.generate(d)
+    override fun generate(d: List<T>, i: Int) = area.generate(d, i)
 }

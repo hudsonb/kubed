@@ -16,30 +16,24 @@ import javafx.scene.transform.Transform
 import java.util.*
 import kotlin.comparisons.compareBy
 
-open class Selection() : BaseSelection<Selection> {
-    companion object {
-        val UNDEFINED = Any()
-        internal val EMPTY_SELECTION = Selection()
-        internal const val DATA_PROPERTY: String = "__data__"
-    }
-
+open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
     val groups = ArrayList<Group>()
 
-    var undefined = UNDEFINED
+    var appender: (parent: Node, i: Int, child: Node) -> Unit = ::addNode
 
-    private var enter: Selection? = null
-    private var exit: Selection? = null
+    private var enter: Selection<T>? = null
+    private var exit: Selection<T>? = null
 
-    fun enter(): Selection {
+    fun enter(): Selection<T> {
         if(enter == null)
-            return EMPTY_SELECTION
+            throw IllegalStateException()
 
         return Selection(enter!!)
     }
 
-    fun exit(): Selection {
+    fun exit(): Selection<T> {
         if(exit == null)
-            return EMPTY_SELECTION
+            throw IllegalStateException()
 
         return Selection(exit!!)
     }
@@ -47,7 +41,7 @@ open class Selection() : BaseSelection<Selection> {
     /**
      * Copy constructor.
      */
-    constructor(other: Selection) : this() {
+    constructor(other: Selection<T>) : this() {
         for(g in other.groups) {
             val group = Group(g.parent)
             for(e in g)
@@ -56,8 +50,8 @@ open class Selection() : BaseSelection<Selection> {
             groups += group
         }
 
-        enter = other.enter()
-        exit = other.exit()
+        enter = if(other.enter != null) other.enter() else null
+        exit = if(other.exit != null) other.exit() else null
     }
 
     /**
@@ -65,14 +59,6 @@ open class Selection() : BaseSelection<Selection> {
      */
     val empty: Boolean
         get() = groups.any { !it.empty }
-
-    /**
-     * Sets the undefined value; the value returned when there is no data associated with a [Node] in the scenegraph.
-     */
-    fun undefined(value: Any): Selection {
-        undefined = value
-        return this
-    }
 
     /**
      * For each selected element, selects the first descendant element that matches the specified [selector]. If no
@@ -86,8 +72,8 @@ open class Selection() : BaseSelection<Selection> {
      *
      * Unlike [selectAll], [select] does not affect grouping: it preserves the existing group structure and indexes.
      */
-    fun select(selector: String?): Selection {
-        val sel = Selection()
+    fun select(selector: String?): Selection<T> {
+        val sel = Selection<T>()
 
         if(selector == null) {
             for(g in groups) {
@@ -122,6 +108,10 @@ open class Selection() : BaseSelection<Selection> {
         return sel
     }
 
+    fun select(selector: String?, f: Selection<T>.() -> Unit) {
+        f(select(selector))
+    }
+
     /**
      * For each selected element, selects the first descendant element returned by the specified [selector]. If no
      * descendant matches the specified [selector] for the current element, the element at the current index will be
@@ -132,8 +122,8 @@ open class Selection() : BaseSelection<Selection> {
      *
      * Unlike [selectAll], [select] does not affect grouping: it preserves the existing group structure and indexes.
      */
-    fun select(selector: (d: Any, i: Int, nodes: List<Node?>) -> Node?): Selection {
-        val sel = Selection()
+    fun select(selector: (d: T, i: Int, nodes: List<Node?>) -> Node?): Selection<T> {
+        val sel = Selection<T>()
 
         for(g in groups) {
             val newGroup = Group(g.parent)
@@ -143,7 +133,7 @@ open class Selection() : BaseSelection<Selection> {
                 val e = g[i]
                 if(e is Node) {
                     val nodes = g.map { if(it is Node) it else null }
-                    val selNode = selector(e.datum ?: undefined, i, nodes)
+                    val selNode = selector(e.datum as T, i, nodes)
                     if(selNode != null) {
                         selNode.datum = e.datum
                         newGroup += selNode
@@ -159,7 +149,9 @@ open class Selection() : BaseSelection<Selection> {
         return sel
     }
 
-    fun selectAll() = selectAll("*")
+    fun select(selector: (d: T, i: Int, nodes: List<Node?>) -> Node?, f: Selection<T>.() -> Unit) {
+        f(select(selector))
+    }
 
     /**
      * For each selected element, selects the descendant elements that match the specified [selector]. The elements in
@@ -171,8 +163,8 @@ open class Selection() : BaseSelection<Selection> {
      * Unlike [select], [selectAll] does affect grouping: each selected descendant is grouped by
      * the parent element in the originating selection.
      */
-    fun selectAll(selector: String?): Selection {
-        val sel = Selection()
+    fun <T2> selectAll(selector: String?): Selection<T2> {
+        val sel = Selection<T2>()
 
         for(g in groups) {
             for(i in g.indices) {
@@ -191,19 +183,11 @@ open class Selection() : BaseSelection<Selection> {
             }
         }
 
-//        groups.flatMap { it }
-//              .filterIsInstance<Node>()
-//              .forEach {
-//                  if(selector != null) {
-//                      val group = Group(it)
-//                      sel += group
-//
-//                      val nodes = it.lookupAllChildren(selector)
-//                      group.addAll(nodes.sortedWith(compareBy(Node::depth, Node::pos)))
-//                  }
-//              }
-
         return sel
+    }
+
+    fun <T2> selectAll(selector: String?, f: Selection<T2>.() -> Unit) {
+        f(selectAll(selector))
     }
 
     /**
@@ -212,12 +196,12 @@ open class Selection() : BaseSelection<Selection> {
      *
      * If [value] is null, the bound data will be removed from the selected elements.
      */
-    fun datum(value: Any?): Selection {
+    fun datum(value: T): Selection<T> {
         for(g in groups) {
             for(e in g) {
                 when(e) {
                     is Node -> e.datum = value
-                    is Placeholder -> e.datum = value ?: undefined
+                    is Placeholder -> e.datum = value as Any // Huh?
                 }
             }
         }
@@ -234,13 +218,13 @@ open class Selection() : BaseSelection<Selection> {
      * The value returned from the [value] function is then bound to the element. If null is returned, the element will
      * be bound to [undefined].
      */
-    fun datum(value: (d: Any, i: Int, nodes: List<Node?>) -> Any?): Selection {
+    fun datum(value: (d: T, i: Int, nodes: List<Node?>) -> T?): Selection<T> {
         for(g in groups) {
             for(i in g.indices) {
                 val e = g[i]
                 if(e is Node) {
                     val nodes = g.map { if(it is Node) it else null }
-                    val datum = value(e.datum ?: undefined, i, nodes) ?: undefined
+                    val datum = value(e.datum as T, i, nodes)
                     e.datum = datum
                 }
             }
@@ -250,7 +234,7 @@ open class Selection() : BaseSelection<Selection> {
     }
 
     /**
-     * Joins the specified array of data with the selected elements, returning a new selection that it represents the
+     * Joins the specified array of data with the selected elements, returning a new selection that represents the
      * _update_ selection: the elements successfully bound to data. Also defines the enter and exit selections on the
      * returned selection, which can be used to add or remove elements to correspond to the new data. The specified
      * [data] is a [List] of arbitrary values (_e.g._, numbers or objects).
@@ -260,23 +244,24 @@ open class Selection() : BaseSelection<Selection> {
      *
      * The data is specified *for each group* in the selection.
      */
-    fun data(data: List<*>, key: (d: Any?, i: Int, groupDatum: Any) -> Any = { _, i, _ -> i }) = data( { _, _, _ -> data }, key)
+    fun data(data: List<T>, key: (d: T, i: Int, groupDatum: Any?) -> Any = { _, i, _ -> i }) =
+            data<Any?>({ _, _, _ -> data }, key)
 
-    fun data(data: (d: Any, i: Int, nodes: List<Node?>) -> List<*>,
-             key: (d: Any?, i: Int, groupDatum: Any) -> Any = { _, i, _ -> i }): Selection {
-        val sel = Selection()
-        val enter = Selection()
-        val exit = Selection()
+    fun <G> data(data: (d: G?, i: Int, nodes: List<Node?>) -> List<T>,
+             key: (d: T, i: Int, groupDatum: Any?) -> Any = { _, i, _ -> i }): Selection<T> {
+        val sel = Selection<T>()
+        val enter = Selection<T>()
+        val exit = Selection<T>()
         sel.enter = enter
         sel.exit = exit
 
         val parentNodes = groups.map { it.parent }
 
-        val dataList = ArrayList<List<*>>(groups.size)
+        val dataList = ArrayList<List<T>>(groups.size)
         for(i in groups.indices) {
             val g = groups[i]
-            val d = g.parent.datum ?: undefined
-            dataList.add(data(d, i, parentNodes))
+            val d = g.parent.datum
+            dataList.add(data(d as? G, i, parentNodes))
         }
 
         for(i in groups.indices) {
@@ -293,8 +278,8 @@ open class Selection() : BaseSelection<Selection> {
                 val e = g[j]
 
                 val k = when(e) {
-                    is Node -> key(e.datum ?: undefined, j, g)
-                    is Placeholder -> key(e.datum, j, g)
+                    is Node -> e.key//key(e.datum as G, j, g)
+                    is Placeholder -> e.key//key(e.datum as G, j, g)
                     else -> null
                 }
                 oldKeys += k
@@ -303,7 +288,7 @@ open class Selection() : BaseSelection<Selection> {
             val groupData = dataList[i]
             val newKeys = ArrayList<Any?>(groupData.size)
             for(j in groupData.indices)
-                newKeys += key(groupData[j], j, g.parent.datum ?: undefined)
+                newKeys += key(groupData[j], j, g.parent.datum)
 
             val remove = BooleanArray(oldKeys.size, { true })
             for(j in newKeys.indices) {
@@ -320,7 +305,7 @@ open class Selection() : BaseSelection<Selection> {
                     remove[index] = false
                 }
                 else {
-                    enterGroup += Placeholder(g.parent, groupData[j]!!)
+                    enterGroup += Placeholder(g.parent, k, groupData[j])
                     updateGroup.add(null)
                 }
             }
@@ -336,44 +321,43 @@ open class Selection() : BaseSelection<Selection> {
         return sel
     }
 
-    fun append(node: () -> Node, append: (parent: Node, i: Int, child: Node) -> Unit = ::addNode): Selection {
-        val sel = Selection()
-
-        for(g in groups) {
-            val newGroup = Group(g.parent)
-            sel.groups += newGroup
-
-            if(g.isEmpty()) {
-                val newNode = node()
-                append(g.parent, -1, newNode)
-                newGroup += newNode
-            }
-            else {
-                for(i in g.indices) {
-                    val e = g[i]
-                    when(e) {
-                        is Node -> {
-                            val newNode = node()
-                            newNode.datum = e.datum
-                            append(e, -1, newNode)
-                            newGroup += newNode
-                        }
-                        is Placeholder -> {
-                            val newNode = node()
-                            newNode.datum = e.datum
-                            append(e.parent, -1, newNode)
-                            newGroup += newNode
-                        }
-                        else -> newGroup.add(null)
-                    }
-                }
-            }
-        }
-
-        return sel
-    }
-
-    fun append(node: (datum: Any, index: Int, nodes: List<Node?>) -> Node) = append(node, ::addNode)
+//    fun append(node: () -> Node): Selection<T> {
+//        val sel = Selection<T>()
+//
+//        for(g in groups) {
+//            val newGroup = Group(g.parent)
+//            sel.groups += newGroup
+//
+//            if(g.isEmpty()) {
+//                val newNode = node()
+//                newNode.datum = g.parent.datum
+//                append(g.parent, -1, newNode)
+//                newGroup += newNode
+//            }
+//            else {
+//                for(i in g.indices) {
+//                    val e = g[i]
+//                    when(e) {
+//                        is Node -> {
+//                            val newNode = node()
+//                            newNode.datum = e.datum
+//                            append(e, -1, newNode)
+//                            newGroup += newNode
+//                        }
+//                        is Placeholder -> {
+//                            val newNode = node()
+//                            newNode.datum = e.datum
+//                            append(e.parent, -1, newNode)
+//                            newGroup += newNode
+//                        }
+//                        else -> newGroup.add(null)
+//                    }
+//                }
+//            }
+//        }
+//
+//        return sel
+//    }
 
     /**
      * Evaluates the [node] function for each selected element, in order, being passed:
@@ -397,29 +381,36 @@ open class Selection() : BaseSelection<Selection> {
      * [javafx.scene.Group] or [javafx.scene.layout.Pane]. If parent is not a subclass of either of these types an
      * [IllegalArgumentException] is thrown.
      */
-    open fun append(node: (datum: Any, index: Int, nodes: List<Node?>) -> Node,
-                    append: (parent: Node, i: Int, child: Node) -> Unit): Selection {
-        val sel = Selection()
+    open fun append(node: (datum: T, index: Int, nodes: List<Node?>) -> Node): Selection<T> {
+        val sel = Selection<T>()
 
-        for(g in groups) {
+        for(i in groups.indices) {
+            val g = groups[i]
             val newGroup = Group(g.parent)
             sel.groups += newGroup
 
-            for(i in g.indices) {
-                val e = g[i]
-                val nodes = g.map { if(it is Node) it else null }
+            val nodes = g.filterIsInstance<Node>()
+            val newNodes = ArrayList<Node>(g.size)
+            for(j in g.indices) {
+                val e = g[j]
                 when(e) {
                     is Node -> {
-                        val newNode = node(e.datum ?: undefined, i, nodes)
+                        val newNode = node(e.datum as T, j, nodes)
                         newNode.datum = e.datum
-                        append(e, -1, newNode)
+                        newNode.key = e.key
+                        appender(e, -1, newNode)
+                        newNodes += newNode
                         newGroup += newNode
                     }
                     is Placeholder -> {
-                        val newNode = node(e.datum, i, nodes)
-                        newNode.datum = e.datum
-                        append(e.parent, -1, newNode)
-                        newGroup += newNode
+                        if(e.datum != null) {
+                            val newNode = node(e.datum as T, j, nodes)
+                            newNode.datum = e.datum
+                            newNode.key = e.key
+                            newNodes += newNode
+                            appender(e.parent, -1, newNode)
+                            newGroup += newNode
+                        }
                     }
                     else -> newGroup.add(null)
                 }
@@ -429,36 +420,77 @@ open class Selection() : BaseSelection<Selection> {
         return sel
     }
 
-    fun classed(vararg styleClasses: String, apply: Boolean = true): Selection {
+    fun append(node: () -> Node): Selection<T> {
+        val sel = Selection<T>()
+
+        for(g in groups) {
+            val newGroup = Group(g.parent)
+            sel.groups += newGroup
+
+            if(g.isEmpty()) {
+                val newNode = node()
+                newNode.datum = g.parent.datum
+                appender(g.parent, -1, newNode)
+                newGroup += newNode
+            }
+            else {
+                for(i in g.indices) {
+                    val e = g[i]
+                    when(e) {
+                        is Node -> {
+                            val newNode = node()
+                            newNode.datum = e.datum
+                            appender(e, -1, newNode)
+                            newGroup += newNode
+                        }
+                        is Placeholder -> {
+                            val newNode = node()
+                            newNode.datum = e.datum
+                            appender(e.parent, -1, newNode)
+                            newGroup += newNode
+                        }
+                        else -> newGroup.add(null)
+                    }
+                }
+            }
+        }
+
+        return sel
+    }
+
+    fun styleClasses(values: (datum: T, index: Int, nodes: List<Node?>) -> List<String>): Selection<T> =
+            forEach<Node> { d, i, group -> styleClass += values(d, i, group) }
+
+    fun classed(vararg styleClasses: String, apply: Boolean = true): Selection<T> {
         if(styleClasses.isNotEmpty()) {
             groups.flatMap { it }
-                  .filterIsInstance<Node>()
-                  .forEach {
-                      if(apply) it.styleClass += styleClasses
-                      else it.styleClass -= styleClasses
-                  }
+                    .filterIsInstance<Node>()
+                    .forEach {
+                        if(apply) it.styleClass += styleClasses
+                        else it.styleClass -= styleClasses
+                    }
         }
 
         return this
     }
 
-    fun classed(vararg styleClasses: String, apply: (d: Any, i: Int, nodes: List<Node?>) -> Boolean) =
-        forEach<Node> { d, i, group ->
-            if(apply(d, i, group))
-                styleClass += styleClasses
-            else
-                styleClass -= styleClasses
-        }
+    fun classed(vararg styleClasses: String, apply: (d: T, i: Int, nodes: List<Node?>) -> Boolean) =
+            forEach<Node> { d, i, group ->
+                if(apply(d, i, group))
+                    styleClass += styleClasses
+                else
+                    styleClass -= styleClasses
+            }
 
     /**
      * Appends the given key/value pair to the [Node]'s [Node.style] property.
      *
      * If the value is null, the given key is removed from the [Node]'s [Node.style] property.
      */
-    fun style(key: String, value: String?): Selection {
+    fun style(key: String, value: String?): Selection<T> {
         groups.flatMap { it }
-              .filterIsInstance<Node>()
-              .forEach { style(it, key, value) }
+                .filterIsInstance<Node>()
+                .forEach { style(it, key, value) }
 
         return this
     }
@@ -470,7 +502,7 @@ open class Selection() : BaseSelection<Selection> {
      * @param values Value(s)
      * @param units The units to append to each numeric value. Defaults to an emptySelection string.
      */
-    fun style(key: String, vararg values: Number, units: String = ""): Selection {
+    fun style(key: String, vararg values: Number, units: String = ""): Selection<T> {
         val joiner = StringJoiner(" ")
         values.forEach { joiner.add(it.toString() + units) }
         return style(key, joiner.toString())
@@ -479,10 +511,10 @@ open class Selection() : BaseSelection<Selection> {
     /**
      *
      */
-    fun style(key: String, value: (d: Any, i: Int, nodes: List<Node?>) -> String?) =
+    fun style(key: String, value: (d: T, i: Int, nodes: List<Node?>) -> String?) =
             forEach<Node> { d, i, group -> style(this, key, value(d, i, group)) }
 
-    fun effect(effect: Effect): Selection {
+    fun effect(effect: Effect): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.effect = effect }
@@ -490,8 +522,8 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    fun effect(value: (d: Any, i: Int, group: List<Node?>) -> Effect) =
-        forEach<Node> { d, i, group -> effect = value(d, i, group) }
+    fun effect(value: (d: T, i: Int, group: List<Node?>) -> Effect) =
+            forEach<Node> { d, i, group -> effect = value(d, i, group) }
 
     /**
      *
@@ -499,14 +531,14 @@ open class Selection() : BaseSelection<Selection> {
     fun remove(remove: (node: Node) -> Unit = ::removeNode) {
         for(g in groups) {
             g.filterIsInstance<Node>()
-             .forEach { remove(it) }
+                    .forEach { remove(it) }
         }
     }
 
     /**
      *
      */
-    fun merge(other: Selection): Selection {
+    fun merge(other: Selection<T>): Selection<T> {
         val sel = Selection(this)
 
         for(i in sel.groups.indices) {
@@ -527,23 +559,23 @@ open class Selection() : BaseSelection<Selection> {
         return sel
     }
 
-    inline fun <reified T : Node> forEach(action: T.(d: Any, i: Int, group: List<Node?>) -> Unit): Selection {
+    inline fun <reified N : Node> forEach(action: N.(d: T, i: Int, group: List<Node?>) -> Unit): Selection<T> {
         for(i in groups.indices) {
             val group = groups[i]
-            val nodes = group.map { if(it is T) it else null }
+            val nodes = group.map { if(it is N) it else null }
             for(j in group.indices) {
                 val e = group[j]
-                if(e is T) action(e, e.datum ?: undefined, j, nodes)
+                if(e is N) action(e, e.datum as T, j, nodes)
             }
         }
 
         return this
     }
 
-    fun cursor(value: (d: Any, i: Int, group: List<Node?>) -> Cursor) =
-        forEach<Node> { d, i, group -> cursor = value(d, i, group)}
+    fun cursor(value: (d: T, i: Int, group: List<Node?>) -> Cursor) =
+            forEach<Node> { d, i, group -> cursor = value(d, i, group)}
 
-    fun cursor(cursor: Cursor): Selection {
+    fun cursor(cursor: Cursor): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.cursor = cursor }
@@ -551,10 +583,10 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun opacity(value: (d: Any, i: Int, group: List<Node?>) -> Double): Selection =
+    override fun opacity(value: (d: T, i: Int, group: List<Node?>) -> Double): Selection<T> =
             forEach<Node> { d, i, group -> opacity = value(d, i, group) }
 
-    override fun opacity(value: Double): Selection {
+    override fun opacity(value: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.opacity = value }
@@ -562,7 +594,7 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    fun rotate(rotate: Double): Selection {
+    fun rotate(rotate: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.rotate = rotate }
@@ -570,10 +602,10 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    fun rotate(angle: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    fun rotate(angle: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group -> rotate = angle(d, i, group) }
 
-    fun rotationAxis(axis: Point3D): Selection {
+    fun rotationAxis(axis: Point3D): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.rotationAxis = axis }
@@ -581,10 +613,10 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    fun rotationAxis(axis: (d: Any, i: Int, group: List<Node?>) -> Point3D) =
+    fun rotationAxis(axis: (d: T, i: Int, group: List<Node?>) -> Point3D) =
             forEach<Node> { d, i, group -> rotationAxis = axis(d, i, group) }
 
-    override fun rotateX(angle: Double): Selection {
+    override fun rotateX(angle: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -595,13 +627,13 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun rotateX(angle: (d: Any, i: Int, group: List<Node?>) -> Double) =
-        forEach<Node> { d, i, group ->
-            rotationAxis = Rotate.X_AXIS
-            rotate = angle(d, i, group)
-        }
+    override fun rotateX(angle: (d: T, i: Int, group: List<Node?>) -> Double) =
+            forEach<Node> { d, i, group ->
+                rotationAxis = Rotate.X_AXIS
+                rotate = angle(d, i, group)
+            }
 
-    override fun rotateY(angle: Double): Selection {
+    override fun rotateY(angle: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -612,13 +644,13 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun rotateY(angle: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    override fun rotateY(angle: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group ->
                 rotationAxis = Rotate.Y_AXIS
                 rotate = angle(d, i, group)
             }
 
-    override fun rotateZ(angle: Double): Selection {
+    override fun rotateZ(angle: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -629,13 +661,13 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun rotateZ(angle: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    override fun rotateZ(angle: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group ->
                 rotationAxis = Rotate.Z_AXIS
                 rotate = angle(d, i, group)
             }
 
-    override fun scaleX(x: Double): Selection {
+    override fun scaleX(x: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.scaleX = x }
@@ -643,10 +675,10 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun scaleX(x: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    override fun scaleX(x: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group -> scaleX = x(d, i, group) }
 
-    override fun scaleY(y: Double): Selection {
+    override fun scaleY(y: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.scaleY = y }
@@ -654,10 +686,10 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun scaleY(y: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    override fun scaleY(y: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group -> scaleY = y(d, i, group) }
 
-    override fun scaleZ(z: Double): Selection {
+    override fun scaleZ(z: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.scaleZ = z }
@@ -665,10 +697,10 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun scaleZ(z: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    override fun scaleZ(z: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group -> scaleZ = z(d, i, group)}
 
-    override fun translateX(x: Double): Selection {
+    override fun translateX(x: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.translateX = x }
@@ -676,11 +708,11 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun translateX(x: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    override fun translateX(x: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group -> translateX = x(d, i, group) }
 
 
-    override fun translateY(y: Double): Selection {
+    override fun translateY(y: Double): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.translateY = y }
@@ -688,21 +720,21 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun translateY(y: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    override fun translateY(y: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group -> translateY = y(d, i, group) }
 
-    override fun translateZ(z: Double): Selection {
+    override fun translateZ(z: Double): Selection<T> {
         groups.flatMap { it }
-              .filterIsInstance<Node>()
-              .forEach { it.translateZ = z }
+                .filterIsInstance<Node>()
+                .forEach { it.translateZ = z }
 
         return this
     }
 
-    override fun translateZ(z: (d: Any, i: Int, group: List<Node?>) -> Double) =
+    override fun translateZ(z: (d: T, i: Int, group: List<Node?>) -> Double) =
             forEach<Node> { d, i, group -> translateZ = z(d, i, group) }
 
-    fun transform(transforms: List<Transform>): Selection {
+    fun transform(transforms: List<Transform>): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.transforms.setAll(transforms) }
@@ -710,10 +742,10 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    fun transform(values: (d: Any, i: Int, group: List<Node?>) -> List<Transform>) =
+    fun transform(values: (d: T, i: Int, group: List<Node?>) -> List<Transform>) =
             forEach<Node> { d, i, group -> transforms.setAll(values(d, i, group))}
 
-    fun visible(visible: Boolean): Selection {
+    fun visible(visible: Boolean): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { it.isVisible = visible }
@@ -721,16 +753,16 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    fun visible(value: (d: Any, i: Int, group: List<Node?>) -> Boolean) =
+    fun visible(value: (d: T, i: Int, group: List<Node?>) -> Boolean) =
             forEach<Node> { d, i, group -> isVisible = value(d, i, group )}
 
-    fun <T> bind(accessor: Node.(d: Any, i: Int, group: List<Node?>) -> Property<T>?, value: ObservableValue<T>) =
-        forEach<Node> { d, i, group -> accessor(d, i, group)?.bind(value) }
+    fun <P> bind(accessor: Node.(d: T, i: Int, group: List<Node?>) -> Property<P>?, value: ObservableValue<P>) =
+            forEach<Node> { d, i, group -> accessor(d, i, group)?.bind(value) }
 
-    fun <T> unbind(accessor: Node.(d: Any, i: Int, group: List<Node?>) -> Property<T>?) =
+    fun <P> unbind(accessor: Node.(d: T, i: Int, group: List<Node?>) -> Property<P>?) =
             forEach<Node> { d, i, group -> accessor(d, i, group)?.unbind() }
 
-    override fun fill(paint: Paint): Selection {
+    override fun fill(paint: Paint): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Shape>()
                 .forEach { it.fill = paint }
@@ -738,10 +770,10 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun fill(paint: (d: Any, i: Int, group: List<Node?>) -> Paint) =
+    override fun fill(paint: (d: T, i: Int, group: List<Node?>) -> Paint) =
             forEach<Shape> { d, i, group -> fill = paint(d, i, group) }
 
-    override fun stroke(paint: Paint): Selection {
+    override fun stroke(paint: Paint): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Shape>()
                 .forEach { it.stroke = paint }
@@ -749,56 +781,56 @@ open class Selection() : BaseSelection<Selection> {
         return this
     }
 
-    override fun stroke(value: (d: Any, i: Int, group: List<Node?>) -> Paint) =
-        forEach<Shape> { d, i, group -> stroke = value(d, i, group) }
+    override fun stroke(value: (d: T, i: Int, group: List<Node?>) -> Paint) =
+            forEach<Shape> { d, i, group -> stroke = value(d, i, group) }
 
-    fun <E : Event, T : EventType<E>> on(type: T, handler: (E) -> Unit): Selection {
+    fun <E : Event, ET : EventType<E>> on(type: ET, handler: Node.(E) -> Unit): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
-                .forEach { it.addEventHandler(type, handler) }
+                .forEach { it.addEventHandler(type, { e -> it.handler(e) }) }
 
         return this
     }
 
-    fun <E : Event, T : EventType<E>> on(type: T, name: String, handler: (E) -> Unit): Selection {
+    fun <E : Event, ET : EventType<E>> on(type: ET, name: String, handler: (E) -> Unit): Selection<T> {
         groups.flatMap { it }
-              .filterIsInstance<Node>()
-              .forEach {
-                  // We can't simply use automatic SAM conversion because each conversion seems to create a different
-                  // instance, which causes removal to fail in off()
-                  val eventHandler = EventHandler<E> { e -> handler.invoke(e) }
-                  it.addEventHandler(type, eventHandler)
+                .filterIsInstance<Node>()
+                .forEach {
+                    // We can't simply use automatic SAM conversion because each conversion seems to create a different
+                    // instance, which causes removal to fail in off()
+                    val eventHandler = EventHandler<E> { e -> handler.invoke(e) }
+                    it.addEventHandler(type, eventHandler)
 
-                  var handlers: MutableMap<EventType<*>, MutableMap<String, Any>>? =
-                          it.properties["__handlers__"] as MutableMap<EventType<*>, MutableMap<String, Any>>?
+                    var handlers: MutableMap<EventType<*>, MutableMap<String, Any>>? =
+                            it.properties["__handlers__"] as MutableMap<EventType<*>, MutableMap<String, Any>>?
 
-                  if(handlers == null) {
-                      handlers = HashMap()
-                      it.properties["__handlers__"] = handlers
-                  }
+                    if(handlers == null) {
+                        handlers = HashMap()
+                        it.properties["__handlers__"] = handlers
+                    }
 
-                  var map: MutableMap<String, Any>? = handlers[type]
-                  if(map == null) {
-                      map = HashMap()
-                      handlers[type] = map
-                  }
+                    var map: MutableMap<String, Any>? = handlers[type]
+                    if(map == null) {
+                        map = HashMap()
+                        handlers[type] = map
+                    }
 
-                  try {
-                      val oldHandler = map[name] as ((E) -> Unit)?
-                      if (oldHandler != null)
-                          it.removeEventHandler(type, oldHandler)
-                  }
-                  catch(cce : ClassCastException) {
-                      // Failed to remove existing handler
-                  }
+                    try {
+                        val oldHandler = map[name] as ((E) -> Unit)?
+                        if (oldHandler != null)
+                            it.removeEventHandler(type, oldHandler)
+                    }
+                    catch(cce : ClassCastException) {
+                        // Failed to remove existing handler
+                    }
 
-                  map[name] = eventHandler
-              }
+                    map[name] = eventHandler
+                }
 
         return this
     }
 
-    fun <E : Event, T : EventType<E>> off(type: T, name: String): Selection {
+    fun <E : Event, ET : EventType<E>> off(type: ET, name: String): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -872,5 +904,4 @@ open class Selection() : BaseSelection<Selection> {
     }
 }
 
-private class Placeholder(val parent: Node, var datum: Any)
-
+private data class Placeholder(val parent: Node, var key: Any?, var datum: Any?)

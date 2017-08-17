@@ -409,34 +409,16 @@ fun Node.yAngle(): Double {
 //        properties["__transitions__"] = map
 //}
 
-internal fun Node.getTransitions(): MutableMap<String, MutableMap<Int, Transition>>? =
-        properties["__transitions__"] as MutableMap<String, MutableMap<Int, Transition>>?
+internal fun Node.getTransitions(): MutableMap<String, MutableMap<Int, Transition<*>>>? =
+        properties["__transitions__"] as MutableMap<String, MutableMap<Int, Transition<*>>>?
 
-internal fun Node.setTransitions(map: Map<String, MutableMap<Int, Transition>>?) {
+internal fun Node.setTransitions(map: Map<String, MutableMap<Int, Transition<*>>>?) {
     if(map == null)
         properties.remove("__transitions__")
     else
         properties["__transitions__"] = map
 }
 
-fun Node.active(name: String = ""): Transition? {
-    val outer = getTransitions()
-    if(outer != null) {
-        val transitions = outer[name]
-        if(transitions != null) {
-            val t = transitions[transitions.keys.max()]
-            if(t != null) {
-                val sel = Selection()
-                val group = Group(this.parent)
-                group += this
-                sel += group
-                val newTransition = Transition(t, sel, t.name)
-                val m = t.metadata[this] ?: TransitionMetadata(this)
-                newTransition.metadata[this] = TransitionMetadata(this, m.delay, m.duration, m.cacheHint, m.interpolator)
-                return newTransition
-            }
-        }
-    }
+fun Node.active(name: String? = null) {
 
-    return null
 }

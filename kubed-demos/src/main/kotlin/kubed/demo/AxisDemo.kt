@@ -2,18 +2,13 @@ package kubed.demo
 
 import javafx.application.Application
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.stage.Stage
-import kubed.selection.emptySelection
 import kubed.selection.selectAll
 import kubed.shape.circle
-import kubed.shape.text
-import javafx.scene.paint.Color
 import kubed.axis.axisBottom
 import kubed.axis.axisLeft
-import kubed.interpolate.interpolateNumber
-import kubed.scale.LinearScale
+import kubed.scale.scaleLinear
 
 class AxisDemo: Application() {
     override fun start(primaryStage: Stage?) {
@@ -38,40 +33,51 @@ class AxisDemo: Application() {
                            listOf(220, 88),
                            listOf(600, 150))
 
-        val xScale = LinearScale(::interpolateNumber).domain(listOf(0.0, data.map { it[0].toDouble() }.max() as Double))
-                                                     .range(listOf(padding, width - padding * 2))
+        val xScale = scaleLinear<Double> {
+            domain(listOf(0.0, data.map { it[0].toDouble() }.max() as Double))
+            range(listOf(padding, width - padding * 2))
+        }
 
-        val yScale = LinearScale(::interpolateNumber).domain(listOf(0.0, data.map { it[1].toDouble() }.max() as Double))
-                                                     .range(listOf(height - padding, padding))
+        val yScale = scaleLinear<Double> {
+            domain(listOf(0.0, data.map { it[1].toDouble() }.max() as Double))
+            range(listOf(height - padding, padding))
+        }
 
-        val rScale = LinearScale(::interpolateNumber).domain(listOf(0.0, data.map { it[1].toDouble() }.max() as Double))
-                                                     .range(listOf(2.0, 5.0))
+        val rScale = scaleLinear<Double> {
+            domain(listOf(0.0, data.map { it[1].toDouble() }.max() as Double))
+            range(listOf(2.0, 5.0))
+        }
 
-        val circle = circle<List<Int>>().radius { d -> rScale(d[1].toDouble())}
-                                       .translateX { d -> xScale(d[0].toDouble()) }
-                                       .translateY { d -> yScale(d[1].toDouble()) }
+        val circle = circle<List<Int>> {
+            radius { d, _ -> rScale(d[1].toDouble()) }
+            translateX { d, _ -> xScale(d[0].toDouble()) }
+            translateY { d, _ -> yScale(d[1].toDouble()) }
+        }
 
-        root.selectAll<Node>()
+        root.selectAll<List<Int>>("Circle")
             .data(data)
             .enter()
-            .append { d, _, _ -> circle(d as List<Int>) }
+            //.append { d, _, _ -> circle(d as List<Int>) }
 
         val xAxis = axisBottom(xScale) {
             tickCount = 5
             formatter = { d -> d.toInt().toString() }
         }
 
-        xAxis(root.emptySelection().append(fun(): Node { return Group() })
-                                   .classed("axis")
-                                   .translateY(height - padding))
+        xAxis(root.selectAll<Unit>("xAxis")
+                  .append { _, _, _ -> Group() }
+                  .classed("axis")
+                  .translateY(height - padding))
 
         val yAxis = axisLeft(yScale) {
             tickCount = 4
             formatter = { d -> d.toInt().toString() }
         }
-        yAxis(root.emptySelection().append(fun(): Node { return Group() })
-                                   .classed("axis")
-                                   .translateX(padding))
+
+        yAxis(root.selectAll<Unit>("yAxis")
+                  .append { _, _, _ -> Group() }
+                  .classed("axis")
+                  .translateX(padding))
 
         val scene = Scene(root)
         primaryStage?.width = width + padding * 2

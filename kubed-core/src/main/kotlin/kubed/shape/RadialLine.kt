@@ -55,5 +55,5 @@ class RadialLine<T> : PathShape<RadialLine<T>, List<T>>() {
         return this
     }
 
-    override fun generate(d: List<T>) = line.generate(d)
+    override fun generate(d: List<T>, i: Int) = line.generate(d, i)
 }

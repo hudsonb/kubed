@@ -40,16 +40,17 @@ class CyclingTransitionDemo : Application() {
 
         val c = circle<Double> {
             radius(25.0)
-            translateY(y::invoke)
             stroke(Color.BLACK)
-            fill { d: Double -> z(Math.abs(d % 20 - 10)).toColor() }
+
+            translateY { d, _ -> y(d) }
+            fill { d, _ -> z(Math.abs(d % 20 - 10)).toColor() }
         }
 
-        root.selectAll<Node>()
+        root.selectAll<Double>("Circle")
              .data(y.domain)
-             .enter().append { d, _, _ -> c(d as Double) }
+             .enter().append { d, _, _ -> c(d) }
              .transition()
-             .delay { d, _, _ -> Duration.millis(d as Double * 40) }
+             .delay { d, _, _ -> Duration.millis(d * 40) }
              .duration(Duration.millis(2500.0))
              .cycleCount(Timeline.INDEFINITE)
              .autoReverse(true)

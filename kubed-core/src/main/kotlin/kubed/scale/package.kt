@@ -1,8 +1,17 @@
 package kubed.scale
 
+import javafx.scene.paint.Color
 import kubed.interpolate.interpolateNumber
 
-inline fun <reified R> scaleLinear() {
+inline fun <reified R> scaleLinear(): LinearScale<R> = scaleLinear {}
+inline fun <reified R> scaleLinear(init: LinearScale<R>.() -> Unit): LinearScale<R> {
+    val interpolate = interpolator<R>()
+    val uninterpolate = uninterpolator<R>()
+    // TODO: Default comparators
+
+    val scale = LinearScale(interpolate as (R, R) -> (Double) -> R)
+    scale.init()
+    return scale
 }
 
 fun <D> scaleBand() = BandScale<D>()
@@ -11,8 +20,14 @@ fun <D> scaleBand(init: BandScale<D>.() -> Unit) = BandScale<D>().apply { init.i
 fun <D, R> scaleOrdinal() = OrdinalScale<D, R>()
 fun <D, R> scaleOrdinal(init: OrdinalScale<D, R>.() -> Unit) = OrdinalScale<D, R>().apply { init.invoke(this) }
 
+// Consider: Should this be in the color package instead?
+fun <D> scaleCategory10() = OrdinalScale<D, Color>().apply { range(schemeCategory10()) }
+fun <D> scaleCategory20() = OrdinalScale<D, Color>().apply { range(schemeCategory20()) }
+fun <D> scaleCategory20b() = OrdinalScale<D, Color>().apply { range(schemeCategory20b()) }
+fun <D> scaleCategory20c() = OrdinalScale<D, Color>().apply { range(schemeCategory20c()) }
+
 inline fun <reified R> interpolator() = when {
-    R::class == Number::class -> ::interpolateNumber
+    R::class.equals(Double::class) -> ::interpolateNumber
     else -> throw IllegalArgumentException()
 }
 

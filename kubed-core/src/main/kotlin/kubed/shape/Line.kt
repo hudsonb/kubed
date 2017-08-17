@@ -35,7 +35,7 @@ class Line<T> : PathShape<Line<T>, List<T>>() {
         return this
     }
 
-    override fun generate(data: List<T>): Context {
+    override fun generate(data: List<T>, i: Int): Context {
         val context = PathContext()
         val output = curve(context)
 

@@ -1,5 +1,12 @@
 package kubed.shape.symbol
 
+fun <T> symbol(): Symbol<T> = Symbol()
+fun <T> symbol(init: Symbol<T>.() -> Unit): Symbol<T> {
+    val symbol = Symbol<T>()
+    symbol.init()
+    return symbol
+}
+
 fun symbols(): List<SymbolType> = listOf(symbolCircle(),
                                          symbolCross(),
                                          symbolDiamond(),

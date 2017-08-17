@@ -4,11 +4,9 @@ import javafx.application.Application
 import javafx.geometry.Point2D
 import javafx.scene.Group
 import javafx.scene.Scene
-import javafx.scene.paint.Color
 import javafx.stage.Stage
 import kubed.interpolate.interpolateNumber
 import kubed.scale.LinearScale
-import kubed.selection.selectAll
 import kubed.shape.*
 
 class SteamgraphDemo: Application() {
@@ -23,7 +21,7 @@ class SteamgraphDemo: Application() {
         val n = 2 // Number of layers
         val m = 200 // Number of samples per layer
         val test = (0 until n).map { bumpLayer(m) }
-        val layers = stack<List<Point2D>, Int>({ (0 until m).map { it }}, { d, k -> d[k].y }, test)
+        val layers = stack({ (0 until m).map { it }}, { d, k -> d[k].y }, test)
 
         val xScale = LinearScale<Double>(::interpolateNumber).domain(listOf(0.0, (m - 1).toDouble()))
                                                         .range(listOf(0.0, width))

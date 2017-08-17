@@ -3,7 +3,6 @@ package kubed.demo
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Stage
@@ -11,11 +10,9 @@ import kubed.axis.axisBottom
 import kubed.axis.axisLeft
 import kubed.interpolate.interpolateRound
 import kubed.scale.LinearScale
-import kubed.scale.scaleBand
 import kubed.selection.selectAll
 import kubed.shape.area
 import kubed.shape.curve.*
-import kubed.shape.rect
 
 class AreaDemo: Application() {
     override fun start(primaryStage: Stage?) {
@@ -41,13 +38,15 @@ class AreaDemo: Application() {
                 .domain(listOf(0.0, 10.0))
 
         val xAxis = axisBottom(xScale)
-        xAxis(root.selectAll(".xAxis").append(fun(): Node { return Group() })
-                .classed("axis", "xAxis")
-                .translateY(innerHeight))
+        xAxis(root.selectAll<Unit>(".xAxis")
+                  .append { _, _, _ -> Group() }
+                  .classed("axis", "xAxis")
+                  .translateY(innerHeight))
 
         val yAxis = axisLeft(yScale)
-        yAxis(root.selectAll(".yAxis").append(fun(): Node { return Group() })
-                .classed("axis", "yAxis"))
+        yAxis(root.selectAll<Unit>(".yAxis")
+                  .append { _, _, _ -> Group() }
+                  .classed("axis", "yAxis"))
 
         val area = area<Int> {
             x { _, i, _ -> xScale(i.toDouble()) }

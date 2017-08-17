@@ -1,15 +1,23 @@
 package kubed.demo
 
 import javafx.application.Application
+import javafx.application.Platform
+import javafx.embed.swing.SwingFXUtils
 import javafx.scene.Group
+import javafx.scene.Node
 import javafx.scene.Scene
+import javafx.scene.SnapshotParameters
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.scene.transform.Translate
 import javafx.stage.Stage
 import kubed.scale.scaleOrdinal
+import kubed.scale.schemeCategory10
 import kubed.selection.selectAll
 import kubed.shape.*
+import java.io.File
+import java.io.IOException
+import javax.imageio.ImageIO
 
 class DonutChartDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -26,15 +34,16 @@ class DonutChartDemo: Application() {
                 AgeGroup("18-24", 3853788), AgeGroup("25-44", 14106543), AgeGroup("45-64", 8819342), AgeGroup("≥65", 612463))
 
         val color = scaleOrdinal<String, Color> {
-            range(listOf(Color.web("#98abc5"), Color.web("#8a89a6"), Color.web("#7b6888"), Color.web("#6b486b"),
-                         Color.web("#a05d56"), Color.web("#d0743c"), Color.web("#ff8c00")))
+            range(schemeCategory10())
+            //range(listOf(Color.web("#98abc5"), Color.web("#8a89a6"), Color.web("#7b6888"), Color.web("#6b486b"),
+            //             Color.web("#a05d56"), Color.web("#d0743c"), Color.web("#ff8c00")))
             domain(data.map { it.label })
         }
 
         val arc = arc<PieWedge<AgeGroup>> {
-            startAngle { d -> d.startAngle }
-            endAngle { d -> d.endAngle }
-            fill { d -> color(d.data.label) }
+            startAngle { d, _ -> d.startAngle }
+            endAngle { d, _ -> d.endAngle }
+            fill { d, _ -> color(d.data.label) }
 
             stroke(Color.WHITE)
             outerRadius(radius - 10)
@@ -42,7 +51,7 @@ class DonutChartDemo: Application() {
         }
 
         val text = text<PieWedge<AgeGroup>> {
-            text { d -> d.data.label }
+            text { d, _ -> d.data.label }
             textAnchor(TextAnchor.MIDDLE)
             font(Font("sans-serif", 10.0))
         }
@@ -51,20 +60,24 @@ class DonutChartDemo: Application() {
             value = { d, _, _ -> d.population.toDouble() }
         }
 
-        val g = root.selectAll(".arc")
+        val g = root.selectAll<PieWedge<AgeGroup>>(".arc")
                     .data(pie(data))
                     .enter()
                     .append { _, _, _ -> Group() }
                     .classed("arc")
 
-        g.append { d, _, _ -> arc(d as PieWedge<AgeGroup>) }
+        g.append { d, _, _ -> arc(d) }
 
-        g.append { d, _, _ -> text(d as PieWedge<AgeGroup>)}
+        g.append { d, _, _ -> text(d) }
          .transform { d, _, _ ->
-             d as PieWedge<AgeGroup>
              val c = arc.centroid(d)
              listOf(Translate(c.x, c.y))
          }
+
+        Thread(Runnable {
+            Thread.sleep(1000)
+            Platform.runLater { saveAsPng(root) }
+        }).start()
 
         val scene = Scene(root)
         primaryStage.scene = scene
@@ -73,6 +86,19 @@ class DonutChartDemo: Application() {
         primaryStage.show()
     }
 
+    fun saveAsPng(node: Node) {
+        val image = node.snapshot(SnapshotParameters(), null)
+
+        // TODO: probably use a file chooser here
+        val file = File("chart.png")
+
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file)
+        } catch (e: IOException) {
+            // TODO: handle exception here
+        }
+
+    }
     companion object {
         @JvmStatic
         fun main(vararg args: String) {

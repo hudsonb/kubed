@@ -25,7 +25,7 @@ group 'org.kubed'
 version '0.1-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.1.0-rc-91'
+    ext.kotlin_version = '1.1.4'
 
     repositories {
         maven { url 'http://dl.bintray.com/kotlin/kotlin-eap-1.1' }

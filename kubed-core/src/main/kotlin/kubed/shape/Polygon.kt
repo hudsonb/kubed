@@ -16,7 +16,7 @@ class Polygon<T> : Shape<Polygon<T>, List<T>>() {
         return this
     }
 
-    override fun invoke(d: List<T>): javafx.scene.shape.Shape {
+    override fun invoke(d: List<T>, i: Int): javafx.scene.shape.Shape {
         val poly = javafx.scene.shape.Polygon(*DoubleArray(d.size * 2, {
             if (it % 2 != 0)
                 x(d[it], it, d)
@@ -24,7 +24,7 @@ class Polygon<T> : Shape<Polygon<T>, List<T>>() {
                 y(d[it], it, d)
         }))
 
-        apply(d, poly)
+        apply(d, i, poly)
 
         return poly
     }

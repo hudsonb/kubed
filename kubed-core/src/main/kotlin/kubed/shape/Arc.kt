@@ -7,68 +7,69 @@ import kubed.util.MoreMath
 import kubed.util.isTruthy
 
 class Arc<T> : PathShape<Arc<T>, T>() {
-    var innerRadius: (T) -> Double = { 0.0 }
-    var outerRadius: (T) -> Double = { throw IllegalStateException("outerRadius must be specified") }
-    var startAngle: (T) -> Double = { throw IllegalStateException("startAngle must be specified") }
-    var endAngle: (T) -> Double = { throw IllegalStateException("endAngle must be specified") }
-    var padAngle: (T) -> Double = { 0.0 }
-    var cornerRadius: (T) -> Double = { 0.0 }
-    var padRadius: ((T) -> Double)? = null
+    var innerRadius: (T, Int) -> Double = { _, _ -> 0.0 }
+    var outerRadius: (T, Int) -> Double = { _, _ -> throw IllegalStateException("outerRadius must be specified") }
+    var startAngle: (T, Int) -> Double = { _, _ -> throw IllegalStateException("startAngle must be specified") }
+    var endAngle: (T, Int) -> Double = { _, _ -> throw IllegalStateException("endAngle must be specified") }
+    var padAngle: (T, Int) -> Double = { _, _ -> 0.0 }
+    var cornerRadius: (T, Int) -> Double = { _, _ -> 0.0 }
+    var padRadius: ((T, Int) -> Double)? = null
 
-    fun innerRadius(value: Double) = innerRadius { value }
-    fun innerRadius(f: (T) -> Double): Arc<T> {
+    fun innerRadius(value: Double) = innerRadius { _, _ -> value }
+    fun innerRadius(f: (T, Int) -> Double): Arc<T> {
         innerRadius = f
         return this
     }
 
-    fun outerRadius(value: Double) = outerRadius { value }
-    fun outerRadius(f: (T) -> Double): Arc<T> {
+    fun outerRadius(value: Double) = outerRadius { _, _ -> value }
+    fun outerRadius(f: (T, Int) -> Double): Arc<T> {
         outerRadius = f
         return this
     }
 
-    fun startAngle(value: Double) = startAngle { value }
-    fun startAngle(f: (T) -> Double): Arc<T> {
+    fun startAngle(value: Double) = startAngle { _, _ -> value }
+    fun startAngle(f: (T, Int) -> Double): Arc<T> {
         startAngle = f
         return this
     }
 
-    fun endAngle(value: Double) = endAngle { value }
-    fun endAngle(f: (T) -> Double): Arc<T> {
+    fun endAngle(value: Double) = endAngle { _, _ -> value }
+    fun endAngle(f: (T, Int) -> Double): Arc<T> {
         endAngle = f
         return this
     }
 
-    fun padAngle(value: Double) = padAngle { value }
-    fun padAngle(f: (T) -> Double): Arc<T> {
+    fun padAngle(value: Double) = padAngle { _, _ -> value }
+    fun padAngle(f: (T, Int) -> Double): Arc<T> {
         padAngle = f
         return this
     }
 
-    fun padRadius(value: Double) = padRadius { value }
-    fun padRadius(f: ((T) -> Double)?): Arc<T> {
+    fun padRadius(value: Double) = padRadius { _, _ -> value }
+    fun padRadius(f: ((T, Int) -> Double)?): Arc<T> {
         padRadius = f
         return this
     }
 
-    fun cornerRadius(value: Double) = cornerRadius { value }
-    fun cornerRadius(f: (T) -> Double): Arc<T> {
+    fun cornerRadius(value: Double) = cornerRadius { _, _ -> value }
+    fun cornerRadius(f: (T, Int) -> Double): Arc<T> {
         cornerRadius = f
         return this
     }
 
-    fun centroid(d: T): Point2D {
-        val r = (innerRadius(d) + outerRadius(d)) / 2
-        val a = (startAngle(d) + endAngle(d)) / 2.0 - Math.PI / 2.0
+    fun centroid(d: T) = centroid(d, -1)
+    fun centroid(d: T, i: Int): Point2D {
+        val r = (innerRadius(d, i) + outerRadius(d, i)) / 2
+        val a = (startAngle(d, i) + endAngle(d, i)) / 2.0 - Math.PI / 2.0
         return Point2D(Math.cos(a) * r, Math.sin(a) * r)
     }
 
-    override fun generate(d: T): Context {
+    override fun generate(d: T, i: Int): Context {
         val context = PathContext()
-        var r0 = innerRadius(d)
-        var r1 = outerRadius(d)
-        val a0 = startAngle(d) - MoreMath.HALF_PI
-        val a1 = endAngle(d) - MoreMath.HALF_PI
+        var r0 = innerRadius(d, i)
+        var r1 = outerRadius(d, i)
+        val a0 = startAngle(d, i) - MoreMath.HALF_PI
+        val a1 = endAngle(d, i) - MoreMath.HALF_PI
         val da = Math.abs(a1 - a0)
         val cw = a1 > a0
 
@@ -96,9 +97,9 @@ class Arc<T> : PathShape<Arc<T>, T>() {
             var a10 = a1
             var da0 = da
             var da1 = da
-            val ap = padAngle(d) / 2
-            val rp = if(ap > MoreMath.EPSILON && padRadius != null) padRadius!!.invoke(d) else Math.sqrt(r0 * r0 + r1 * r1)
-            val rc = Math.min(Math.abs(r1 - r0) / 2, cornerRadius(d))
+            val ap = padAngle(d, i) / 2
+            val rp = if(ap > MoreMath.EPSILON && padRadius != null) padRadius!!.invoke(d, i) else Math.sqrt(r0 * r0 + r1 * r1)
+            val rc = Math.min(Math.abs(r1 - r0) / 2, cornerRadius(d, i))
             var rc0 = rc
             var rc1 = rc
 
@@ -274,6 +275,4 @@ class Arc<T> : PathShape<Arc<T>, T>() {
 
         return CornerTangents(cx0, cy0, -ox, -oy, cx0 * (r1 / r - 1), cy0 * (r1 / r - 1))
     }
-
-    fun constant(d: Double): (T) -> Double = { d }
 }

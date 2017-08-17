@@ -8,6 +8,7 @@ import javafx.scene.text.Font
 import javafx.scene.transform.Translate
 import javafx.stage.Stage
 import kubed.scale.scaleOrdinal
+import kubed.scale.schemeCategory10
 import kubed.selection.selectAll
 import kubed.shape.*
 
@@ -26,22 +27,23 @@ class PieChartDemo: Application() {
                 AgeGroup("18-24", 3853788), AgeGroup("25-44", 14106543), AgeGroup("45-64", 8819342), AgeGroup("≥65", 612463))
 
         val color = scaleOrdinal<String, Color> {
-            range(listOf(Color.web("#98abc5"), Color.web("#8a89a6"), Color.web("#7b6888"), Color.web("#6b486b"),
-                    Color.web("#a05d56"), Color.web("#d0743c"), Color.web("#ff8c00")))
+//            range(listOf(Color.web("#98abc5"), Color.web("#8a89a6"), Color.web("#7b6888"), Color.web("#6b486b"),
+//                    Color.web("#a05d56"), Color.web("#d0743c"), Color.web("#ff8c00")))
+            range(schemeCategory10())
             domain(data.map { it.label })
         }
 
         val arc = arc<PieWedge<AgeGroup>> {
-            startAngle { d -> d.startAngle }
-            endAngle { d -> d.endAngle }
-            fill { d -> color(d.data.label) }
+            startAngle { d, _ -> d.startAngle }
+            endAngle { d, _ -> d.endAngle }
+            fill { d, _ -> color(d.data.label) }
 
             stroke(Color.WHITE)
             outerRadius(radius - 10)
         }
 
         val text = text<PieWedge<AgeGroup>> {
-            text { d -> d.data.label }
+            text { d, _ -> d.data.label }
             textAnchor(TextAnchor.MIDDLE)
             font(Font("sans-serif", 10.0))
         }
@@ -50,17 +52,16 @@ class PieChartDemo: Application() {
             value = { d, _, _ -> d.population.toDouble() }
         }
 
-        val g = root.selectAll(".arc")
+        val g = root.selectAll<PieWedge<AgeGroup>>(".arc")
                 .data(pie(data))
                 .enter()
                 .append { _, _, _ -> Group() }
                 .classed("arc")
 
-        g.append { d, _, _ -> arc(d as PieWedge<AgeGroup>) }
+        g.append { d, _, _ -> arc(d) }
 
-        g.append { d, _, _ -> text(d as PieWedge<AgeGroup>)}
+        g.append { d, _, _ -> text(d)}
                 .transform { d, _, _ ->
-                    d as PieWedge<AgeGroup>
                     val c = arc.centroid(d)
                     listOf(Translate(c.x, c.y))
                 }

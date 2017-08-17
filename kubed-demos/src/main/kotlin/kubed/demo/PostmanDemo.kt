@@ -2,6 +2,7 @@ package kubed.demo
 
 import javafx.animation.*
 import javafx.application.Application
+import javafx.application.Application.launch
 import javafx.scene.CacheHint
 import javafx.scene.Scene
 import javafx.scene.layout.StackPane
@@ -9,10 +10,10 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Shape
 import javafx.stage.Stage
 import kubed.scale.PointScale
-import kubed.selection.emptySelection
 import kubed.shape.circle
 import kubed.transition.pathTo
 import javafx.util.Duration
+import kubed.selection.selectAll
 
 class PostmanDemo: Application() {
     override fun start(primaryStage: Stage?) {
@@ -29,23 +30,28 @@ class PostmanDemo: Application() {
         r.domain((0..3).map(Int::toDouble))
         r.range(listOf(25.0, 100.0))
 
-        val ring = circle<Double>().radius(r::invoke)
-                                   .stroke(Color.ORANGERED)
-                                   .fill(Color.TRANSPARENT)
+        val ring = circle<Double> {
+            radius { d, _ -> r(d) }
+            stroke(Color.ORANGERED)
+            fill(Color.TRANSPARENT)
+            styleClasses("ring")
+        }
 
         val rings = ArrayList<Shape>()
-        root.emptySelection()
-            .data(r.domain)
-            .enter().append { d, _, _ ->
-                val p = ring(d as Double)
-                rings += p
-                p
-            }
-            .fill { _, i, _ -> if(i == 0) Color.ORANGERED else Color.TRANSPARENT }
+        root.selectAll<Double>(".ring")
+                .data(r.domain)
+                .enter().append { d, _, _ ->
+                    val p = ring(d)
+                    rings += p
+                    p
+                }
+                .fill { _, i, _ -> if(i == 0) Color.ORANGERED else Color.TRANSPARENT }
 
-        val orbitor = circle<Unit>().radius(4.0)
-                                    .stroke(Color.ORANGERED)
-                                    .fill(Color.ORANGERED)
+        val orbitor = circle<Unit> {
+            radius(4.0)
+            stroke(Color.ORANGERED)
+            fill(Color.ORANGERED)
+        }
 
         for(i in 1..3) {
             val o = orbitor(Unit)

@@ -4,13 +4,16 @@ import javafx.animation.*
 import javafx.scene.CacheHint
 import javafx.scene.Node
 import javafx.scene.paint.Color
+import javafx.scene.paint.Paint
 import javafx.scene.shape.Shape
 import javafx.util.Duration
 import kubed.ease.CubicInOutInterpolator
+import kubed.selection.AbstractSelection
 import kubed.selection.Selection
 import kubed.selection.removeNode
 
-class Transition internal constructor(val parent: Transition?, internal var selection: Selection, val name: String = "") {
+class Transition<T> internal constructor(val parent: Transition<T>?, internal var selection: Selection<T>, val name: String = "")
+    : AbstractSelection<Transition<T>, T>() {
     companion object {
         const val COALESCE_MS = 17.0
     }
@@ -24,7 +27,6 @@ class Transition internal constructor(val parent: Transition?, internal var sele
     private val transitions = HashMap<Node, ParallelTransition>()
 
     init {
-
         if(parent == null) {
             val coalescer = PauseTransition(Duration.millis(COALESCE_MS))
             coalescer.statusProperty().addListener { _, _, status ->
@@ -45,7 +47,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         }
     }
 
-    fun transition(): Transition {
+    fun transition(): Transition<T> {
         val t = Transition(this, Selection(selection), name)
         metadata.forEach { k, (node, _, duration, interpolator, cacheHint) ->
             t.metadata[k] = TransitionMetadata(node, Duration.ZERO, duration, interpolator, cacheHint)
@@ -53,7 +55,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return t
     }
 
-    fun delay(delay: (d: Any, i: Int, nodes: List<Node?>) -> Duration): Transition {
+    fun delay(delay: (d: T, i: Int, nodes: List<Node?>) -> Duration): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             var ms = delay(d, i, group).toMillis()
             if(parent == null)
@@ -65,7 +67,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun delay(delay: Duration): Transition {
+    fun delay(delay: Duration): Transition<T> { 
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -79,7 +81,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun duration(delay: (d: Any, i: Int, nodes: List<Node?>) -> Duration): Transition {
+    fun duration(delay: (d: T, i: Int, nodes: List<Node?>) -> Duration): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getMetadata(this).duration = delay(d, i, group)
         }
@@ -87,7 +89,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun duration(duration: Duration): Transition {
+    fun duration(duration: Duration): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { getMetadata(it).duration = Duration.millis(duration.toMillis()) }
@@ -95,7 +97,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun cycleCount(cycleCount: (d: Any, i: Int, nodes: List<Node?>) -> Int): Transition {
+    fun cycleCount(cycleCount: (d: T, i: Int, nodes: List<Node?>) -> Int): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.cycleCount = cycleCount(d, i, group)
         }
@@ -103,7 +105,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun cycleCount(cycleCount: Int): Transition {
+    fun cycleCount(cycleCount: Int): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { getTransition(it, index)?.cycleCount = cycleCount }
@@ -111,7 +113,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun autoReverse(autoReverse: (d: Any, i: Int, nodes: List<Node?>) -> Boolean): Transition {
+    fun autoReverse(autoReverse: (d: T, i: Int, nodes: List<Node?>) -> Boolean): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.isAutoReverse = autoReverse(d, i, group)
         }
@@ -119,7 +121,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun autoReverse(autoReverse: Boolean): Transition {
+    fun autoReverse(autoReverse: Boolean): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { getTransition(it, index)?.isAutoReverse = autoReverse }
@@ -127,25 +129,25 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun opacity(opacity: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun opacity(value: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
-            getTransition(this, index)?.children?.add(fadeTo(opacity(d, i, group), play = false))
+            getTransition(this, index)?.children?.add(fadeTo(value(d, i, group), play = false))
         }
 
         return this
     }
 
-    fun opacity(opacity: Double): Transition {
+    override fun opacity(value: Double): Transition<T> {
         selection.groups.flatMap { it }
                  .filterIsInstance<Node>()
                  .forEach {
-                     getTransition(it, index)?.children?.add(it.fadeTo(opacity, play = false))
+                     getTransition(it, index)?.children?.add(it.fadeTo(value, play = false))
                  }
 
         return this
     }
 
-    fun rotate(angle: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    fun rotate(angle: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(rotateTo(angle(d, i, group), play = false))
         }
@@ -153,7 +155,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun rotate(angle: Double): Transition {
+    fun rotate(angle: Double): Transition<T> {
         selection.groups.flatMap { it }
                         .filterIsInstance<Node>()
                         .forEach { getTransition(it, index)?.children?.add(it.rotateTo(angle, play = false)) }
@@ -161,7 +163,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun rotateX(angle: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun rotateX(angle: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(rotateXTo(angle(d, i, group), play = false))
         }
@@ -169,7 +171,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun rotateX(angle: Double): Transition {
+    override fun rotateX(angle: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -179,7 +181,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun rotateY(angle: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun rotateY(angle: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(rotateYTo(angle(d, i, group), play = false))
         }
@@ -187,7 +189,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun rotateY(angle: Double): Transition {
+    override fun rotateY(angle: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -197,7 +199,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun rotateZ(angle: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun rotateZ(angle: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(rotateZTo(angle(d, i, group), play = false))
         }
@@ -205,7 +207,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun rotateZ(angle: Double): Transition {
+    override fun rotateZ(angle: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -215,7 +217,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun scaleX(x: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun scaleX(x: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(scaleXTo(x(d, i, group), play = false))
         }
@@ -223,17 +225,17 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun scaleX(angle: Double): Transition {
+    override fun scaleX(x: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
-                    getTransition(it, index)?.children?.add(it.scaleXTo(angle, play = false))
+                    getTransition(it, index)?.children?.add(it.scaleXTo(x, play = false))
                 }
 
         return this
     }
 
-    fun scaleY(y: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun scaleY(y: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(scaleYTo(y(d, i, group), play = false))
         }
@@ -241,7 +243,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun scaleY(y: Double): Transition {
+    override fun scaleY(y: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -251,7 +253,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun scaleZ(z: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun scaleZ(z: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(scaleZTo(z(d, i, group), play = false))
         }
@@ -259,7 +261,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun scaleZ(z: Double): Transition {
+    override fun scaleZ(z: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -269,7 +271,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun translateX(x: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun translateX(x: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(translateXTo(x(d, i, group), play = false))
         }
@@ -277,7 +279,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun translateX(x: Double): Transition {
+    override fun translateX(x: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -287,7 +289,7 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun translateY(y: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun translateY(y: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(translateYTo(y(d, i, group), play = false))
         }
@@ -295,24 +297,24 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun translateY(y: Double): Transition {
+    override fun translateY(y: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
-                    getTransition(it, index)?.children?.add(it.translateXTo(y, play = false))
+                    getTransition(it, index)?.children?.add(it.translateYTo(y, play = false))
                 }
 
         return this
     }
 
-    fun translateZ(z: (d: Any, i: Int, group: List<Node?>) -> Double): Transition {
+    override fun translateZ(z: (d: T, i: Int, group: List<Node?>) -> Double): Transition<T> {
         selection.forEach<Node> { d, i, group ->
             getTransition(this, index)?.children?.add(translateZTo(z(d, i, group), play = false))
         }
         return this
     }
 
-    fun translateZ(z: Double): Transition {
+    override fun translateZ(z: Double): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach {
@@ -322,12 +324,12 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun interpolator(interpolator: (d: Any, i: Int, group: List<Node?>) -> Interpolator): Transition {
+    fun interpolator(interpolator: (d: T, i: Int, group: List<Node?>) -> Interpolator): Transition<T> {
         selection.forEach<Node>({ d, i, group -> getMetadata(this).interpolator = interpolator(d, i, group) })
         return this
     }
 
-    fun interpolator(interpolator: Interpolator): Transition {
+    fun interpolator(interpolator: Interpolator): Transition<T> { 
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { getMetadata(it).interpolator = interpolator }
@@ -337,14 +339,14 @@ class Transition internal constructor(val parent: Transition?, internal var sele
 
     fun ease(interpolator: Interpolator) = interpolator(interpolator)
 
-    fun ease(interpolator: (d: Any, i: Int, group: List<Node?>) -> Interpolator) = interpolator(interpolator)
+    fun ease(interpolator: (d: T, i: Int, group: List<Node?>) -> Interpolator) = interpolator(interpolator)
 
-    fun cacheHint(hint: (d: Any, i: Int, group: List<Node?>) -> CacheHint): Transition {
+    fun cacheHint(hint: (d: T, i: Int, group: List<Node?>) -> CacheHint): Transition<T> {
         selection.forEach<Node> { d, i, group -> getMetadata(this).cacheHint = hint(d, i, group) }
         return this
     }
 
-    fun cacheHint(hint: CacheHint): Transition {
+    fun cacheHint(hint: CacheHint): Transition<T> { 
         selection.groups.flatMap { it }
                 .filterIsInstance<Node>()
                 .forEach { getMetadata(it).cacheHint = hint }
@@ -352,33 +354,33 @@ class Transition internal constructor(val parent: Transition?, internal var sele
         return this
     }
 
-    fun fill(fill: (d: Any, i: Int, group: List<Node?>) -> Color): Transition {
+    override fun fill(fill: (d: T, i: Int, group: List<Node?>) -> Paint): Transition<T> {
         selection.forEach<Shape> { d, i, group ->
-            getTransition(this, index)?.children?.add(fillTo(fill(d, i, group)))
+            getTransition(this, index)?.children?.add(fillTo(fill(d, i, group) as Color))
         }
 
         return this
     }
 
-    fun fill(color: Color): Transition {
+    override fun fill(paint: Paint): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Shape>()
-                .forEach { getTransition(it, index)?.children?.add(it.fillTo(color)) }
+                .forEach { getTransition(it, index)?.children?.add(it.fillTo(paint as Color)) }
 
         return this
     }
 
-    fun stroke(color: Color): Transition {
+    override fun stroke(paint: Paint): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Shape>()
-                .forEach { getTransition(it, index)?.children?.add(it.strokeTo(color)) }
+                .forEach { getTransition(it, index)?.children?.add(it.strokeTo(paint as Color)) }
 
         return this
     }
 
-    fun stroke(color: (d: Any, i: Int, group: List<Node?>) -> Color): Transition {
+    override fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint): Transition<T> {
         selection.forEach<Shape> { d, i, group ->
-            getTransition(this, index)?.children?.add(strokeTo(color(d, i, group)))
+            getTransition(this, index)?.children?.add(strokeTo(paint(d, i, group) as Color))
         }
 
         return this
@@ -390,20 +392,26 @@ class Transition internal constructor(val parent: Transition?, internal var sele
                 .forEach {
                     val t = getTransition(it, index)
                     if(t != null) {
-                        if(t.status == status)
-                            it.handler()
-                        else {
+                        //if(t.status == status)
+                        //    it.handler()
+                       // else {
                             t.statusProperty()?.addListener { _, _, newStatus ->
-                                if (newStatus == status)
+                                if(newStatus == status)
                                     it.handler()
                             }
-                        }
+                       // }
                     }
                 }
     }
 
-    fun remove(remove: (node: Node) -> Unit = ::removeNode): Transition {
+    fun remove(remove: (node: Node) -> Unit = ::removeNode): Transition<T> { 
         this.remove = remove
+
+        // Consider: Should we remove at the end of the nodes transition, or at the end of the transition as a whole?
+        on(Animation.Status.STOPPED) {
+            remove(this)
+        }
+
         return this
     }
 

@@ -4,6 +4,7 @@ package kubed.axis
 import javafx.geometry.Side
 import javafx.geometry.VPos
 import javafx.scene.Group
+import javafx.scene.Node
 import javafx.scene.paint.Color
 import javafx.scene.shape.*
 import javafx.scene.text.Font
@@ -15,6 +16,7 @@ import kubed.shape.TextAnchor
 import kubed.shape.lineSegment
 import kubed.shape.text
 import snap
+import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
     var tickSizeInner = 6.0
@@ -72,11 +74,15 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
 
     private fun center(scale: BandScale<D>): (d: D) -> R {
         var offset = scale.bandwidth / 2.0
-        if(scale.round) offset = Math.round(offset).toDouble()
+        if(scale.round)
+            offset = Math.round(offset).toDouble()
         return { d -> (scale(d) + offset) as R }
     }
 
-    private fun identity(scale: Scale<D, R>): (d: D) -> R = { d -> scale(d) }
+    private fun identity(scale: Scale<D, R>): (d: D) -> R = {
+        d ->
+        scale(d)
+    }
 
     operator fun <T> invoke(sel: Selection<T>) {
         val values = ArrayList<D>()
@@ -94,18 +100,19 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
         val range0 = range.first().toDouble() + 0.5
         val range1 = range.last().toDouble() + 0.5
         val position = if(scale is BandScale) center(scale) else identity(scale) // TODO: Pass copy of scale
-        var path = sel.selectAll<Unit>(".domain").data(listOf(Unit))
+        var path = sel.selectAll<Unit>(".domain").data(listOf(Unit)) // Well this is hideous
         var tick = sel.selectAll<D>(".tick").data(values, { d, _, _ -> scale(d) })
         val tickExit = tick.exit()
-        val tickEnter = tick.enter().append { _, _, _ ->
+        val tickEnter = tick.enter().append(fun(): Node {
             val g = Group()
             g.styleClass += "tick"
-            g
-        }
+            return g
+        })
         var line = tick.select("line")
         var text = tick.select("text")
-        
-        path = path.merge(path.enter().append { _, _, _ -> Path() }
+
+
+        path = path.merge(path.enter().append { -> Path() }
                                       .classed("domain")
                                       .stroke(Color.BLACK))
 
@@ -122,19 +129,13 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
             stroke(Color.BLACK)
         }
 
-       line = line.merge(tickEnter.append { _, _, _-> lineSegment(Unit)})
+        line = line.merge(tickEnter.append { _, _, _-> lineSegment(Unit)})
 
         val label = text<D> {
+            font(Font("Courier New", 10.0))
             text { d, _ -> formatter(d) }
-            textAnchor { _, _ ->
-                when(side) {
-                    Side.RIGHT -> TextAnchor.START
-                    Side.LEFT -> TextAnchor.END
-                    else -> TextAnchor.MIDDLE
-                }
-            }
+            textAnchor { _, _ -> if(vertical) TextAnchor.END else TextAnchor.MIDDLE }
             textOrigin { _, _ -> if(vertical) VPos.CENTER else VPos.TOP }
-            font(Font("sans-serif", 10.0))
             fill(Color.BLACK)
             x(if(vertical) k * spacing else 0.5)
             y(if(vertical) 0.5 else k * spacing)
@@ -161,6 +162,7 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
             }
         }
 
-        tick.opacity(1.0).transform { d, _, _ -> listOf(transform(position(d as D).toDouble())) }
+        tick.opacity(1.0)
+            .transform { d, _, _ -> listOf(transform(position(d).toDouble())) }
     }
 }

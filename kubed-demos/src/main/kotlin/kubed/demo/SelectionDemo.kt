@@ -6,8 +6,8 @@ import javafx.application.Application
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
+import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.stage.Stage
 import javafx.util.Duration
@@ -34,7 +34,7 @@ class SelectionDemo: Application() {
 
     override fun start(primaryStage: Stage?) {
         val root = Group()
-        root.translateY = 200.0
+        //root.translateY = 200.0
 
         update(root)
 
@@ -53,37 +53,38 @@ class SelectionDemo: Application() {
     private fun update(root: Group) {
         val font = Font("Courier New", 32.0)
 
-        val sel = root.selectAll<Node>()
-                      .data(randomChars(), { d, _, _ -> d as Char })
+        val sel = root.selectAll<Char>("*")
+                      .data(randomChars(), { d, _, _ -> d })
 
         // Exit
-        sel.exit().style("-fx-fill", "red")
-                .transition()
-                .duration(Duration.millis(750.0))
-                .translateY(120.0)
-                .opacity(0.0)
-                .remove()
+        sel.exit()
+           .fill(Color.RED)
+           .transition()
+           .duration(Duration.millis(750.0))
+           .translateY(120.0)
+           .opacity(0.0)
+           .remove()
+
+        val text = text<Char> {
+            text { d, _ -> d.toString() }
+            font(font)
+            opacity(0.0)
+        }
 
         // Enter
-        sel.enter().append { d, _, _ ->
-            val t = text<Char>().text(Char::toString)
-                    .x(0.0)
-                    .y(0.0)
-                    .font(font)
-                    .opacity(0.0)
-            t(d as Char)
-        }
-                .style("-fx-fill", "green")
-                .translateX({ _, i, _ -> i * 20.0 })
-                .transition()
-                .duration(Duration.millis(750.0))
-                .interpolator(BounceOutInterpolator())
-                .translateY(60.0)
-                .opacity(1.0)
+        sel.enter()
+           .append { d, _, _ -> text(d) }
+           .fill(Color.GREEN)
+           .translateX { _, i, _ -> i * 20.0 }
+           .transition()
+           .duration(Duration.millis(750.0))
+           .interpolator(BounceOutInterpolator())
+           .translateY(60.0)
+           .opacity(1.0)
 
         // Update
         sel.opacity(1.0)
-           .style("-fx-fill", "black")
+           .fill(Color.BLACK)
            .transition()
            .duration(Duration.millis(750.0))
            .translateX { _, i, _ -> i * 20.0 }

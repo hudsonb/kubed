@@ -44,30 +44,32 @@ class BarChartDemo: Application() {
                                                        .domain(listOf(0.0, data.map { it.frequency }.max()) as List<Double>)
 
         val xAxis = axisBottom(x)
-        xAxis(root.selectAll(".xAxis").append(fun(): Node { return Group() })
-                .classed("axis", "xAxis")
-                .translateY(innerHeight))
+        xAxis(root.selectAll<Nothing>(".xAxis")
+                  .append { _, _, _ -> Group() }
+                  .classed("axis", "xAxis")
+                  .translateY(innerHeight))
 
         val yAxis = axisLeft(y) {
             formatter = { d -> (d * 100).toInt().toString() + "%" }
         }
-        yAxis(root.selectAll(".yAxis").append(fun(): Node { return Group() })
-                                      .classed("axis", "yAxis"))
+        yAxis(root.selectAll<Nothing>(".yAxis")
+                  .append { _, _, _ -> Group() }
+                  .classed("axis", "yAxis"))
 
 
     val bar = rect<LetterFrequency> {
-            translateX { (letter) -> x(letter) }
-            translateY { d -> y(d.frequency) }
+            translateX { (letter), _ -> x(letter) }
+            translateY { d, _ -> y(d.frequency) }
             width(x.bandwidth)
-            height { d -> innerHeight - y(d.frequency) }
+            height { d, _ -> innerHeight - y(d.frequency) }
             fill(Color.STEELBLUE)
-            styleClasses { listOf("bar") }
+            styleClasses { _, _ -> listOf("bar") }
     }
 
-    root.selectAll(".bar")
+    root.selectAll<LetterFrequency>(".bar")
         .data(data)
         .enter()
-        .append { d, _, _ -> bar(d as LetterFrequency) }
+        .append { d, _, _ -> bar(d) }
 
         val scene = Scene(root)
         primaryStage?.scene = scene
