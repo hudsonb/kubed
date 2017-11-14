@@ -1,30 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id="kubed" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" external.system.module.group="org.kubed" external.system.module.version="0.1-SNAPSHOT" type="JAVA_MODULE" version="4">
-  <component name="FacetManager">
-    <facet type="kotlin-language" name="Kotlin">
-      <configuration version="2" platform="JVM 1.6" useProjectSettings="false">
-        <compilerSettings />
-        <compilerArguments>
-          <option name="languageVersion" value="1.1" />
-          <option name="apiVersion" value="1.1" />
-          <option name="pluginOptions">
-            <array />
-          </option>
-          <option name="pluginClasspaths">
-            <array />
-          </option>
-          <option name="coroutinesWarn" value="true" />
-        </compilerArguments>
-      </configuration>
-    </facet>
-  </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/../../build/classes/main" />
-    <output-test url="file://$MODULE_DIR$/../../build/classes/test" />
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/../../out/production/classes" />
+    <output-test url="file://$MODULE_DIR$/../../out/test/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../..">
       <excludeFolder url="file://$MODULE_DIR$/../../.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

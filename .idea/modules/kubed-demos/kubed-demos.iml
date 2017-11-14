@@ -27,8 +27,8 @@
     </facet>
   </component>
   <component name="NewModuleRootManager">
-    <output url="file://$MODULE_DIR$/../../../kubed-demos/build/classes/main" />
-    <output-test url="file://$MODULE_DIR$/../../../kubed-demos/build/classes/test" />
+    <output url="file://$MODULE_DIR$/../../../kubed-demos/out/production/classes" />
+    <output-test url="file://$MODULE_DIR$/../../../kubed-demos/out/test/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../kubed-demos">
       <sourceFolder url="file://$MODULE_DIR$/../../../kubed-demos/src/main/java" isTestSource="false" />
@@ -39,14 +39,15 @@
       <sourceFolder url="file://$MODULE_DIR$/../../../kubed-demos/src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/../../../kubed-demos/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../../kubed-demos/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../kubed-demos/out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="kubed-core" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.1.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.1.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.1.60" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.1.60" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jre8:1.1.60" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.60" level="project" />
   </component>
 </module>
