@@ -1,5 +1,6 @@
 package kubed.shape.symbol
 
+import javafx.geometry.Point2D
 import javafx.scene.paint.Color
 import kubed.path.Context
 import kubed.path.PathContext
@@ -168,3 +169,37 @@ class Wye : PathSymbolType {
         context.closePath()
     }
 }
+
+class Pentagon : PathSymbolType {
+    companion object {
+        private val circumradiusCoeff = 1.0 / 10.0 * Math.sqrt(50 + 10 * Math.sqrt(5.0))
+    }
+
+    private fun circumradius(sideLength: Double) = sideLength * circumradiusCoeff
+
+    private fun sideLength(area: Double) = Math.sqrt((4 * area) / Math.sqrt(5 * (5 + 2 * Math.sqrt(5.0))))
+
+    override fun draw(context: Context, size: Double) {
+        val s = sideLength(size)
+        val r = circumradius(s)
+        val theta = -MoreMath.TAU / 4
+
+        var p = rotatePoint(r, 0.0, theta)
+        context.moveTo(p.x, p.y)
+
+        for (i in 0..4) {
+            val a = MoreMath.TAU * i / 5
+            val x = Math.cos(a) * r
+            val y = Math.sin(a) * r
+
+            p = rotatePoint(x, y, theta)
+            context.lineTo(p.x, p.y)
+        }
+
+        context.closePath()
+    }
+}
+
+private fun rotatePoint(x: Double, y: Double, theta: Double) = Point2D(Math.cos(theta) * x + -Math.sin(theta) * y,
+                                                                       Math.sin(theta) * x + Math.cos(theta) * y)
+
