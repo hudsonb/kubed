@@ -14,7 +14,9 @@ fun symbols(): List<SymbolType> = listOf(symbolCircle(),
                                          symbolStar(),
                                          symbolTriangle(),
                                          symbolWye(),
-                                         symbolPentagon())
+                                         symbolHexagon(),
+                                         symbolPentagon(),
+                                         symbolX())
 
 fun symbolCircle(): SymbolType = Circle()
 fun symbolCross(): SymbolType = Cross()
@@ -24,4 +26,6 @@ fun symbolStar(): SymbolType = Star()
 fun symbolTriangle(): SymbolType = Triangle()
 fun symbolWye(): SymbolType = Wye()
 
+fun symbolHexagon(): SymbolType = Hexagon()
 fun symbolPentagon(): SymbolType = Pentagon()
+fun symbolX(): SymbolType = X()

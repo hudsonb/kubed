@@ -170,6 +170,27 @@ class Wye : PathSymbolType {
     }
 }
 
+class Hexagon(val theta: Double = MoreMath.TAU / 12) : PathSymbolType {
+    private fun sideLength(area: Double) = Math.sqrt((2 * area) / (3 * Math.sqrt(3.0)))
+
+    override fun draw(context: Context, size: Double) {
+        val s = sideLength(size)
+
+        rotatePoint(s, 0.0, theta).apply { context.moveTo(x, y) }
+
+        for(i in 0..5) {
+            val a = MoreMath.TAU * i / 6
+            val x = Math.cos(a) * s
+            val y = Math.sin(a) * s
+
+            val p = rotatePoint(x, y, theta)
+            context.lineTo(p.x, p.y)
+        }
+
+        context.closePath()
+    }
+}
+
 class Pentagon : PathSymbolType {
     companion object {
         private val circumradiusCoeff = 1.0 / 10.0 * Math.sqrt(50 + 10 * Math.sqrt(5.0))
@@ -198,6 +219,31 @@ class Pentagon : PathSymbolType {
 
         context.closePath()
     }
+}
+
+class X : PathSymbolType {
+    override fun draw(context: Context, size: Double) {
+        val r = Math.sqrt(size / 5) / 2
+        val theta = MoreMath.TAU / 8
+
+        with(context) {
+            rotatePoint(-3 * r, -r, theta).apply { moveTo(x, y) }
+            rotatePoint(-r, -r, theta).apply { lineTo(x, y) }
+            rotatePoint(-r, -3 * r, theta).apply { lineTo(x, y) }
+            rotatePoint(r, -3 * r, theta).apply { lineTo(x, y) }
+            rotatePoint(r, -r, theta).apply { lineTo(x, y) }
+            rotatePoint(3 * r, -r, theta).apply { lineTo(x, y) }
+            rotatePoint(3 * r, r, theta).apply { lineTo(x, y) }
+            rotatePoint(r, r, theta).apply { lineTo(x, y) }
+            rotatePoint(r, 3 * r, theta).apply { lineTo(x, y) }
+            rotatePoint(-r, 3 * r, theta).apply { lineTo(x, y) }
+            rotatePoint(-r, r, theta).apply { lineTo(x, y) }
+            rotatePoint(-3 * r, r, theta).apply { lineTo(x, y) }
+        }
+
+        context.closePath()
+    }
+
 }
 
 private fun rotatePoint(x: Double, y: Double, theta: Double) = Point2D(Math.cos(theta) * x + -Math.sin(theta) * y,
