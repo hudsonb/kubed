@@ -78,6 +78,8 @@ class BandScale<D> : Scale<D, Double> {
         return this
     }
 
+    fun rangeRound(vararg r: Double): BandScale<D> = rangeRound(r.toList())
+
     fun rangeRound(r: List<Double>): BandScale<D> {
         round = true
         range(r)
