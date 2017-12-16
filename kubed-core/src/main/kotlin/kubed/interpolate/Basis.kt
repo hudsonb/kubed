@@ -12,8 +12,8 @@ private fun basis(t1: Double, v0: Double, v1: Double, v2: Double, v3: Double): D
 internal fun basis(vararg values: Double): (Double) -> Double {
     val n = values.size - 1
     return { t ->
-        var t1 = Math.max(0.0, Math.min(1.0, t))
-        val i = if(t >= 1) n - 1 else Math.floor(t * n).toInt()
+        val t1 = Math.max(0.0, Math.min(1.0, t))
+        val i = if(t1 >= 1) n - 1 else Math.floor(t1 * n).toInt()
         val v1 = values[i]
         val v2 = values[i + 2]
         val v0 = if(i > 0) values[i - 1] else 2 * v1 - v2
