@@ -10,7 +10,7 @@ class CacheHintTransition(val node: Node, transition: Transition, val cacheHint:
         transition.statusProperty().addListener { _, _, status ->
             when(status) {
                 Status.RUNNING -> node.cacheHint = cacheHint
-                Status.STOPPED, Status.PAUSED -> node.cacheHint = originalCacheHint
+                Status.STOPPED, Status.PAUSED, null -> node.cacheHint = originalCacheHint
             }
         }
     }

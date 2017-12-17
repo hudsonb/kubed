@@ -31,11 +31,11 @@ class AreaDemo: Application() {
 
         val data = listOf(4, 2, 6, 3, 3, 7, 9, 2, 1, 6)
 
-        val xScale = LinearScale<Double>(::interpolateRound).range(listOf(0.0, innerWidth))
-                .domain(listOf(0.0, data.size - 1.0))
+        val xScale = LinearScale(::interpolateRound).range(0.0, innerWidth)
+                                                    .domain(0.0, data.size - 1.0)
 
-        val yScale = LinearScale<Double>(::interpolateRound).range(listOf(innerHeight, 0.0))
-                .domain(listOf(0.0, 10.0))
+        val yScale = LinearScale(::interpolateRound).range(innerHeight, 0.0)
+                                                    .domain(0.0, 10.0)
 
         val xAxis = axisBottom(xScale)
         xAxis(root.selectAll<Unit>(".xAxis")

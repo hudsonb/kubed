@@ -7,8 +7,8 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.scene.transform.Translate
 import javafx.stage.Stage
+import kubed.color.scheme.schemeCategory10
 import kubed.scale.scaleOrdinal
-import kubed.scale.schemeCategory10
 import kubed.selection.selectAll
 import kubed.shape.*
 
@@ -27,8 +27,6 @@ class PieChartDemo: Application() {
                 AgeGroup("18-24", 3853788), AgeGroup("25-44", 14106543), AgeGroup("45-64", 8819342), AgeGroup("≥65", 612463))
 
         val color = scaleOrdinal<String, Color> {
-//            range(listOf(Color.web("#98abc5"), Color.web("#8a89a6"), Color.web("#7b6888"), Color.web("#6b486b"),
-//                    Color.web("#a05d56"), Color.web("#d0743c"), Color.web("#ff8c00")))
             range(schemeCategory10())
             domain(data.map { it.label })
         }

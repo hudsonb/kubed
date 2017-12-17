@@ -2,25 +2,19 @@ package kubed.demo
 
 
 import javafx.application.Application
-import javafx.embed.swing.SwingFXUtils
 import javafx.geometry.Insets
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
-import javafx.scene.SnapshotParameters
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import kubed.axis.axisBottom
 import kubed.axis.axisLeft
 import kubed.interpolate.interpolateRound
 import kubed.scale.LinearScale
-import kubed.scale.OrdinalScale
 import kubed.scale.scaleBand
+import kubed.scale.scaleOrdinal
 import kubed.selection.selectAll
 import kubed.shape.*
-import java.io.File
-import java.io.IOException
-import javax.imageio.ImageIO
 
 class StackedBarChartDemo: Application() {
     override fun start(primaryStage: Stage?) {
@@ -40,22 +34,23 @@ class StackedBarChartDemo: Application() {
         val data = parseData().sortedBy { 0 - (it["Total"]?.toInt() as Int) }
 
         val xScale = scaleBand<String> {
-            rangeRound(listOf(0.0, innerWidth))
+            rangeRound(0.0, innerWidth)
             domain(data.map { it["State"] }.distinct() as List<String>)
             paddingInner = 0.05
             align = 0.1
         }
 
-        val yScale = LinearScale<Double>(::interpolateRound).range(listOf(innerHeight, 0.0))
-                .domain(listOf(0.0, (data.maxBy { it["Total"]?.toInt() ?: 0 })?.get("Total")?.toDouble() ?: throw IllegalStateException()))
-        (yScale as LinearScale<*>).nice()
+        val yScale = LinearScale(::interpolateRound).range(innerHeight, 0.0)
+                                                    .domain(listOf(0.0, (data.maxBy { it["Total"]?.toInt() ?: 0 })?.get("Total")?.toDouble() ?: throw IllegalStateException()))
+                                                    .nice()
 
         val keys = listOf("Under 5 Years", "5 to 13 Years", "14 to 17 Years", "18 to 24 Years", "25 to 44 Years",
                 "45 to 64 Years", "65 Years and Over")
-        val zScale = OrdinalScale<String, Color>()
-                .range(listOf(Color.web("#98abc5"), Color.web("#8a89a6"), Color.web("#7b6888"),
-                        Color.web("#6b486b"), Color.web("#a05d56"), Color.web("#d0743c"), Color.web("#ff8c00")))
-                .domain(keys)
+        val zScale = scaleOrdinal<String, Color> {
+            range(listOf(Color.web("#98abc5"), Color.web("#8a89a6"), Color.web("#7b6888"),
+                         Color.web("#6b486b"), Color.web("#a05d56"), Color.web("#d0743c"), Color.web("#ff8c00")))
+            domain(keys)
+        }
 
         val bar = rect<Point<Map<String, String>, String>> {
             fill { d, _ -> zScale(d.key) }
@@ -86,25 +81,9 @@ class StackedBarChartDemo: Application() {
                   .append { -> Group() }
                   .classed("axis", "yAxis"))
 
-        saveAsPng(root)
-
         val scene = Scene(root)
         primaryStage?.scene = scene
         primaryStage?.show()
-    }
-
-    fun saveAsPng(node: Node) {
-        val image = node.snapshot(SnapshotParameters(), null)
-
-        // TODO: probably use a file chooser here
-        val file = File("chart.png")
-
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file)
-        } catch (e: IOException) {
-            // TODO: handle exception here
-        }
-
     }
 
     fun parseData(): List<Map<String, String>> {

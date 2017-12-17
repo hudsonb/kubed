@@ -95,28 +95,28 @@ class Area<T> : PathShape<Area<T>, List<T>>() {
         return this
     }
 
-    override fun generate(data: List<T>, i: Int): Context {
+    override fun generate(d: List<T>, i: Int): Context {
         val context = PathContext()
         val output = curve(context)
 
         var defined0 = false
 
-        val n = data.size
+        val n = d.size
         var j = 0
         val x0z = DoubleArray(n)
         val y0z = DoubleArray(n)
-        for(i in 0..n) {
-            if(!(i < n && defined(data[i], i, data)) == defined0) {
+        for(idx in 0..n) {
+            if(!(idx < n && defined(d[idx], idx, d)) == defined0) {
                 defined0 = !defined0
                 if(defined0) {
-                    j = i
+                    j = idx
                     output.areaStart()
                     output.lineStart()
                 }
                 else {
                     output.lineEnd()
                     output.lineStart()
-                    for(k in i - 1 downTo j) {
+                    for(k in idx - 1 downTo j) {
                         output.point(x0z[k], y0z[k])
                     }
                     output.lineEnd()
@@ -124,11 +124,11 @@ class Area<T> : PathShape<Area<T>, List<T>>() {
                 }
             }
             if(defined0) {
-                val datum = data[i]
-                x0z[i] = x0(datum, i, data)
-                y0z[i] = y0(datum, i, data)
+                val datum = d[idx]
+                x0z[idx] = x0(datum, idx, d)
+                y0z[idx] = y0(datum, idx, d)
 
-                output.point(x1?.invoke(datum, i, data) ?: x0z[i], y1?.invoke(datum, i, data) ?: y0z[i])
+                output.point(x1?.invoke(datum, idx, d) ?: x0z[idx], y1?.invoke(datum, idx, d) ?: y0z[idx])
             }
         }
 

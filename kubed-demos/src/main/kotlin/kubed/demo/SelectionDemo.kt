@@ -53,7 +53,7 @@ class SelectionDemo: Application() {
     private fun update(root: Group) {
         val font = Font("Courier New", 32.0)
 
-        val sel = root.selectAll<Char>("*")
+        val sel = root.selectAll<Char>()
                       .data(randomChars(), { d, _, _ -> d })
 
         // Exit

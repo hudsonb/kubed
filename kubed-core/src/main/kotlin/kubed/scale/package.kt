@@ -2,14 +2,17 @@ package kubed.scale
 
 import javafx.scene.paint.Color
 import kubed.interpolate.interpolateNumber
+import kubed.color.scheme.schemeCategory10
+import kubed.color.scheme.schemeCategory20
+import kubed.color.scheme.schemeCategory20b
+import kubed.color.scheme.schemeCategory20c
 
 inline fun <reified R> scaleLinear(): LinearScale<R> = scaleLinear {}
 inline fun <reified R> scaleLinear(init: LinearScale<R>.() -> Unit): LinearScale<R> {
-    val interpolate = interpolator<R>()
-    val uninterpolate = uninterpolator<R>()
     // TODO: Default comparators
 
-    val scale = LinearScale(interpolate as (R, R) -> (Double) -> R)
+    val scale = LinearScale(interpolator<R>() as (R, R) -> (Double) -> R,
+                            uninterpolator())
     scale.init()
     return scale
 }
@@ -19,6 +22,12 @@ fun <D> scaleBand(init: BandScale<D>.() -> Unit) = BandScale<D>().apply { init.i
 
 fun <D, R> scaleOrdinal() = OrdinalScale<D, R>()
 fun <D, R> scaleOrdinal(init: OrdinalScale<D, R>.() -> Unit) = OrdinalScale<D, R>().apply { init.invoke(this) }
+
+fun <D> scalePoint() = PointScale<D>().apply { range(listOf(0.0, 1.0)) }
+fun <D> scalePoint(init: PointScale<D>.() -> Unit) = PointScale<D>().apply {
+    range(listOf(0.0, 1.0))
+    init.invoke(this)
+}
 
 // Consider: Should this be in the color package instead?
 fun <D> scaleCategory10() = OrdinalScale<D, Color>().apply { range(schemeCategory10()) }

@@ -26,9 +26,11 @@ class CirclesDemo : Application() {
             fill(Color.BLACK)
         }
 
+        val colors = kubed.color.scheme.schemeViridis()
         val circle = root.selectAll<Data>("Circle")
-                .data((0..5).map { Data(width * Math.random(), height * Math.random(), Math.random() - 0.5, Math.random() - 0.5) })
+                .data((0..5000).map { Data(width * Math.random(), height * Math.random(), Math.random() - 0.5, Math.random() - 0.5) })
                 .enter().append { d, _, _ -> c(d) }
+                        .fill { _, i, _ -> colors[i % colors.size] }
 
         timer {
             // Update the circle positions

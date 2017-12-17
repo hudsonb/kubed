@@ -4,11 +4,11 @@ import kubed.util.MoreMath
 import java.util.*
 
 class Pie<T> {
-    var value: (d: T, i: Int, data: List<T>) -> Double = { d, i, data -> d as Double }
+    var value: (d: T, i: Int, data: List<T>) -> Double = { d, _, _ -> d as Double }
     var sort: Comparator<T>? = null
     var sortValues: Comparator<Double>? = Comparator { a, b -> (a - b).toInt() }
         set(value) {
-            sortValues = value
+            field = value
             sort = null
         }
     var startAngle: () -> Double = { 0.0 }

@@ -75,6 +75,6 @@ class Hsl(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0
             else -> m1
         }
 
-        return (t * 255.0).toInt()
+        return (t * 255.0).toInt()//Math.min(255.0, (t * 255.0)).toInt()
     }
 }

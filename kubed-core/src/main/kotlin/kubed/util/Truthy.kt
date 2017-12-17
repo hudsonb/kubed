@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package kubed.util
 
 inline fun Any?.isTruthy(): Boolean = this != null

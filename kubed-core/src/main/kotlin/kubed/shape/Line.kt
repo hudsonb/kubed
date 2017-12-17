@@ -35,15 +35,15 @@ class Line<T> : PathShape<Line<T>, List<T>>() {
         return this
     }
 
-    override fun generate(data: List<T>, i: Int): Context {
+    override fun generate(d: List<T>, i: Int): Context {
         val context = PathContext()
         val output = curve(context)
 
         var defined0 = false
 
-        val n = data.size
-        for(i in data.indices) {
-            if(!(i < n && defined(data[i], i, data)) == defined0) {
+        val n = d.size
+        for(idx in d.indices) {
+            if(!(idx < n && defined(d[idx], idx, d)) == defined0) {
                 defined0 = !defined0
                 if(defined0)
                     output.lineStart()
@@ -51,7 +51,7 @@ class Line<T> : PathShape<Line<T>, List<T>>() {
                     output.lineEnd()
             }
             if(defined0)
-                output.point(x(data[i], i, data), y(data[i], i, data))
+                output.point(x(d[idx], idx, d), y(d[idx], idx, d))
         }
 
         return context

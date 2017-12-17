@@ -36,5 +36,51 @@ class MoreMath {
             val f = formatDecimal(Math.abs(x))
             return f.exponent
         }
+
+        /**
+         * Linear interpolation between [min] and [max] at the given
+         * [ratio].
+         * Returns the interpolated value in the interval `[min;max]`.
+         *
+         * @param min
+         * The lower interval bound.
+         *
+         * @param max
+         * The upper interval bound.
+         *
+         * @param ratio
+         * A value in the interval `[0;1]`.
+         *
+         * @return The interpolated value.
+         */
+        @JvmStatic
+        fun lerp(min: Double, max: Double, ratio: Double): Double {
+            val d = (1 - ratio) * min + ratio * max
+            return if(d.isNaN()) 0.0 else Math.min(max, Math.max(min, d))
+        }
+
+        /**
+         * Normalizes a given [value] which is in range `[min;max]`
+         * to range `[0;1]`.
+         *
+         * @param min
+         * The lower bound of the range.
+         *
+         * @param max
+         * The upper bound of the range.
+         *
+         * @param value
+         * The value in the range.
+         *
+         * @return The normalized value (in range `[0;1]`).
+         */
+        fun norm(min: Double, max: Double, value: Double): Double {
+            val d = (value - min) / (max - min)
+            return if(d.isNaN()) 0.0 else Math.min(1.0, Math.max(0.0, d))
+        }
+
+        fun min(vararg values: Int) {
+            if(values.isEmpty()) throw IllegalArgumentException("1 or more ")
+        }
     }
 }

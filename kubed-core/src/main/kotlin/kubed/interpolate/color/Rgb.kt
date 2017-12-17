@@ -1,8 +1,11 @@
-package kubed.interpolate
+package kubed.interpolate.color
 
+import javafx.scene.paint.Color
 import kubed.color.Rgb
+import kubed.interpolate.basis
+import kubed.interpolate.basisClosed
 
-fun interpolateRgb(start: Any, end: Any, gamma: Double = 1.0): (Double) -> Rgb {
+fun interpolateRgb(start: Any, end: Any, gamma: Double = 1.0): (Double) -> Color {
     val sc = Rgb.convert(start)
     val ec = Rgb.convert(end)
 
@@ -11,13 +14,13 @@ fun interpolateRgb(start: Any, end: Any, gamma: Double = 1.0): (Double) -> Rgb {
     val b = gamma(gamma)(sc.b.toDouble(), ec.b.toDouble())
     val opacity = nogamma(sc.opacity, ec.opacity)
 
-    return {t -> Rgb(r(t).toInt(), g(t).toInt(), b(t).toInt(), opacity(t))}
+    return { t -> Color(r(t), g(t), b(t), opacity(t)) }
 }
 
-fun interpolateRgbBasis(vararg colors: Any) = interpolateRgb(colors, ::basis)
-fun interpolateRgbBasisClosed(vararg colors: Any) = interpolateRgb(colors, ::basisClosed)
+fun interpolateRgbBasis(vararg colors: Any) = interpolate(colors.asList(), ::basis)
+fun interpolateRgbBasisClosed(vararg colors: Any) = interpolate(colors.asList(), ::basisClosed)
 
-private fun interpolateRgb(vararg colors: Any, spline: (DoubleArray) -> (Double) -> Double): (Double) -> Rgb {
+private fun interpolate(colors: List<Any>, spline: (DoubleArray) -> (Double) -> Double): (Double) -> Color {
     val n = colors.size
     val r = DoubleArray(n)
     val g = DoubleArray(n)
@@ -34,5 +37,5 @@ private fun interpolateRgb(vararg colors: Any, spline: (DoubleArray) -> (Double)
     val gs = spline(g)
     val bs = spline(b)
 
-    return { t -> Rgb(rs(t).toInt(), gs(t).toInt(), bs(t).toInt(), 1.0) }
+    return { t -> Color(rs(t) / 255, gs(t) / 255, bs(t) / 255, 1.0) }
 }

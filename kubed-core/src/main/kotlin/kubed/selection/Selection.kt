@@ -132,7 +132,7 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
             for(i in g.indices) {
                 val e = g[i]
                 if(e is Node) {
-                    val nodes = g.map { if(it is Node) it else null }
+                    val nodes = g.map { it as? Node }
                     val selNode = selector(e.datum as T, i, nodes)
                     if(selNode != null) {
                         selNode.datum = e.datum
@@ -223,7 +223,7 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
             for(i in g.indices) {
                 val e = g[i]
                 if(e is Node) {
-                    val nodes = g.map { if(it is Node) it else null }
+                    val nodes = g.map { it as? Node }
                     val datum = value(e.datum as T, i, nodes)
                     e.datum = datum
                 }
@@ -781,8 +781,8 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
         return this
     }
 
-    override fun stroke(value: (d: T, i: Int, group: List<Node?>) -> Paint) =
-            forEach<Shape> { d, i, group -> stroke = value(d, i, group) }
+    override fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint) =
+            forEach<Shape> { d, i, group -> stroke = paint(d, i, group) }
 
     fun <E : Event, ET : EventType<E>> on(type: ET, handler: Node.(E) -> Unit): Selection<T> {
         groups.flatMap { it }

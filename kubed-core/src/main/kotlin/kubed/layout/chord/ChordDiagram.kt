@@ -3,7 +3,6 @@ package kubed.layout.chord
 import kubed.util.MoreMath
 import kubed.util.isTruthy
 import java.util.*
-import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 class ChordDiagram {
     var padAngle = 0.0
@@ -16,7 +15,7 @@ class ChordDiagram {
         val groupSums = ArrayList<Double>(n)
         val groupIndex = ArrayList((0 until n).toList())
         val subgroupIndex = ArrayList<List<Int>>()
-        val groups = ArrayList<Group?>(n)//ArrayList<Group?>(n, { null })
+        val groups = ArrayList<Group?>(n)
         (0 until n).forEach { groups.add(null) } // Has to be a better way to do this
         val subgroups = Array<Group?>(n * n, { null })
         val chords = Chords(groups)
@@ -85,10 +84,8 @@ class ChordDiagram {
                     continue
 
                 if(source.value.isTruthy() || target.value.isTruthy()) {
-                    if(source.value < target.value)
-                        chords += Chord(target, source)
-                    else
-                        chords += Chord(source, target)
+                    chords += if(source.value < target.value) Chord(target, source)
+                              else Chord(source, target)
                 }
             }
         }

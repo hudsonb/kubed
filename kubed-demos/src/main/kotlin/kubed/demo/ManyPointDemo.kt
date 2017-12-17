@@ -7,6 +7,7 @@ import kubed.selection.Selection
 import kubed.selection.selectAll
 import kubed.shape.rect
 import javafx.scene.*
+import kubed.interpolate.color.*
 import kubed.scale.*
 import kubed.timer.timer
 
@@ -23,10 +24,10 @@ class ManyPointDemo : Application() {
         val pointMargin = 3.0
 
         val points = createPoints(numPoints)
-        val toGrid = { points: List<Point> -> gridLayout(points, pointWidth + pointMargin, width) }
-        val toSine = { points: List<Point> -> sineLayout(points, pointWidth + pointMargin, width, height) }
-        val toSpiral = { points: List<Point> -> spiralLayout(points, pointWidth + pointMargin, width, height) }
-        val toPhyllotaxis = { points: List<Point> -> phyllotaxisLayout(points, pointWidth + pointMargin, width / 2, height / 2) }
+        val toGrid = { p: List<Point> -> gridLayout(p, pointWidth + pointMargin, width) }
+        val toSine = { p: List<Point> -> sineLayout(p, pointWidth + pointMargin, width, height) }
+        val toSpiral = { p: List<Point> -> spiralLayout(p, pointWidth + pointMargin, width, height) }
+        val toPhyllotaxis = { p: List<Point> -> phyllotaxisLayout(p, pointWidth + pointMargin, width / 2, height / 2) }
         val layouts = listOf(toSine, toPhyllotaxis, toSpiral, toPhyllotaxis, toGrid)
 
         toGrid(points)
@@ -34,7 +35,7 @@ class ManyPointDemo : Application() {
         //toPhyllotaxis(points)
         //toSpiral(points)
 
-        val color = scaleSequential(interpolateViridis()).domain(points.size - 1.0, 0.0)
+        val color = scaleSequential(interpolateYlOrBr()).domain(points.size - 1.0, 0.0)
         val c = rect<Point> {
             translateX { d, _ -> d.x }
             translateY { d, _ -> d.y }

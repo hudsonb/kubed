@@ -38,7 +38,7 @@ class TransitionDemo: Application() {
         root.selectAll<Double>()
                 .data(x.domain)
                 .enter().append { d, _, _ -> c(d) }
-                .bind({ _, _, _ -> translateYProperty() }, primaryStage!!.heightProperty().divide(2).subtract(margin + 25.0 / 2))
+                .bind({ _, _, _ -> translateYProperty() }, primaryStage.heightProperty().divide(2).subtract(margin + 25.0 / 2))
                 .transition()
                 .duration(Duration.millis(1000.0))
                 .fill(Color.YELLOW)

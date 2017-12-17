@@ -1,29 +1,10 @@
 package kubed.demo
 
 import javafx.application.Application
-import javafx.application.Application.launch
-import javafx.application.Platform
-import javafx.embed.swing.SwingFXUtils
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
-import javafx.scene.SnapshotParameters
-import javafx.scene.paint.Color
 import javafx.stage.Stage
-import javafx.util.Duration
-import kubed.scale.PointScale
-import kubed.scale.scaleOrdinal
-import kubed.scale.schemeCategory10
 import kubed.selection.selectAll
-import kubed.shape.circle
-import kubed.shape.rect
-import kubed.shape.symbol.SymbolType
-import kubed.shape.symbol.symbol
-import kubed.shape.symbol.symbols
-import kubed.transition.*
-import java.io.File
-import java.io.IOException
-import javax.imageio.ImageIO
 
 class MatrixHeatmapDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -40,30 +21,12 @@ class MatrixHeatmapDemo: Application() {
             .translateY { _, i, _ -> i * cellSize }
             .selectAll<Pair<String, Int>>("Group")
 
-
-
         val scene = Scene(root)
-
-
         //primaryStage.width = width + margin * 2
         //primaryStage.height = height + margin * 2
 
         primaryStage.scene = scene
         primaryStage.show()
-    }
-
-    fun saveAsPng(node: Node) {
-        val image = node.snapshot(SnapshotParameters(), null)
-
-        // TODO: probably use a file chooser here
-        val file = File("chart.png")
-
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file)
-        } catch (e: IOException) {
-            // TODO: handle exception here
-        }
-
     }
 
     fun getData(): List<Data> {

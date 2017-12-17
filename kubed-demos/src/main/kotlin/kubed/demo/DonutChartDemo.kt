@@ -1,23 +1,16 @@
 package kubed.demo
 
 import javafx.application.Application
-import javafx.application.Platform
-import javafx.embed.swing.SwingFXUtils
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
-import javafx.scene.SnapshotParameters
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.scene.transform.Translate
 import javafx.stage.Stage
+import kubed.color.scheme.schemeCategory10
 import kubed.scale.scaleOrdinal
-import kubed.scale.schemeCategory10
 import kubed.selection.selectAll
 import kubed.shape.*
-import java.io.File
-import java.io.IOException
-import javax.imageio.ImageIO
 
 class DonutChartDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -57,7 +50,7 @@ class DonutChartDemo: Application() {
         }
 
         val pie = pie<AgeGroup> {
-            value = { d, _, _ -> d.population.toDouble() }
+            value { d, _, _ -> d.population.toDouble() }
         }
 
         val g = root.selectAll<PieWedge<AgeGroup>>(".arc")
@@ -74,11 +67,6 @@ class DonutChartDemo: Application() {
              listOf(Translate(c.x, c.y))
          }
 
-        Thread(Runnable {
-            Thread.sleep(1000)
-            Platform.runLater { saveAsPng(root) }
-        }).start()
-
         val scene = Scene(root)
         primaryStage.scene = scene
         primaryStage.width = width
@@ -86,19 +74,6 @@ class DonutChartDemo: Application() {
         primaryStage.show()
     }
 
-    fun saveAsPng(node: Node) {
-        val image = node.snapshot(SnapshotParameters(), null)
-
-        // TODO: probably use a file chooser here
-        val file = File("chart.png")
-
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file)
-        } catch (e: IOException) {
-            // TODO: handle exception here
-        }
-
-    }
     companion object {
         @JvmStatic
         fun main(vararg args: String) {

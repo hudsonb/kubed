@@ -1,10 +1,11 @@
-package kubed.interpolate
+package kubed.interpolate.color
 
+import javafx.scene.paint.Color
 import kubed.color.ColorSpace
 import kubed.color.Cubehelix
 
 private fun interpolateCubeHelix(start: ColorSpace<*>, end: ColorSpace<*>, gamma: Double = 1.0,
-                                 hue: (Double, Double) -> (Double) -> Double = ::hue): (Double) -> Cubehelix {
+                                 hue: (Double, Double) -> (Double) -> Double = ::hue): (Double) -> Color {
     val sch = Cubehelix.convert(start)
     val ech = Cubehelix.convert(end)
 
@@ -13,7 +14,7 @@ private fun interpolateCubeHelix(start: ColorSpace<*>, end: ColorSpace<*>, gamma
     val l = nogamma(sch.l, ech.l)
     val opacity = nogamma(sch.opacity, ech.opacity)
 
-    return { t -> Cubehelix(h(t), s(t), l(Math.pow(t, gamma)), opacity(t)) }
+    return { t -> Cubehelix(h(t), s(t), l(Math.pow(t, gamma)), opacity(t)).toColor() }
 }
 
 fun interpolateCubeHelix(start: ColorSpace<*>, end: ColorSpace<*>, gamma: Double = 1.0) =

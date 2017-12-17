@@ -3,9 +3,9 @@ package kubed.demo
 import javafx.application.Application
 import javafx.scene.Group
 import javafx.scene.Scene
-import javafx.scene.paint.Color
-import javafx.scene.shape.Path
+import javafx.scene.layout.StackPane
 import javafx.stage.Stage
+import kubed.ScalingPane
 import kubed.array.range
 import kubed.color.Hsl
 import kubed.selection.selectAll
@@ -25,12 +25,13 @@ class RainbowCircleDemo: Application() {
         root.translateYProperty().bind(primaryStage.heightProperty().divide(2))
 
         val arc = arc<Double> {
-            outerRadius(outerRadius)
-            innerRadius(innerRadius)
             startAngle { d, _ -> d }
             endAngle { d, _ -> d + t / n * 1.1 }
             fill { d, _ -> Hsl(d * 360 / t, 1.0, 0.5).toColor() }
-            stroke(Color.TRANSPARENT)
+
+            stroke(null)
+            outerRadius(outerRadius)
+            innerRadius(innerRadius)
         }
 
        root.selectAll<Double>()
@@ -38,7 +39,10 @@ class RainbowCircleDemo: Application() {
            .enter()
            .append { d, _, _ -> arc(d) }
 
-        val scene = Scene(root)
+
+        val sp = ScalingPane()
+        sp.contentPane = StackPane(root)
+        val scene = Scene(sp)
         primaryStage.scene = scene
         primaryStage.width = width
         primaryStage.height = height

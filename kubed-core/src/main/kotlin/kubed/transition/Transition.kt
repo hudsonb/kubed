@@ -354,9 +354,9 @@ class Transition<T> internal constructor(val parent: Transition<T>?, internal va
         return this
     }
 
-    override fun fill(fill: (d: T, i: Int, group: List<Node?>) -> Paint): Transition<T> {
+    override fun fill(paint: (d: T, i: Int, group: List<Node?>) -> Paint): Transition<T> {
         selection.forEach<Shape> { d, i, group ->
-            getTransition(this, index)?.children?.add(fillTo(fill(d, i, group) as Color))
+            getTransition(this, index)?.children?.add(fillTo(paint(d, i, group) as Color))
         }
 
         return this
@@ -466,7 +466,7 @@ class Transition<T> internal constructor(val parent: Transition<T>?, internal va
                 when(status) {
                     Animation.Status.RUNNING -> node.cacheHint = m?.cacheHint ?: node.cacheHint
                     Animation.Status.PAUSED,
-                    Animation.Status.STOPPED -> node.cacheHint = originalCacheHint
+                    Animation.Status.STOPPED, null -> node.cacheHint = originalCacheHint
                 }
             }
         }

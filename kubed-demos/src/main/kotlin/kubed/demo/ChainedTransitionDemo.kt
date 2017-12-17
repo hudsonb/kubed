@@ -9,7 +9,7 @@ import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import javafx.util.Duration
-import kubed.interpolate.interpolateRgb
+import kubed.interpolate.color.interpolateRgb
 import kubed.selection.selectAll
 import kubed.shape.rect
 import kubed.transition.transition

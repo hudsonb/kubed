@@ -1,7 +1,6 @@
 package kubed.demo
 
 import javafx.application.Application
-import javafx.embed.swing.SwingFXUtils
 import javafx.scene.*
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
@@ -9,14 +8,12 @@ import javafx.scene.transform.Rotate
 import javafx.scene.transform.Translate
 import javafx.stage.Stage
 import kubed.color.Cubehelix
-import kubed.interpolate.interpolateCubeHelix
+import kubed.color.cubehelix
+import kubed.interpolate.color.interpolateCubeHelix
 import kubed.scale.LinearScale
 import kubed.selection.selectAll
 import kubed.shape.rect
 import kubed.timer.timer
-import java.io.File
-import java.io.IOException
-import javax.imageio.ImageIO
 
 class SpiralTriangleDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -33,10 +30,11 @@ class SpiralTriangleDemo: Application() {
         val g = Group()
         root.children += g
 
-        val color = LinearScale<Cubehelix>({ a, b -> interpolateCubeHelix(a, b) }).domain(listOf(0.0, 0.5, 1.0))
-                .range(listOf(Cubehelix(-100.0, 0.75, 0.35),
-                              Cubehelix(80.0, 1.0, 0.80),
-                              Cubehelix(260.0, 0.75, 0.35)))
+        val color = LinearScale<Color>({ a, b -> interpolateCubeHelix(a.cubehelix(), b.cubehelix()) })
+                .domain(listOf(0.0, 0.5, 1.0))
+                .range(listOf(Cubehelix(-100.0, 0.75, 0.35).toColor(),
+                              Cubehelix(80.0, 1.0, 0.80).toColor(),
+                              Cubehelix(260.0, 0.75, 0.35).toColor()))
 
         val rect = rect<Unit> {
             translateX(-squareSize / 2)
@@ -74,7 +72,7 @@ class SpiralTriangleDemo: Application() {
                       .datum { _, i, _ -> i / squareCount.toDouble() }
 
         timer { elapsed ->
-            square.fill { t, _, _ -> color((t + elapsed * colorSpeed) % 1).toColor() }
+            square.fill { t, _, _ -> color((t + elapsed * colorSpeed) % 1) }
             square.transform { t, _, _ ->
                 listOf(Translate((t - .5) * triangleSize, 0.0), Rotate(t * 120 + elapsed * angularSpeed, squareSize / 2, squareSize / 2))
             }
@@ -86,20 +84,6 @@ class SpiralTriangleDemo: Application() {
         primaryStage.width = width
         primaryStage.height = height
         primaryStage.show()
-    }
-
-    fun saveAsPng(node: Node) {
-        val image = node.snapshot(SnapshotParameters(), null)
-
-        // TODO: probably use a file chooser here
-        val file = File("chart.png")
-
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file)
-        } catch (e: IOException) {
-            // TODO: handle exception here
-        }
-
     }
 
     companion object {

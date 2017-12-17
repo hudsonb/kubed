@@ -25,7 +25,7 @@ class StepCurve(val context: Context, var t: Double = 0.5) : Curve {
     }
 
     override fun lineEnd() {
-        if(0 < t && t < 1 && point === 2)
+        if(0 < t && t < 1 && point == 2)
             context.lineTo(x, y)
 
         if(line.isTruthy() || (line != 0.0 && point == 1))

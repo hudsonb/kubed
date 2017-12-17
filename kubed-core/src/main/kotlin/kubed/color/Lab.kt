@@ -66,8 +66,8 @@ class Lab(val l: Double, val a: Double, val b: Double, val opacity: Double = 1.0
                    opacity)
     }
 
-    override fun brighter(k: Double): Lab = Lab(l + Kn * k, a, b, opacity)
-    override fun darker(k: Double): Lab = Lab(l - Kn * k, a, b, opacity)
+    override fun brighter(k: Double) = Lab(l + Kn * k, a, b, opacity)
+    override fun darker(k: Double) = Lab(l - Kn * k, a, b, opacity)
 
     private fun lab2xyz(t: Double): Double {
         return when {

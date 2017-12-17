@@ -1,27 +1,16 @@
 package kubed.demo
 
 import javafx.application.Application
-import javafx.embed.swing.SwingFXUtils
 import javafx.geometry.VPos
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
-import javafx.scene.SnapshotParameters
 import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
-import javafx.scene.paint.Color.color
 import javafx.stage.Stage
-import kubed.color.hcl
-import kubed.color.rgb
-import kubed.interpolate.interpolateHcl
-import kubed.scale.LinearScale
 import kubed.selection.selectAll
 import kubed.shape.TextAnchor
 import kubed.shape.rect
 import kubed.shape.text
-import java.io.File
-import java.io.IOException
-import javax.imageio.ImageIO
 
 class StateGridDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -34,10 +23,6 @@ class StateGridDemo: Application() {
         val g = Group()
         root.children += g
 
-        //val color = LinearScale(::interpolateHcl)
-        //color.domain(listOf(0.0, 1.0))
-        //color.range(listOf(Color.web("#f7fcb9").rgb().hcl(), Color.web("#31a354").rgb().hcl()))
-
         val rect = rect<State> {
             layoutX(-cellSize / 2)
             layoutY(-cellSize / 2)
@@ -45,9 +30,7 @@ class StateGridDemo: Application() {
             translateY { d, _ -> d.row * cellSize }
             width(cellSize - 2)
             height(cellSize - 2)
-            //fill { d, _ -> color(d.value).toColor() }
             fill { d, _ -> if(d.party == "d") Color.web("#2196F3") else Color.web("#FF5252") }
-            //stroke { d, _ -> if(d.battleground) Color.YELLOW else null }
         }
 
         val text = text<State> {
@@ -67,26 +50,10 @@ class StateGridDemo: Application() {
 
         val scene = Scene(root)
 
-        saveAsPng(root)
-
         primaryStage.scene = scene
         primaryStage.width = width
         primaryStage.height = height
         primaryStage.show()
-    }
-
-    fun saveAsPng(node: Node) {
-        val image = node.snapshot(SnapshotParameters(), null)
-
-        // TODO: probably use a file chooser here
-        val file = File("chart.png")
-
-        try {
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file)
-        } catch (e: IOException) {
-            // TODO: handle exception here
-        }
-
     }
 
     data class State(val abbrv: String, val row: Int, val col: Int, val party: String, val battleground: Boolean = false)

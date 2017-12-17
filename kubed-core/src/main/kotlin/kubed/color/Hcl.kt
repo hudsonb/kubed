@@ -23,6 +23,6 @@ class Hcl(val h: Double, var c: Double, var l: Double, var opacity: Double = 1.0
     }
 
     override fun rgb(): Rgb = Lab.convert(this).rgb()
-    override fun brighter(k: Double): Hcl = Hcl(h, c, l + Kn * k, opacity)
-    override fun darker(k: Double): Hcl = Hcl(h, c, l - Kn * k, opacity)
+    override fun brighter(k: Double) = Hcl(h, c, l + Kn * k, opacity)
+    override fun darker(k: Double) = Hcl(h, c, l - Kn * k, opacity)
 }

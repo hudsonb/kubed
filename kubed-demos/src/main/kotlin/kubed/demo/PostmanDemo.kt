@@ -2,7 +2,6 @@ package kubed.demo
 
 import javafx.animation.*
 import javafx.application.Application
-import javafx.application.Application.launch
 import javafx.scene.CacheHint
 import javafx.scene.Scene
 import javafx.scene.layout.StackPane
@@ -63,10 +62,10 @@ class PostmanDemo: Application() {
 
         val scene = Scene(root)
         primaryStage!!.width = width + margin * 2
-        primaryStage!!.height = height + margin * 2
+        primaryStage.height = height + margin * 2
 
-        primaryStage!!.scene = scene
-        primaryStage!!.show()
+        primaryStage.scene = scene
+        primaryStage.show()
     }
 
     companion object {

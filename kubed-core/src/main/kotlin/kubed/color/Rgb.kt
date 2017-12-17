@@ -22,7 +22,9 @@ class Rgb(var r: Int, var g: Int, var b: Int, var opacity: Double = 1.0) : Color
     override fun rgb(): Rgb = this
 
     override fun brighter(k: Double): Rgb {
-        val t = if(k == BRIGHTER) BRIGHTER else Math.pow(BRIGHTER, k)
+        val t = if(k == BRIGHTER) BRIGHTER
+                else Math.pow(BRIGHTER, k)
+
         return Rgb((r * t).toInt(),
                    (g * t).toInt(),
                    (b * t).toInt(),
@@ -30,7 +32,9 @@ class Rgb(var r: Int, var g: Int, var b: Int, var opacity: Double = 1.0) : Color
     }
 
     override fun darker(k: Double): Rgb {
-        val t = if(k == DARKER) DARKER else Math.pow(DARKER, k)
+        val t = if(k == DARKER) DARKER
+                else Math.pow(DARKER, k)
+
         return Rgb((r * t).toInt(),
                    (g * t).toInt(),
                    (b * t).toInt(),

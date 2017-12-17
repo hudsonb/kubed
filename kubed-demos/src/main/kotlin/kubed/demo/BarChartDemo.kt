@@ -40,8 +40,8 @@ class BarChartDemo: Application() {
             padding(0.1)
         }
 
-        val y = LinearScale<Double>(::interpolateRound).range(listOf(innerHeight, 0.0))
-                                                       .domain(listOf(0.0, data.map { it.frequency }.max()) as List<Double>)
+        val y = LinearScale(::interpolateRound).range(innerHeight, 0.0)
+                                               .domain(0.0, data.map { it.frequency }.max() ?: 0.0)
 
         val xAxis = axisBottom(x)
         xAxis(root.selectAll<Nothing>(".xAxis")
@@ -63,7 +63,7 @@ class BarChartDemo: Application() {
             width(x.bandwidth)
             height { d, _ -> innerHeight - y(d.frequency) }
             fill(Color.STEELBLUE)
-            styleClasses { _, _ -> listOf("bar") }
+            styleClasses("bar")
     }
 
     root.selectAll<LetterFrequency>(".bar")

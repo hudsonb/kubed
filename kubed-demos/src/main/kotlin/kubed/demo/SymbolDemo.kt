@@ -5,8 +5,8 @@ import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import kubed.color.scheme.schemeCategory10
 import kubed.scale.scaleOrdinal
-import kubed.scale.schemeCategory10
 import kubed.selection.selectAll
 import kubed.shape.symbol.SymbolType
 import kubed.shape.symbol.symbol
@@ -39,7 +39,7 @@ class SymbolDemo: Application() {
         root.selectAll<SymbolType>()
                 .data(symbols())
                 .enter().append { d, i, _ -> c(d, i) }
-                .bind({ _, _, _ -> translateYProperty() }, primaryStage!!.heightProperty().divide(2).subtract(margin + 25.0 / 2))
+                .bind({ _, _, _ -> translateYProperty() }, primaryStage.heightProperty().divide(2).subtract(margin + 25.0 / 2))
 
         val scene = Scene(root)
         primaryStage.width = width + margin * 2

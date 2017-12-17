@@ -20,7 +20,7 @@ fun formatDecimal(value: Double, precision: Int = 20): Result {
 }
 
 fun formatPrefixAuto(x: Double, p: Int): String {
-    val (coefficient, exponent) = formatDecimal(x, p) ?: return x.toString()
+    val (coefficient, exponent) = formatDecimal(x, p)
     val i = (exponent - (Math.max(-8.0, Math.min(8.0, Math.floor(exponent / 3.0))) * 3) + 1).toInt()
     val n = coefficient.length
     if(i == n)
@@ -39,14 +39,14 @@ fun formatPrefixAuto(x: Double, p: Int): String {
     else {
         result = "0."
         (0..1 - i).forEach { result += '0' }
-        result += formatDecimal(x, Math.max(0, p + i - 1))?.coefficient // less than 1y!
+        result += formatDecimal(x, Math.max(0, p + i - 1)).coefficient // less than 1y!
     }
 
     return result
 }
 
 fun formatRounded(x: Double, p: Int): String {
-    val (coefficient, exponent) = formatDecimal(x, p) ?: return x.toString()
+    val (coefficient, exponent) = formatDecimal(x, p)
 
     var result : String
     when {

@@ -1,4 +1,4 @@
-package kubed.interpolate
+package kubed.interpolate.color
 
 import kubed.util.isTruthy
 
@@ -14,7 +14,7 @@ internal fun exponential(a: Double, b: Double, y: Double): (Double) -> Double {
 internal fun hue(a: Double, b: Double): (Double) -> Double {
     val d = b - a
     return when {
-        d.isTruthy() -> linear(a, if(d > 180 || d < -180) d - 360.0 * Math.round(d / 360.0) else d)
+        d.isTruthy() -> linear(a, if (d > 180 || d < -180) d - 360.0 * Math.round(d / 360.0) else d)
         else -> { _ -> if(a.isNaN()) b else a }
     }
 }
