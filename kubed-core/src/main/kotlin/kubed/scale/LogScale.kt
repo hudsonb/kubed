@@ -9,7 +9,7 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
                   rangeComparator: Comparator<R>? = null) : ContinuousScale<R>(interpolate, uninterpolate, rangeComparator) {
     var base = 10.0
         set(value) {
-            base = value
+            field = value
             rescale()
         }
 
@@ -82,7 +82,7 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
             if(u > 0) {
                 while(i < j) {
                     val p = pows(i)
-                    z = (1..base.toInt() - 1)
+                    z = (1 until base.toInt())
                             .map { p * it }
                             .filter { it >= u }
                             .takeWhile { it <= v }
