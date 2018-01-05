@@ -1,17 +1,9 @@
 package kubed.scale
 
 import kubed.array.bisect
-import kubed.interpolate.interpolateNumber
-import kubed.util.isTruthy
 import kotlin.comparisons.naturalOrder
 
-fun <R> scaleQuantize(interpolate: (R, R) -> (Double) -> R,
-                      uninterpolate: ((R, R) -> (R) -> Double)? = null,
-                      rangeComparator: Comparator<R>? = null): QuantizeScale<R> = QuantizeScale(interpolate, uninterpolate, rangeComparator)
-
-class QuantizeScale<R>(interpolate: (R, R) -> (Double) -> R,
-                       uninterpolate: ((R, R) -> (R) -> Double)? = null,
-                       rangeComparator: Comparator<R>? = null) : LinearScale<R>(interpolate, uninterpolate, rangeComparator) {
+class QuantizeScale<R> : LinearScale<R>({ _: R, _: R -> throw UnsupportedOperationException() }, null, null) {
     private var x0 = 0.0
     private var x1 = 1.0
 
@@ -38,6 +30,8 @@ class QuantizeScale<R>(interpolate: (R, R) -> (Double) -> R,
 
     override fun invoke(d: Double): R = range[bisect(domain, d, naturalOrder(), 0, range.size - 1)]
 
+    override fun invert(r: R): Double = throw UnsupportedOperationException("QuantizeScale does not support invert, see invertExtent")
+
     fun invertExtent(y: R): List<Double> {
         val i = range.indexOf(y)
         val n = range.size - 1
@@ -55,21 +49,6 @@ class QuantizeScale<R>(interpolate: (R, R) -> (Double) -> R,
         val n = range.size - 1
         for(i in range.indices) {
             domain.add(i, ((i + 1) * x1 - (i - n) * x0) / (n + 1))
-        }
-    }
-
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val test: Char? = null
-            println(test.isTruthy())
-
-            val scale = scaleQuantize(::interpolateNumber).domain(listOf(10.0, 100.0))
-                                                           .range(listOf(1.0, 2.0, 4.0))
-
-            println(scale(20.0))
-            println(scale(50.0))
-            println(scale(80.0))
         }
     }
 }

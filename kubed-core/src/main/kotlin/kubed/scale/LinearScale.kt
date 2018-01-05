@@ -25,13 +25,12 @@ open class LinearScale<R>(interpolate: (R, R) -> (Double) -> R,
 
     fun nice(count: Int = 10): LinearScale<R> {
         val i = domain.size - 1
-        val n = count
         val start: Double = domain.first()
         val stop: Double = domain.last()
-        var step = tickStep(start, stop, n)
+        var step = tickStep(start, stop, count)
 
         if(step > 0) {
-            step = tickStep(Math.floor(start / step) * step, Math.ceil(stop / step) * step, n)
+            step = tickStep(Math.floor(start / step) * step, Math.ceil(stop / step) * step, count)
             domain[0] = Math.floor(start / step) * step
             domain[i] = Math.ceil(stop / step) * step
         }

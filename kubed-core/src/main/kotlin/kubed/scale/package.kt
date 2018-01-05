@@ -29,6 +29,11 @@ fun <D> scalePoint(init: PointScale<D>.() -> Unit) = PointScale<D>().apply {
     init.invoke(this)
 }
 
+fun <R> scaleQuantile() = QuantileScale<R>()
+
+fun <R> scaleQuantize() = QuantizeScale<R>()
+fun <D> scaleQuantize(init: QuantizeScale<D>.() -> Unit) = QuantizeScale<D>().apply { init.invoke(this) }
+
 // Consider: Should this be in the color package instead?
 fun <D> scaleCategory10() = OrdinalScale<D, Color>().apply { range(schemeCategory10()) }
 fun <D> scaleCategory20() = OrdinalScale<D, Color>().apply { range(schemeCategory20()) }

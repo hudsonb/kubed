@@ -77,7 +77,7 @@ abstract class ContinuousScale<R>(val interpolate: (R, R) -> (Double) -> R,
         return output?.invoke(d) ?: throw IllegalStateException()
     }
 
-    fun invert(r: R): Double {
+    open fun invert(r: R): Double {
         if(uninterpolate == null)
             throw IllegalStateException()
 
@@ -92,8 +92,8 @@ abstract class ContinuousScale<R>(val interpolate: (R, R) -> (Double) -> R,
     }
 
     protected open fun rescale() {
-        piecewiseOutput = if(Math.min(domain.size, range.size) > 2) this::polymap else this::bimap
-        piecewiseInput = if(Math.min(domain.size, range.size) > 2) this::polymapInvert else this::bimapInvert
+        piecewiseOutput = if(Math.min(domain.size, range.size) > 2) ::polymap else ::bimap
+        piecewiseInput = if(Math.min(domain.size, range.size) > 2) ::polymapInvert else ::bimapInvert
         input = null
         output = null
     }
