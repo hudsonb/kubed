@@ -1,9 +1,8 @@
 package kubed.array
 
-
 fun quantile(values: List<Double>, p: Double, f: (Double, Int, List<Double>) -> Double = { x, _, _ -> x }): Double {
     if(values.isEmpty())
-        throw IllegalArgumentException("values must be non-emptySelection")
+        throw IllegalArgumentException("values must be non-empty")
 
     val n = values.size
     if(p <= 0.0 || n < 2)

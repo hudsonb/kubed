@@ -4,10 +4,6 @@ import kubed.array.bisect
 import kubed.array.quantile
 import kotlin.comparisons.naturalOrder
 
-fun <R> scaleQuantile(): QuantileScale<R> {
-    return QuantileScale()
-}
-
 class QuantileScale<R> : Scale<Double, R> {
     override val domain = ArrayList<Double>()
     override val range = ArrayList<R>()
@@ -15,14 +11,14 @@ class QuantileScale<R> : Scale<Double, R> {
     private val thresholds = ArrayList<Double>()
 
     override fun invoke(d: Double): R {
-        if(d.isNaN())
-            throw IllegalArgumentException("Can not be NaN")
+        if(d.isNaN()) throw IllegalArgumentException("Can not be NaN")
 
         return range[bisect(thresholds, d, naturalOrder())]
     }
 
-    override fun ticks(count: Int): List<Double> = listOf()
+    override fun ticks(count: Int): List<Double> = emptyList()
 
+    fun domain(vararg d: Double) = domain(d.toList())
     fun domain(d: List<Double>): QuantileScale<R> {
         domain.clear()
         domain.addAll(d.filter { it != Double.NaN })
@@ -32,6 +28,7 @@ class QuantileScale<R> : Scale<Double, R> {
         return this
     }
 
+    fun range(vararg r: R) = range(r.toList())
     fun range(r: List<R>): QuantileScale<R> {
         range.clear()
         range.addAll(r)
@@ -62,17 +59,4 @@ class QuantileScale<R> : Scale<Double, R> {
             thresholds.add(i - 1, quantile(domain, i / n.toDouble()))
         }
     }
-
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val scale = scaleQuantile<Int>().domain(listOf(10.0, 100.0))
-                                            .range(listOf(1, 2, 4))
-
-            println(scale(20.0))
-            println(scale(50.0))
-            println(scale(80.0))
-        }
-    }
-
 }
