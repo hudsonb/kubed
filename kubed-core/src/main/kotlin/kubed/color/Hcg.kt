@@ -1,7 +1,13 @@
 package kubed.color
 
+import javafx.scene.paint.Color
 import kubed.util.isFalsy
 import kubed.util.isTruthy
+
+/**
+ * Returns a representation of this color in the Hsl color space
+ */
+fun Color.hcg(): Hcg = rgb().hcg()
 
 fun Rgb.hcg() = Hcg.convert(this)
 

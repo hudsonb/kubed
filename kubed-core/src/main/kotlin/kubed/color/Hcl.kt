@@ -1,6 +1,12 @@
 package kubed.color
 
+import javafx.scene.paint.Color
 import kubed.util.MoreMath
+
+/**
+ * Returns a representation of this color in the Hsl color space
+ */
+fun Color.hcl(): Hcl = rgb().hcl()
 
 fun Rgb.hcl() = Hcl.convert(this)
 

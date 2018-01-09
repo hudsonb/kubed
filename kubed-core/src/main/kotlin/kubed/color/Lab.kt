@@ -2,7 +2,6 @@ package kubed.color
 
 import javafx.scene.paint.Color
 import kubed.util.MoreMath
-import kubed.util.isTruthy
 
 internal const val Kn = 18.0
 internal const val Xn = 0.950470 // D65 standard referent
@@ -12,6 +11,11 @@ private const val T0 = 4.0 / 29.0
 private const val T1 = 6.0 / 29.0
 private const val T2 = 3.0 * T1 * T1
 private const val T3 = T1 * T1 * T1
+
+/**
+ * Returns a representation of this color in the CIELAB color space
+ */
+fun Color.lab(): Lab = rgb().lab()
 
 fun Rgb.lab(): Lab {
     val b = rgb2xyz(r)

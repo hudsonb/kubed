@@ -13,6 +13,11 @@ private const val ED = E * D
 private const val EB = E * B
 private const val BC_DA = B * C - D * A
 
+/**
+ * Returns a representation of this color in the Cubehelix color space
+ */
+fun Color.cubehelix(): Cubehelix = rgb().cubehelix()
+
 fun Rgb.cubehelix(): Cubehelix {
     val r = this.r / 255.0
     val g = this.g / 255.0

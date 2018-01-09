@@ -2,6 +2,13 @@ package kubed.color
 
 import javafx.scene.paint.Color
 
+/**
+ * Returns a representation of this color in the Rgb color space
+ */
+fun Color.rgb(): Rgb = Rgb((red * 255).toInt(),
+        (green * 255).toInt(),
+        (blue * 255).toInt(),
+        opacity)
 
 class Rgb(var r: Int, var g: Int, var b: Int, var opacity: Double = 1.0) : ColorSpace<Rgb> {
     companion object {

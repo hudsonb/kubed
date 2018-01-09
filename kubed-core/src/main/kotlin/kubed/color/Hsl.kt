@@ -4,6 +4,11 @@ import javafx.scene.paint.Color
 import kubed.util.isTruthy
 
 /**
+ * Returns a representation of this color in the Hsl color space
+ */
+fun Color.hsl(): Hsl = rgb().hsl()
+
+/**
  * Convert to Hsl color space
  */
 fun Rgb.hsl(): Hsl {
