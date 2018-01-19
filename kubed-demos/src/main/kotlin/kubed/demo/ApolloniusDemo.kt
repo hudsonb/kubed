@@ -14,6 +14,8 @@ import kubed.util.isTruthy
 
 import kubed.selection.selectAll
 import kubed.shape.circle
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 
 class ApolloniusDemo: Application() {
@@ -149,8 +151,8 @@ class ApolloniusDemo: Application() {
         val A = xb * xb + yb * yb - 1
         val B = 2 * (xa * xb + ya * yb + r1)
         val C = xa * xa + ya * ya - r1 * r1
-        val r = if(A.isTruthy()) (-B - Math.sqrt(B * B - 4 * A * C)) / (2 * A) else (-C / B)
-        return if(r.isNaN()) null else Data(xa + xb * r + x1, ya + yb * r + y1, Math.abs(r))
+        val r = if(A.isTruthy()) (-B - sqrt(B * B - 4 * A * C)) / (2 * A) else (-C / B)
+        return if(r.isNaN()) null else Data(xa + xb * r + x1, ya + yb * r + y1, abs(r))
     }
 
     data class Data(val x: Double, val y: Double, val r: Double)

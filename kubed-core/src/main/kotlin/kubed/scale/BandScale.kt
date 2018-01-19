@@ -1,6 +1,7 @@
 package kubed.scale
 
 import java.util.*
+import kotlin.math.max
 
 class BandScale<D> : Scale<D, Double> {
     private val index: MutableMap<D, Int> = HashMap()
@@ -121,7 +122,7 @@ class BandScale<D> : Scale<D, Double> {
         val reverse = range.last() < range.first()
         var start = if(reverse) range.last() else range.first()
         val stop = if(reverse) range.first() else range.last()
-        var step = (stop - start) / Math.max(1.0, n - paddingInner + paddingOuter * 2)
+        var step = (stop - start) / max(1.0, n - paddingInner + paddingOuter * 2)
         if(round)
             step = Math.floor(step)
 

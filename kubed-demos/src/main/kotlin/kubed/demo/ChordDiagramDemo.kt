@@ -22,6 +22,7 @@ import javafx.scene.Node
 import javafx.scene.paint.Color
 import kubed.selection.selectAll
 import java.util.Comparator
+import kotlin.math.min
 
 class ChordDiagramDemo: Application() {
     override fun start(primaryStage: Stage?) {
@@ -33,7 +34,7 @@ class ChordDiagramDemo: Application() {
                             listOf(15.0, 20.0, 5.0, 0.0, 0.0, 0.0))
         val width = 960.0
         val height = 960.0
-        val outerRadius = Math.min(width, height) * 0.5 - 40
+        val outerRadius = min(width, height) * 0.5 - 40
         val innerRadius = outerRadius - 30
 
         val root = Group()

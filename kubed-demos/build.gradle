@@ -1,3 +1,4 @@
 dependencies {
 	compile project(':kubed-core')
+	compile project(':kubed-geo')
 }

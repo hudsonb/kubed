@@ -2,6 +2,9 @@ package kubed.color
 
 import javafx.scene.paint.Color
 import kubed.util.isTruthy
+import java.lang.Math.pow
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Returns a representation of this color in the Hsl color space
@@ -15,8 +18,8 @@ fun Rgb.hsl(): Hsl {
     val r = this.r / 255.0
     val g = this.g / 255.0
     val b = this.b / 255.0
-    val min = Math.min(r, Math.min(g, b))
-    val max = Math.max(r, Math.max(g, b))
+    val min = min(r, min(g, b))
+    val max = max(r, max(g, b))
 
     var h = Double.NaN
     var s = max - min
@@ -62,12 +65,12 @@ class Hsl(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0
     }
 
     override fun brighter(k: Double): Hsl {
-        val t = if(k == BRIGHTER) BRIGHTER else Math.pow(BRIGHTER, k)
+        val t = if(k == BRIGHTER) BRIGHTER else pow(BRIGHTER, k)
         return Hsl(h, s, l * t, opacity)
     }
 
     override fun darker(k: Double): Hsl {
-        val t = if(k == DARKER) DARKER else Math.pow(DARKER, k)
+        val t = if(k == DARKER) DARKER else pow(DARKER, k)
         return Hsl(h, s, l * t, opacity)
     }
 
@@ -80,6 +83,6 @@ class Hsl(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0
             else -> m1
         }
 
-        return (t * 255.0).toInt()//Math.min(255.0, (t * 255.0)).toInt()
+        return (t * 255.0).toInt()
     }
 }

@@ -1,6 +1,6 @@
 package kubed.layout.chord
 
-import kubed.util.MoreMath
+import kubed.math.TAU
 import kubed.util.isTruthy
 import java.util.*
 
@@ -15,8 +15,7 @@ class ChordDiagram {
         val groupSums = ArrayList<Double>(n)
         val groupIndex = ArrayList((0 until n).toList())
         val subgroupIndex = ArrayList<List<Int>>()
-        val groups = ArrayList<Group?>(n)
-        (0 until n).forEach { groups.add(null) } // Has to be a better way to do this
+        val groups = ArrayList<Group?>(n).apply { repeat(n) { add(null) }  }
         val subgroups = Array<Group?>(n * n, { null })
         val chords = Chords(groups)
 
@@ -49,8 +48,8 @@ class ChordDiagram {
         }
 
         // Convert the sum to scaling factor for [0, 2pi]
-        k = Math.max(0.0, MoreMath.TAU - padAngle * n) / k
-        val dx = if(k.isTruthy()) padAngle else MoreMath.TAU / n
+        k = Math.max(0.0, TAU - padAngle * n) / k
+        val dx = if(k.isTruthy()) padAngle else TAU / n
 
         // Compute the start and end angle for each group and subgroup
         var x = 0.0

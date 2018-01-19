@@ -12,6 +12,7 @@ import kubed.axis.axisLeft
 import kubed.interpolate.interpolateRound
 import kubed.scale.LinearScale
 import kubed.scale.scaleBand
+import kubed.scale.scaleLinear
 import kubed.scale.scaleOrdinal
 import kubed.selection.selectAll
 import kubed.shape.*
@@ -40,9 +41,11 @@ class StackedBarChartDemo: Application() {
             align = 0.1
         }
 
-        val yScale = LinearScale(::interpolateRound).range(innerHeight, 0.0)
-                                                    .domain(listOf(0.0, (data.maxBy { it["Total"]?.toInt() ?: 0 })?.get("Total")?.toDouble() ?: throw IllegalStateException()))
-                                                    .nice()
+        val yScale = scaleLinear(::interpolateRound) {
+            range(innerHeight, 0.0)
+            domain(0.0, (data.maxBy { it["Total"]?.toInt() ?: 0 })?.get("Total")?.toDouble() ?: throw IllegalStateException())
+            nice()
+        }
 
         val keys = listOf("Under 5 Years", "5 to 13 Years", "14 to 17 Years", "18 to 24 Years", "25 to 44 Years",
                 "45 to 64 Years", "65 Years and Over")

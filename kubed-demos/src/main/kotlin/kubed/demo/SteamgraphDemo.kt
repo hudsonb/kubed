@@ -1,13 +1,18 @@
 package kubed.demo
 
 import javafx.application.Application
+import javafx.application.Application.launch
 import javafx.geometry.Point2D
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.stage.Stage
 import kubed.interpolate.interpolateNumber
 import kubed.scale.LinearScale
+import kubed.scale.scaleLinear
 import kubed.shape.*
+import java.lang.Math.random
+import kotlin.math.exp
+import kotlin.math.max
 
 class SteamgraphDemo: Application() {
     override fun start(primaryStage: Stage?) {
@@ -21,14 +26,18 @@ class SteamgraphDemo: Application() {
         val n = 2 // Number of layers
         val m = 200 // Number of samples per layer
         val test = (0 until n).map { bumpLayer(m) }
-        val layers = stack({ (0 until m).map { it }}, { d, k -> d[k].y }, test)
+        val layers = stack({ (0 until m).map { it } }, { d, k -> d[k].y }, test)
 
-        val xScale = LinearScale<Double>(::interpolateNumber).domain(listOf(0.0, (m - 1).toDouble()))
-                                                        .range(listOf(0.0, width))
+        val xScale = scaleLinear<Double> {
+            domain(0.0, (m - 1).toDouble())
+            range(0.0, width)
+        }
 
         val max = layers.map { it.map { it.y0 + it.y1 } }.flatMap { it }.max() ?: throw IllegalArgumentException()
-        val yScale = LinearScale(::interpolateNumber).domain(listOf(0.0, max))
-                                                .range(listOf(height, 0.0))
+        val yScale = scaleLinear<Double> {
+            domain(0.0, max)
+            range(height, 0.0)
+        }
 
 //        val area = area<Point<Point2D>> {
 //            x { d, i, _ -> xScale(i.toDouble()) }
@@ -54,17 +63,17 @@ class SteamgraphDemo: Application() {
         }
 
         var i = 0.0
-        return a.map { Point2D(i++, Math.max(0.0, it)) }
+        return a.map { Point2D(i++, max(0.0, it)) }
     }
 
     fun bump(a: DoubleArray) {
-        val x = 1.0 / (0.1 + Math.random())
-        val y = 2.0 * Math.random() - 0.5
-        val z = 10.0 / (0.1 + Math.random())
+        val x = 1.0 / (0.1 + random())
+        val y = 2.0 * random() - 0.5
+        val z = 10.0 / (0.1 + random())
 
         for(i in a.indices) {
             val w = (i / a.size.toDouble() - y) * z
-            a[i] += x * Math.exp(-w * w)
+            a[i] += x * exp(-w * w)
         }
     }
 

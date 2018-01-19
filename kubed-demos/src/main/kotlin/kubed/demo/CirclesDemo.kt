@@ -8,6 +8,7 @@ import javafx.stage.Stage
 import kubed.selection.selectAll
 import kubed.shape.circle
 import kubed.timer.timer
+import java.lang.Math.random
 
 
 class CirclesDemo : Application() {
@@ -22,13 +23,13 @@ class CirclesDemo : Application() {
         val c = circle<Data> {
             translateX { (x), _ -> x }
             translateY { (y), _ -> y }
-            radius { _, _ -> 3 * Math.random() + Math.random() }
+            radius { _, _ -> 3 * random() + random() }
             fill(Color.BLACK)
         }
 
         val colors = kubed.color.scheme.schemeViridis()
         val circle = root.selectAll<Data>("Circle")
-                .data((0..5000).map { Data(width * Math.random(), height * Math.random(), Math.random() - 0.5, Math.random() - 0.5) })
+                .data((0..5000).map { Data(width * random(), height * random(), random() - 0.5, random() - 0.5) })
                 .enter().append { d, _, _ -> c(d) }
                         .fill { _, i, _ -> colors[i % colors.size] }
 

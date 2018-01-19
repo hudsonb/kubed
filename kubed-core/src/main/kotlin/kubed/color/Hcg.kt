@@ -25,7 +25,7 @@ class Hcg(val h: Double, var c: Double, var g: Double, var opacity: Double = 1.0
                     val min = Math.min(r, Math.min(g, b))
                     val max = Math.max(r, Math.max(g, b))
                     val d = max - min
-                    val gr = if(min.isFalsy()) min else min / (1 - d)
+                    val gr = if(min.isTruthy()) min / (1 - d) else min
 
                     var h = Double.NaN
                     if(d.isTruthy())

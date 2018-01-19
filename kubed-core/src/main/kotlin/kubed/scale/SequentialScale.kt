@@ -3,6 +3,8 @@ package kubed.scale
 import kubed.array.tickStep
 import kubed.array.ticks
 import kubed.util.isTruthy
+import kotlin.math.ceil
+import kotlin.math.floor
 
 fun <R> scaleSequential(interpolator: ((Double) -> R)? = null): SequentialScale<R> = SequentialScale(interpolator)
 
@@ -46,9 +48,9 @@ class SequentialScale<R>(var interpolator: ((Double) -> R)? = null) : Scale<Doub
         var step = tickStep(start, stop, count)
 
         if(step.isTruthy()) {
-            step = tickStep(Math.floor(start / step) * step, Math.ceil(stop / step) * step, count)
-            domain(listOf(Math.floor(start / step) * step,
-                          Math.ceil(stop / step) * step))
+            step = tickStep(floor(start / step) * step, ceil(stop / step) * step, count)
+            domain(listOf(floor(start / step) * step,
+                          ceil(stop / step) * step))
         }
     }
 

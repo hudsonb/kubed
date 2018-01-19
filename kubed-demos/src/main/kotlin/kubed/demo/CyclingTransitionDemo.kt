@@ -2,6 +2,7 @@ package kubed.demo
 
 import javafx.animation.Timeline
 import javafx.application.Application
+import javafx.application.Application.launch
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.paint.Color
@@ -11,9 +12,12 @@ import kubed.color.Hsl
 import kubed.interpolate.color.interpolateHcl
 import kubed.scale.LinearScale
 import kubed.scale.PointScale
+import kubed.scale.scaleLinear
+import kubed.scale.scalePoint
 import kubed.selection.selectAll
 import kubed.shape.circle
 import kubed.transition.transition
+import kotlin.math.abs
 
 
 class CyclingTransitionDemo : Application() {
@@ -27,20 +31,22 @@ class CyclingTransitionDemo : Application() {
         val width = 800.0
         val height = 400.0
 
-        val y = PointScale<Double>()
-        y.domain((0..50).map(Int::toDouble))
-        y.range(listOf(0.0, height))
+        val y = scalePoint<Double> {
+            domain((0..50).map(Int::toDouble))
+            range(listOf(0.0, height))
+        }
 
-        val z = LinearScale(::interpolateHcl)
-        z.domain(listOf(10.0, 0.0))
-        z.range(listOf(Hsl(62.0, 1.0, 0.9).toColor(), Hsl(228.0, 0.3, 0.2).toColor()))
+        val z = scaleLinear(::interpolateHcl) {
+            domain(listOf(10.0, 0.0))
+            range(listOf(Hsl(62.0, 1.0, 0.9).toColor(), Hsl(228.0, 0.3, 0.2).toColor()))
+        }
 
         val c = circle<Double> {
             radius(25.0)
             stroke(Color.BLACK)
 
             translateY { d, _ -> y(d) }
-            fill { d, _ -> z(Math.abs(d % 20 - 10)) }
+            fill { d, _ -> z(abs(d % 20 - 10)) }
         }
 
         root.selectAll<Double>("Circle")

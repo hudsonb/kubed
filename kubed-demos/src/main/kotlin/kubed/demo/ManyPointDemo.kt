@@ -10,6 +10,8 @@ import javafx.scene.*
 import kubed.interpolate.color.*
 import kubed.scale.*
 import kubed.timer.timer
+import java.lang.Math.random
+import kotlin.math.*
 
 
 class ManyPointDemo : Application() {
@@ -77,7 +79,7 @@ class ManyPointDemo : Application() {
 
         val interpolator = CubicInInterpolator()
         timer { elapsed ->
-            val t = Math.min(1.0, elapsed / 1500.0)
+            val t = min(1.0, elapsed / 1500.0)
 
             // Update the point positions
             squares.translateX { d, _, _ -> interpolator.interpolate(d.sx, d.tx, t) }
@@ -97,16 +99,16 @@ class ManyPointDemo : Application() {
     }
 
     fun phyllotaxisLayout(points: List<Point>, pointWidth: Double, xOffset: Double = 0.0, yOffset: Double = 0.0, iOffset: Int = 0) {
-        val theta = Math.PI * (3 - Math.sqrt(5.0))
+        val theta = PI * (3 - sqrt(5.0))
         val pointRadius = pointWidth / 2
 
         for(i in points.indices) {
             val point = points[i]
             val index = (i + iOffset) % points.size
-            val si = Math.sqrt(index.toDouble())
+            val si = sqrt(index.toDouble())
             val it = index * theta
-            val phylloX = pointRadius * si * Math.cos(it)
-            val phylloY = pointRadius * si * Math.sin(it)
+            val phylloX = pointRadius * si * cos(it)
+            val phylloY = pointRadius * si * sin(it)
 
             point.x = xOffset + phylloX - pointRadius
             point.y = yOffset + phylloY - pointRadius
@@ -115,21 +117,21 @@ class ManyPointDemo : Application() {
 
     fun gridLayout(points: List<Point>, pointWidth: Double, gridWidth: Double) {
         val pointHeight = pointWidth
-        val pointsPerRow = Math.floor(gridWidth / pointWidth)
+        val pointsPerRow = floor(gridWidth / pointWidth)
 
         var point: Point
         for(i in points.indices) {
             point = points[i]
             point.x = pointWidth * (i % pointsPerRow)
-            point.y = pointHeight * Math.floor(i / pointsPerRow)
+            point.y = pointHeight * floor(i / pointsPerRow)
         }
     }
 
     fun randomLayout(points: List<Point>, pointWidth: Double, width: Double, height: Double) {
         for(i in points.indices) {
             val point = points[i]
-            point.x = Math.random() * (width - pointWidth)
-            point.y = Math.random() * (height - pointWidth)
+            point.x = random() * (width - pointWidth)
+            point.y = random() * (height - pointWidth)
         }
     }
 
@@ -139,14 +141,14 @@ class ManyPointDemo : Application() {
         val periods = 3
         val yScale = scaleLinear<Double> {
             domain(0.0, (points.size - 1).toDouble())
-            range(0.0, periods * 2 * Math.PI)
+            range(0.0, periods * 2 * PI)
             nice(10)
         }
 
         for(i in points.indices) {
             val point = points[i]
             point.x = (i / points.size.toDouble()) * (width - pointWidth)
-            point.y = amplitude * Math.sin(yScale(i.toDouble())) + yOffset
+            point.y = amplitude * sin(yScale(i.toDouble())) + yOffset
         }
     }
 
@@ -157,18 +159,18 @@ class ManyPointDemo : Application() {
 
         val rScale = scaleLinear<Double> {
             domain(0.0, points.size - 1.0)
-            range(0.0, Math.min(width / 2, height / 2) - pointWidth)
+            range(0.0, min(width / 2, height / 2) - pointWidth)
         }
 
         val thetaScale = scaleLinear<Double> {
             domain(0.0, points.size - 1.0)
-            range(0.0, periods * 2 * Math.PI)
+            range(0.0, periods * 2 * PI)
         }
 
         for(i in points.indices) {
             val point = points[i]
-            point.x = rScale(i.toDouble()) * Math.cos(thetaScale(i.toDouble())) + xOffset
-            point.y = rScale(i.toDouble()) * Math.sin(thetaScale(i.toDouble())) + yOffset
+            point.x = rScale(i.toDouble()) * cos(thetaScale(i.toDouble())) + xOffset
+            point.y = rScale(i.toDouble()) * sin(thetaScale(i.toDouble())) + yOffset
         }
     }
 

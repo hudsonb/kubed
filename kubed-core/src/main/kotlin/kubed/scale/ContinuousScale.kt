@@ -3,10 +3,11 @@ package kubed.scale
 import kubed.array.bisect
 import java.util.*
 import kotlin.comparisons.naturalOrder
+import kotlin.math.min
 
 abstract class ContinuousScale<R>(val interpolate: (R, R) -> (Double) -> R,
-                                  var uninterpolate: ((R, R) -> (R) -> Double)? = null,
-                                  var rangeComparator: Comparator<R>? = null) : Scale<Double, R> {
+                                  val uninterpolate: ((R, R) -> (R) -> Double)? = null,
+                                  val rangeComparator: Comparator<R>? = null) : Scale<Double, R> {
     override val domain: MutableList<Double> = ArrayList(2)
     override val range: MutableList<R> = ArrayList(2)
     var clamp: Boolean = false
@@ -84,8 +85,8 @@ abstract class ContinuousScale<R>(val interpolate: (R, R) -> (Double) -> R,
         if(input == null) {
             input = piecewiseInput?.invoke(domain, range,
                     if(clamp) reinterpolateClamp({ a: Double, b: Double -> run { reinterpolate(a, b) } })
-                    else { a: Double, b: Double -> run { reinterpolate(a, b) } },
-                    uninterpolate ?: throw IllegalStateException())
+                    else ::reinterpolate,
+                    uninterpolate)
         }
 
         return input?.invoke(r) ?: throw IllegalStateException()
@@ -141,9 +142,7 @@ abstract class ContinuousScale<R>(val interpolate: (R, R) -> (Double) -> R,
             r = reinterpolate(r0, r1)
         }
 
-        return { x: R ->
-            d(r(x))
-        }
+        return { x: R -> d(r(x)) }
     }
 
     private fun polymap(domain: List<Double>, range: List<R>,
@@ -152,7 +151,7 @@ abstract class ContinuousScale<R>(val interpolate: (R, R) -> (Double) -> R,
         val dvalues = if(domain.last() < domain.first()) domain.reversed() else domain
         val rvalues = if(domain.last() < domain.first()) range.reversed() else range
 
-        val j = Math.min(domain.size, range.size) - 1
+        val j = min(domain.size, range.size) - 1
         val d = Array(j, { deinterpolate(dvalues[it], dvalues[it + 1]) })
         val r = Array(j, { reinterpolate(rvalues[it], rvalues[it + 1]) })
 

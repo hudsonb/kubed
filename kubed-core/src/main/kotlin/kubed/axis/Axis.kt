@@ -17,6 +17,8 @@ import kubed.shape.lineSegment
 import kubed.shape.text
 import snap
 import java.util.*
+import kotlin.math.max
+import kotlin.math.round
 
 class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
     var tickSizeInner = 6.0
@@ -75,7 +77,7 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
     private fun center(scale: BandScale<D>): (d: D) -> R {
         var offset = scale.bandwidth / 2.0
         if(scale.round)
-            offset = Math.round(offset).toDouble()
+            offset = round(offset).toDouble()
         return { d -> (scale(d) + offset) as R }
     }
 
@@ -95,7 +97,7 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
         if(values.isEmpty())
             throw IllegalStateException("Failed to determine tick values")
 
-        val spacing = Math.max(tickSizeInner, 0.0) + tickPadding
+        val spacing = max(tickSizeInner, 0.0) + tickPadding
         val range = scale.range
         val range0 = range.first().toDouble() + 0.5
         val range1 = range.last().toDouble() + 0.5

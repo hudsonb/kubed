@@ -509,11 +509,19 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
     }
 
     /**
+     * Appends the given key and value returned by [value] to the [Node.style] property.
      *
+     * @param key The CSS key to set.
+     * @param value A function which calculates the value.
      */
     fun style(key: String, value: (d: T, i: Int, nodes: List<Node?>) -> String?) =
             forEach<Node> { d, i, group -> style(this, key, value(d, i, group)) }
 
+    /**
+     * Applies the given [effect] to each [Node] in the [Selection],
+     *
+     * @param effect The effect to be applied.
+     */
     fun effect(effect: Effect): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Node>()
@@ -559,6 +567,13 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
         return sel
     }
 
+    /**
+     * Invokes [action] on each [Node] in the selection.
+     *
+     * @param action The function/action to be invoke on each node.
+     *
+     * @return The selection.
+     */
     inline fun <reified N : Node> forEach(action: N.(d: T, i: Int, group: List<Node?>) -> Unit): Selection<T> {
         for(i in groups.indices) {
             val group = groups[i]

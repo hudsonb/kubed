@@ -4,7 +4,18 @@ import javafx.scene.Node
 import javafx.scene.paint.Paint
 
 abstract class AbstractSelection<S : AbstractSelection<S, T>, T> {
+    /**
+     * Applies the given opacity to each node in the selection.
+     *
+     * @param value The opacity value to be applied.
+     */
     abstract fun opacity(value: Double): S
+
+    /**
+     * Applies a calculated opacity to each node in the selection.
+     *
+     * @param value The opacity calculate function.
+     */
     abstract fun opacity(value: (d: T, i: Int, group: List<Node?>) -> Double): S
 
     abstract fun rotateX(angle: Double): S

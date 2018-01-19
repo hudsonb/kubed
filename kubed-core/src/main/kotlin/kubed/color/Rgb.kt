@@ -1,6 +1,7 @@
 package kubed.color
 
 import javafx.scene.paint.Color
+import java.lang.Math.pow
 
 /**
  * Returns a representation of this color in the Rgb color space
@@ -30,7 +31,7 @@ class Rgb(var r: Int, var g: Int, var b: Int, var opacity: Double = 1.0) : Color
 
     override fun brighter(k: Double): Rgb {
         val t = if(k == BRIGHTER) BRIGHTER
-                else Math.pow(BRIGHTER, k)
+                else pow(BRIGHTER, k)
 
         return Rgb((r * t).toInt(),
                    (g * t).toInt(),
@@ -40,7 +41,7 @@ class Rgb(var r: Int, var g: Int, var b: Int, var opacity: Double = 1.0) : Color
 
     override fun darker(k: Double): Rgb {
         val t = if(k == DARKER) DARKER
-                else Math.pow(DARKER, k)
+                else pow(DARKER, k)
 
         return Rgb((r * t).toInt(),
                    (g * t).toInt(),

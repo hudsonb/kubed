@@ -1,1 +1,3 @@
-fun snap(v: Double) = Math.round(v).toDouble()
+import kotlin.math.round
+
+fun snap(v: Double) = round(v)

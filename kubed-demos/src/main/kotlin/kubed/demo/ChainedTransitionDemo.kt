@@ -13,6 +13,7 @@ import kubed.interpolate.color.interpolateRgb
 import kubed.selection.selectAll
 import kubed.shape.rect
 import kubed.transition.transition
+import java.lang.Math.random
 
 private data class Cell(val row: Int, val col: Int) {}
 
@@ -53,7 +54,7 @@ class ChainedTransitionDemo : Application() {
                 .enter().append { d, _, _ -> r(d) }
                 .transition()
                 .interpolator(Interpolator.LINEAR)
-                .delay { _, i, _ -> Duration.millis(i + Math.random() * n / 4.0) }
+                .delay { _, i, _ -> Duration.millis(i + random() * n / 4.0) }
                 .fill(Color.STEELBLUE)
                 .transition()
                 .delay(Duration.seconds(1.0))

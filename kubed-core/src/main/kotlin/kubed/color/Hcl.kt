@@ -1,7 +1,9 @@
 package kubed.color
 
 import javafx.scene.paint.Color
-import kubed.util.MoreMath
+import kubed.math.toRadians
+import kotlin.math.atan2
+import kotlin.math.sqrt
 
 /**
  * Returns a representation of this color in the Hsl color space
@@ -18,8 +20,8 @@ class Hcl(val h: Double, var c: Double, var l: Double, var opacity: Double = 1.0
             else -> {
                 try {
                     val lab = Lab.convert(value)
-                    val h = Math.atan2(lab.b, lab.a) * MoreMath.RAD_2_DEG
-                    Hcl(if(h < 0) h + 360 else h, Math.sqrt(lab.a * lab.a + lab.b * lab.b), lab.l, lab.opacity)
+                    val h = atan2(lab.b, lab.a).toRadians()
+                    Hcl(if(h < 0) h + 360 else h, sqrt(lab.a * lab.a + lab.b * lab.b), lab.l, lab.opacity)
                 }
                 catch(e: Exception) {
                     throw IllegalArgumentException("Unable to coerce " + value.javaClass.name + " to Hcl")

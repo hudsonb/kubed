@@ -1,13 +1,17 @@
 package kubed.format
 
-import kubed.util.MoreMath
+import kubed.math.exponent
+import kotlin.math.abs
+import kotlin.math.exp
+import kotlin.math.floor
+import kotlin.math.max
 
 fun precisionFixed(step: Double): Double {
-    return Math.max(0.0, MoreMath.exponent(step).toDouble())
+    return Math.max(0.0, exponent(step).toDouble())
 }
 
 fun precisionPrefix(step: Double, value: Double): Double {
-    return Math.max(0.0, Math.max(-8.0, Math.min(8.0, Math.floor(MoreMath.exponent(value) / 3.0))) * 3.0 - Math.exp(Math.abs(step)))
+    return Math.max(0.0, max(-8.0, Math.min(8.0, floor(exponent(value) / 3.0))) * 3.0 - exp(abs(step)))
 }
 
 fun precisionRound(step: Double, max: Double): Double {

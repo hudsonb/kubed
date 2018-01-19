@@ -1,8 +1,10 @@
 package kubed.demo
 
 import javafx.application.Application
+import javafx.application.Application.launch
 import javafx.scene.*
 import javafx.scene.paint.Color
+import javafx.scene.paint.Color.color
 import javafx.scene.shape.Rectangle
 import javafx.scene.transform.Rotate
 import javafx.scene.transform.Translate
@@ -11,9 +13,11 @@ import kubed.color.Cubehelix
 import kubed.color.cubehelix
 import kubed.interpolate.color.interpolateCubeHelix
 import kubed.scale.LinearScale
+import kubed.scale.scaleLinear
 import kubed.selection.selectAll
 import kubed.shape.rect
 import kubed.timer.timer
+import kotlin.math.sqrt
 
 class SpiralTriangleDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -30,11 +34,12 @@ class SpiralTriangleDemo: Application() {
         val g = Group()
         root.children += g
 
-        val color = LinearScale<Color>({ a, b -> interpolateCubeHelix(a.cubehelix(), b.cubehelix()) })
-                .domain(listOf(0.0, 0.5, 1.0))
-                .range(listOf(Cubehelix(-100.0, 0.75, 0.35).toColor(),
-                              Cubehelix(80.0, 1.0, 0.80).toColor(),
-                              Cubehelix(260.0, 0.75, 0.35).toColor()))
+        val color = scaleLinear(::interpolateCubeHelix) {
+                domain(0.0, 0.5, 1.0)
+                range(Cubehelix(-100.0, 0.75, 0.35).toColor(),
+                      Cubehelix(80.0, 1.0, 0.80).toColor(),
+                      Cubehelix(260.0, 0.75, 0.35).toColor())
+        }
 
         val rect = rect<Unit> {
             translateX(-squareSize / 2)
@@ -64,7 +69,7 @@ class SpiralTriangleDemo: Application() {
                       .enter()
                 .append { _, _, _ -> Group() }
                       //.append(fun(): Node { return Group() })
-                      .transform { d, _, _ -> listOf(Rotate(d * 120.0 + 60.0), Translate(0.0, -triangleSize / Math.sqrt(12.0))) }
+                      .transform { d, _, _ -> listOf(Rotate(d * 120.0 + 60.0), Translate(0.0, -triangleSize / sqrt(12.0))) }
                       .selectAll<Double>("Rectangle")
                       .data<Int>({ _, _, _ -> (0..squareCount).map(Int::toDouble) })
                       .enter()

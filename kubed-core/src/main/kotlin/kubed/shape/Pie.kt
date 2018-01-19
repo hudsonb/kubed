@@ -1,6 +1,6 @@
 package kubed.shape
 
-import kubed.util.MoreMath
+import kubed.math.TAU
 import java.util.*
 
 class Pie<T> {
@@ -12,7 +12,7 @@ class Pie<T> {
             sort = null
         }
     var startAngle: () -> Double = { 0.0 }
-    var endAngle: () -> Double = { MoreMath.TAU }
+    var endAngle: () -> Double = { TAU }
     var padAngle: () -> Double = { 0.0 }
 
     fun value(func: (T, Int, List<T>) -> Double): Pie<T> {
@@ -72,7 +72,7 @@ class Pie<T> {
         val values = DoubleArray(n)
         val wedges = Array<PieWedge<T>?>(n, { null })
         var a0 = startAngle()
-        val da = Math.min(MoreMath.TAU, Math.max(-MoreMath.TAU, endAngle() - a0))
+        val da = Math.min(TAU, Math.max(-TAU, endAngle() - a0))
         val p = Math.min(Math.abs(da) / n, padAngle())
         val pa = p * (if(da < 0) -1 else 1)
 

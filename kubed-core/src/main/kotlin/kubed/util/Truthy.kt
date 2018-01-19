@@ -2,17 +2,29 @@
 
 package kubed.util
 
-inline fun Any?.isTruthy(): Boolean = this != null
-inline fun Any?.isFalsy(): Boolean = !isTruthy()
+inline fun Any?.isTruthy() = this != null
+inline fun Any?.isFalsy() = !isTruthy()
 
-inline fun Boolean?.isTruthy(): Boolean = this != null && this
-inline fun Byte?.isTruthy(): Boolean = this != null && this != 0.toByte()
-inline fun Double?.isTruthy(): Boolean = this != null && this != 0.0 && this != Double.NaN
-inline fun Float?.isTruthy(): Boolean = this != null && this != 0f && this != Float.NaN
-inline fun Int?.isTruthy(): Boolean = this != null && this != 0
+inline fun Boolean?.isTruthy() = this != null && this
+inline fun Boolean?.isFalsy() = this == null || this
+
+inline fun Byte?.isTruthy() = this != null && this != 0.toByte()
+inline fun Byte?.isFalsy() = !isTruthy()
+
+inline fun Double?.isTruthy() = this != null && this != 0.0 && this != Double.NaN
+inline fun Double?.isFalsy() = !isTruthy()
+
+inline fun Float?.isTruthy() = this != null && this != 0f && this != Float.NaN
+inline fun Float?.isFalsy() = !isTruthy()
+
+inline fun Int?.isTruthy() = this != null && this != 0
+inline fun Int?.isFalsy() = !isTruthy()
+
 inline fun Long?.isTruthy(): Boolean = this != null && this != 0L
-inline fun Short?.isTruthy(): Boolean = this != null && this != 0.toShort()
-inline fun String?.isTruthy(): Boolean = this != null && isNotEmpty()
+inline fun Long?.isFalsy() = !isTruthy()
 
-inline fun <E> Collection<E>?.isTruthy(): Boolean = this != null && isNotEmpty()
-inline fun <E> Array<E>?.isTruthy(): Boolean = this != null && isNotEmpty()
+inline fun Short?.isTruthy(): Boolean = this != null && this != 0.toShort()
+inline fun Short?.isFalsy() = !isTruthy()
+
+inline fun String?.isTruthy(): Boolean = this != null && isNotEmpty()
+inline fun String?.isFalsy() = !isTruthy()

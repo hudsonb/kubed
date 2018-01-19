@@ -1,6 +1,7 @@
 package kubed.demo
 
 import javafx.application.Application
+import javafx.application.Application.launch
 import javafx.geometry.Insets
 import javafx.scene.Group
 import javafx.scene.Scene
@@ -10,6 +11,7 @@ import kubed.axis.axisBottom
 import kubed.axis.axisLeft
 import kubed.interpolate.interpolateRound
 import kubed.scale.LinearScale
+import kubed.scale.scaleLinear
 import kubed.selection.selectAll
 import kubed.shape.area
 import kubed.shape.curve.*
@@ -31,11 +33,15 @@ class AreaDemo: Application() {
 
         val data = listOf(4, 2, 6, 3, 3, 7, 9, 2, 1, 6)
 
-        val xScale = LinearScale(::interpolateRound).range(0.0, innerWidth)
-                                                    .domain(0.0, data.size - 1.0)
+        val xScale = scaleLinear(::interpolateRound) {
+            range(0.0, innerWidth)
+            domain(0.0, data.size - 1.0)
+        }
 
-        val yScale = LinearScale(::interpolateRound).range(innerHeight, 0.0)
-                                                    .domain(0.0, 10.0)
+        val yScale = scaleLinear(::interpolateRound) {
+            range(innerHeight, 0.0)
+            domain(0.0, 10.0)
+        }
 
         val xAxis = axisBottom(xScale)
         xAxis(root.selectAll<Unit>(".xAxis")

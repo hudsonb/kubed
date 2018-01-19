@@ -2,10 +2,14 @@ package kubed.shape.symbol
 
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
+import kubed.math.TAU
 import kubed.path.Context
 import kubed.path.PathContext
 import kubed.shape.Shape
-import kubed.util.MoreMath
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 class Symbol<T> : Shape<Symbol<T>, T>() {
     var type: (T, Int) -> SymbolType = { _, _ -> symbolCircle() }
@@ -48,7 +52,7 @@ internal interface PathSymbolType : SymbolType {
 
 class Circle : SymbolType {
     override fun create(size: Double): javafx.scene.shape.Shape {
-        val r = Math.sqrt(size / Math.PI)
+        val r = sqrt(size / PI)
         val circle = javafx.scene.shape.Circle()
         circle.radius = r
         circle.stroke = Color.BLACK
@@ -58,7 +62,7 @@ class Circle : SymbolType {
 
 class Cross : PathSymbolType {
     override fun draw(context: Context, size: Double) {
-        val r = Math.sqrt(size / 5) / 2
+        val r = sqrt(size / 5) / 2
         context.moveTo(-3 * r, -r)
         context.lineTo(-r, -r)
         context.lineTo(-r, -3 * r)
@@ -77,12 +81,12 @@ class Cross : PathSymbolType {
 
 class Diamond : PathSymbolType {
     companion object {
-        private val tan30 = Math.sqrt(1.0 / 3.0)
+        private val tan30 = sqrt(1.0 / 3.0)
         private val tan30_2 = tan30 * 2
     }
 
     override fun draw(context: Context, size: Double) {
-        val y = Math.sqrt(size / tan30_2)
+        val y = sqrt(size / tan30_2)
         val x = y * tan30
         context.moveTo(0.0, -y)
         context.lineTo(x, 0.0)
@@ -94,7 +98,7 @@ class Diamond : PathSymbolType {
 
 class Square : SymbolType {
     override fun create(size: Double): javafx.scene.shape.Shape {
-        val w = Math.sqrt(size)
+        val w = sqrt(size)
         val x = -w / 2
         val rect = javafx.scene.shape.Rectangle(x, x, w, w)
         rect.stroke = Color.BLACK
@@ -105,21 +109,21 @@ class Square : SymbolType {
 class Star : PathSymbolType {
     companion object {
         private const val ka = 0.89081309152928522810
-        private val kr = Math.sin(Math.PI / 10) / Math.sin(7 * Math.PI / 10)
-        private val kx = Math.sin(MoreMath.TAU / 10) * kr
-        private val ky = -Math.cos(MoreMath.TAU / 10) * kr
+        private val kr = sin(PI / 10) / sin(7 * PI / 10)
+        private val kx = sin(TAU / 10) * kr
+        private val ky = -cos(TAU / 10) * kr
     }
 
     override fun draw(context: Context, size: Double) {
-        val r = Math.sqrt(size * ka)
+        val r = sqrt(size * ka)
         val x = kx * r
         val y = ky * r
         context.moveTo(0.0, -r)
         context.lineTo(x, y)
         for(i in 1..4) {
-            val a = MoreMath.TAU * i / 5
-            val c = Math.cos(a)
-            val s = Math.sin(a)
+            val a = TAU * i / 5
+            val c = cos(a)
+            val s = sin(a)
             context.lineTo(s * r, -c * r)
             context.lineTo(c * x - s * y, s * x + c * y)
         }
@@ -129,11 +133,11 @@ class Star : PathSymbolType {
 
 class Triangle : PathSymbolType {
     companion object {
-        private val sqrt3 = Math.sqrt(3.0)
+        private val sqrt3 = sqrt(3.0)
     }
 
     override fun draw(context: Context, size: Double) {
-        val y = -Math.sqrt(size / (sqrt3 * 3))
+        val y = -sqrt(size / (sqrt3 * 3))
         context.moveTo(0.0, y * 2)
         context.lineTo(-sqrt3 * y, -y)
         context.lineTo(sqrt3 * y, -y)
@@ -144,13 +148,13 @@ class Triangle : PathSymbolType {
 class Wye : PathSymbolType {
     companion object {
         private const val c = -0.5
-        private val s = Math.sqrt(3.0) / 2
-        private val k = 1 / Math.sqrt(12.0)
+        private val s = sqrt(3.0) / 2
+        private val k = 1 / sqrt(12.0)
         private val a = (k / 2 + 1) * 3
     }
 
     override fun draw(context: Context, size: Double) {
-        val r = Math.sqrt(size / a)
+        val r = sqrt(size / a)
         val x0 = r / 2
         val y0 = r * k
         val x1 = x0
@@ -170,8 +174,8 @@ class Wye : PathSymbolType {
     }
 }
 
-class Hexagon(val theta: Double = MoreMath.TAU / 12) : PathSymbolType {
-    private fun sideLength(area: Double) = Math.sqrt((2 * area) / (3 * Math.sqrt(3.0)))
+class Hexagon(val theta: Double = TAU / 12) : PathSymbolType {
+    private fun sideLength(area: Double) = sqrt((2 * area) / (3 * sqrt(3.0)))
 
     override fun draw(context: Context, size: Double) {
         val s = sideLength(size)
@@ -179,9 +183,9 @@ class Hexagon(val theta: Double = MoreMath.TAU / 12) : PathSymbolType {
         rotatePoint(s, 0.0, theta).apply { context.moveTo(x, y) }
 
         for(i in 0..5) {
-            val a = MoreMath.TAU * i / 6
-            val x = Math.cos(a) * s
-            val y = Math.sin(a) * s
+            val a = TAU * i / 6
+            val x = cos(a) * s
+            val y = sin(a) * s
 
             val p = rotatePoint(x, y, theta)
             context.lineTo(p.x, p.y)
@@ -193,25 +197,25 @@ class Hexagon(val theta: Double = MoreMath.TAU / 12) : PathSymbolType {
 
 class Pentagon : PathSymbolType {
     companion object {
-        private val circumradiusCoeff = 1.0 / 10.0 * Math.sqrt(50 + 10 * Math.sqrt(5.0))
+        private val circumradiusCoeff = 1.0 / 10.0 * sqrt(50 + 10 * sqrt(5.0))
     }
 
     private fun circumradius(sideLength: Double) = sideLength * circumradiusCoeff
 
-    private fun sideLength(area: Double) = Math.sqrt((4 * area) / Math.sqrt(5 * (5 + 2 * Math.sqrt(5.0))))
+    private fun sideLength(area: Double) = sqrt((4 * area) / sqrt(5 * (5 + 2 * sqrt(5.0))))
 
     override fun draw(context: Context, size: Double) {
         val s = sideLength(size)
         val r = circumradius(s)
-        val theta = -MoreMath.TAU / 4
+        val theta = -TAU / 4
 
         var p = rotatePoint(r, 0.0, theta)
         context.moveTo(p.x, p.y)
 
         for (i in 0..4) {
-            val a = MoreMath.TAU * i / 5
-            val x = Math.cos(a) * r
-            val y = Math.sin(a) * r
+            val a = TAU * i / 5
+            val x = cos(a) * r
+            val y = sin(a) * r
 
             p = rotatePoint(x, y, theta)
             context.lineTo(p.x, p.y)
@@ -223,8 +227,8 @@ class Pentagon : PathSymbolType {
 
 class X : PathSymbolType {
     override fun draw(context: Context, size: Double) {
-        val r = Math.sqrt(size / 5) / 2
-        val theta = MoreMath.TAU / 8
+        val r = sqrt(size / 5) / 2
+        val theta = TAU / 8
 
         with(context) {
             rotatePoint(-3 * r, -r, theta).apply { moveTo(x, y) }
@@ -243,9 +247,8 @@ class X : PathSymbolType {
 
         context.closePath()
     }
-
 }
 
-private fun rotatePoint(x: Double, y: Double, theta: Double) = Point2D(Math.cos(theta) * x + -Math.sin(theta) * y,
-                                                                       Math.sin(theta) * x + Math.cos(theta) * y)
+private fun rotatePoint(x: Double, y: Double, theta: Double) = Point2D(cos(theta) * x + -sin(theta) * y,
+                                                                       sin(theta) * x + cos(theta) * y)
 

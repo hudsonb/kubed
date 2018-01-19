@@ -1,15 +1,19 @@
 package kubed.ease
 
 import javafx.animation.Interpolator
-import kubed.util.MoreMath
+import kubed.math.TAU
+import java.lang.Math.pow
+import kotlin.math.asin
+import kotlin.math.max
+import kotlin.math.sin
 
 abstract class ElasticInterpolator(protected var amplitude: Double = 1.0, protected var period: Double = 0.3) : Interpolator() {
     protected var s: Double = 0.0
 
     init {
-        this.amplitude = Math.max(1.0, amplitude)
-        this.period /= MoreMath.TAU
-        s = Math.asin(1 / amplitude) * period
+        this.amplitude = max(1.0, amplitude)
+        this.period /= TAU
+        s = asin(1 / amplitude) * period
     }
 
 }
@@ -17,20 +21,20 @@ abstract class ElasticInterpolator(protected var amplitude: Double = 1.0, protec
 class ElasticInInterpolator(amplitude: Double = 1.0, period: Double = 0.3) : ElasticInterpolator(amplitude, period) {
     override fun curve(t: Double): Double {
         val t2 = t - 1
-        return amplitude * Math.pow(2.0, 10 * t2) * Math.sin((s - t2) / period)
+        return amplitude * pow(2.0, 10 * t2) * sin((s - t2) / period)
     }
 }
 
 class ElasticOutInterpolator(amplitude: Double = 1.0, period: Double = 0.3) : ElasticInterpolator(amplitude, period) {
-    override fun curve(t: Double) = 1 - amplitude * Math.pow(2.0, -10 * t) * Math.sin((t + s) / period)
+    override fun curve(t: Double) = 1 - amplitude * pow(2.0, -10 * t) * sin((t + s) / period)
 }
 
 class ElasticInOutInterpolator(amplitude: Double = 1.0, period: Double = 0.3) : ElasticInterpolator(amplitude, period) {
     override fun curve(t: Double): Double {
         val t2 = t * 2 - 1
         return when {
-            t2 < 0 -> amplitude * Math.pow(2.0, 10 * t2) * Math.sin((s - t2) / period)
-            else -> 2 - amplitude * Math.pow(2.0, -10 * t2) * Math.sin((s + t2) / period)
+            t2 < 0 -> amplitude * pow(2.0, 10 * t2) * sin((s - t2) / period)
+            else -> 2 - amplitude * pow(2.0, -10 * t2) * sin((s + t2) / period)
         } / 2.0
     }
 }

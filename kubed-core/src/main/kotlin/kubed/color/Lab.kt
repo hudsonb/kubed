@@ -1,7 +1,10 @@
 package kubed.color
 
 import javafx.scene.paint.Color
-import kubed.util.MoreMath
+import kubed.math.toRadians
+import java.lang.Math.pow
+import kotlin.math.cos
+import kotlin.math.sin
 
 internal const val Kn = 18.0
 internal const val Xn = 0.950470 // D65 standard referent
@@ -29,12 +32,12 @@ fun Rgb.lab(): Lab {
 
 internal fun rgb2xyz(x: Int): Double {
     val x2 = x / 255.0
-    return if(x2 <= 0.04045) x2 / 12.92 else Math.pow((x2 + 0.055) / 1.055, 2.4)
+    return if(x2 <= 0.04045) x2 / 12.92 else pow((x2 + 0.055) / 1.055, 2.4)
 }
 
 internal fun xyz2lab(t: Double): Double {
     return when {
-        t > T3 -> Math.pow(t, 1.0 / 3.0)
+        t > T3 -> pow(t, 1.0 / 3.0)
         else -> t / T2 + T0
     }
 }
@@ -45,8 +48,8 @@ class Lab(val l: Double, val a: Double, val b: Double, val opacity: Double = 1.0
         fun convert(value: Any): Lab = when(value)  {
             is Lab -> Lab(value.l, value.a, value.b, value.opacity)
             is Hcl -> {
-                val h = value.h * MoreMath.DEG_2_RAD
-                Lab(value.l, Math.cos(h) * value.c, Math.sin(h) * value.c, value.opacity)
+                val h = value.h.toRadians()
+                Lab(value.l, cos(h) * value.c, sin(h) * value.c, value.opacity)
             }
             is ColorSpace<*> -> value.rgb().lab()
             is Color -> value.lab()
@@ -81,6 +84,6 @@ class Lab(val l: Double, val a: Double, val b: Double, val opacity: Double = 1.0
     }
 
     private fun xyz2rgb(x: Double): Double {
-        return 255.0 * (if(x <= 0.0031308) 12.92 * x else 1.055 * Math.pow(x, 1.0 / 2.4) - 0.055)
+        return 255.0 * (if(x <= 0.0031308) 12.92 * x else 1.055 * pow(x, 1.0 / 2.4) - 0.055)
     }
 }

@@ -6,13 +6,25 @@ import kubed.color.scheme.schemeCategory10
 import kubed.color.scheme.schemeCategory20
 import kubed.color.scheme.schemeCategory20b
 import kubed.color.scheme.schemeCategory20c
+import kubed.interpolate.color.interpolateRgb
+import kotlin.reflect.full.isSubclassOf
 
-inline fun <reified R> scaleLinear(): LinearScale<R> = scaleLinear {}
-inline fun <reified R> scaleLinear(init: LinearScale<R>.() -> Unit): LinearScale<R> {
+inline fun <reified R> scaleLinear(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
+                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
+                                   rangeComparator: Comparator<R>? = null): LinearScale<R> = scaleLinear {}
+inline fun <reified R> scaleLinear(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
+                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
+                                   rangeComparator: Comparator<R>? = null,
+                                   init: LinearScale<R>.() -> Unit): LinearScale<R> {
     // TODO: Default comparators
 
-    val scale = LinearScale(interpolator<R>() as (R, R) -> (Double) -> R,
-                            uninterpolator())
+    val scale = LinearScale(interpolate ?: interpolator<R>() as (R, R) -> (Double) -> R,
+            when {
+                uninterpolate != null -> uninterpolate
+                interpolate != null -> null
+                else -> null
+            },
+            rangeComparator)
     scale.init()
     return scale
 }
@@ -45,19 +57,20 @@ fun <D> scaleCategory20b() = OrdinalScale<D, Color>().apply { range(schemeCatego
 fun <D> scaleCategory20c() = OrdinalScale<D, Color>().apply { range(schemeCategory20c()) }
 
 inline fun <reified R> interpolator() = when {
-    R::class == Double::class -> ::interpolateNumber
+    R::class.isSubclassOf(Number::class) -> ::interpolateNumber
+    R::class == Color::class -> ::interpolateRgb
     else -> throw IllegalArgumentException()
 }
 
 inline fun <reified R> uninterpolator(): ((R, R) -> (R) -> Double)? {
-    return when(R::class) {
-        Number::class -> { a: R, b: R ->
+    return when {
+        R::class.isSubclassOf(Number::class) -> { a: R, b: R ->
             val an = (a as Number).toDouble()
             val bn = (b as Number).toDouble()
-            val b2 = bn - an
-            when(b2) {
-                -0.0, +0.0, Double.NaN -> { _ -> b2 }
-                else -> { x: R -> ((x as Number).toDouble() - a.toDouble()) / b2 }
+            val d = bn - an
+            when(d) {
+                -0.0, +0.0, Double.NaN -> { _ -> d }
+                else -> { x: R -> ((x as Number).toDouble() - an) / d }
             }
         }
         else -> null

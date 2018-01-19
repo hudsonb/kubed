@@ -1,5 +1,6 @@
 package kubed.scale
 
+
 class PointScale<D> : Scale<D, Double> {
     val bandScale: BandScale<D> = BandScale()
 
@@ -35,7 +36,7 @@ class PointScale<D> : Scale<D, Double> {
 
     override operator fun invoke(d: D): Double = bandScale.invoke(d)
 
-    override fun ticks(count: Int): List<D> = listOf()
+    override fun ticks(count: Int): List<D> = emptyList()
 
     fun domain(d: List<D>): PointScale<D> {
         bandScale.domain(d)

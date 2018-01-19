@@ -1,8 +1,10 @@
 package kubed.color
 
 import javafx.scene.paint.Color
-import kubed.util.MoreMath
+import kubed.math.toRadians
 import kubed.util.isTruthy
+import java.lang.Math.pow
+import kotlin.math.*
 
 private const val A = -0.14861
 private const val B = 1.78277
@@ -29,10 +31,10 @@ fun Rgb.cubehelix(): Cubehelix {
 
     val s = when(l) {
         0.0, 1.0 -> Double.NaN
-        else -> Math.sqrt(k * k + bl * bl) / (E * l * (1 - l))
+        else -> sqrt(k * k + bl * bl) / (E * l * (1 - l))
     }
 
-    val h = if(s.isTruthy()) Math.atan2(k, bl) * MoreMath.RAD_2_DEG - 120 else Double.NaN
+    val h = if(s.isTruthy()) atan2(k, bl).toRadians() - 120 else Double.NaN
     return Cubehelix(if(h < 0) h + 360 else h, s, l, opacity)
 }
 
@@ -50,24 +52,24 @@ class Cubehelix(var h: Double, var s: Double, var l: Double, var opacity: Double
     }
 
     override fun rgb(): Rgb {
-        val h = if(h.isNaN()) 0.0 else (h + 120) * MoreMath.DEG_2_RAD
+        val h = if(h.isNaN()) 0.0 else (h + 120).toRadians()
         val a = if(s.isNaN()) 0.0 else s * l * (1 - l)
-        val cosh = Math.cos(h)
-        val sinh = Math.sin(h)
+        val cosh = cos(h)
+        val sinh = sin(h)
 
-        return Rgb(Math.min(255.0, 255 * (l + a * (A * cosh + B * sinh))).toInt(),
-                   Math.min(255.0, 255 * (l + a * (C * cosh + D * sinh))).toInt(),
-                   Math.min(255.0, 255 * (l + a * (E * cosh))).toInt(),
+        return Rgb(min(255.0, 255 * (l + a * (A * cosh + B * sinh))).toInt(),
+                   min(255.0, 255 * (l + a * (C * cosh + D * sinh))).toInt(),
+                   min(255.0, 255 * (l + a * (E * cosh))).toInt(),
                    opacity)
     }
 
     override fun brighter(k: Double): Cubehelix {
-        val t = if(k == BRIGHTER) BRIGHTER else Math.pow(BRIGHTER, k)
+        val t = if(k == BRIGHTER) BRIGHTER else pow(BRIGHTER, k)
         return Cubehelix(h, s, l * t, opacity)
     }
 
     override fun darker(k: Double): Cubehelix {
-        val t = if(k == DARKER) DARKER else Math.pow(DARKER, k)
+        val t = if(k == DARKER) DARKER else pow(DARKER, k)
         return Cubehelix(h, s, l * t, opacity)
     }
 }

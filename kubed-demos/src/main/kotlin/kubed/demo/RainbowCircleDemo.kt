@@ -10,6 +10,7 @@ import kubed.array.range
 import kubed.color.Hsl
 import kubed.selection.selectAll
 import kubed.shape.*
+import kotlin.math.PI
 
 class RainbowCircleDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -17,7 +18,7 @@ class RainbowCircleDemo: Application() {
         val height = 960.0
         val outerRadius = width / 2 - 20
         val innerRadius = outerRadius - 80
-        val t = 2 * Math.PI
+        val t = 2 * PI
         val n = 500
 
         val root = Group()

@@ -1,0 +1,13 @@
+group = 'org.kubed'
+version = '0.1-SNAPSHOT'
+
+jar {
+    baseName = 'kubed-geo'
+    version = '0.1.0'
+}
+
+dependencies {
+    compile project(':kubed-core')
+
+    compile 'com.google.code.gson:gson:2.8.2'
+}

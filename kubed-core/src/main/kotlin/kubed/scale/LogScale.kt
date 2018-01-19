@@ -3,6 +3,7 @@ package kubed.scale
 import kubed.array.ticks
 import kubed.util.isTruthy
 import java.lang.Math.*
+import kotlin.math.ln
 
 class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
                   uninterpolate: ((R, R) -> (R) -> Double)? = null,
@@ -18,20 +19,20 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
 
     fun nice() {
         domain.clear()
-        domain += nice(domain, { x -> pows(Math.floor(logs(x))) }, { x -> pows(Math.ceil(logs(x))) })
+        domain += nice(domain, { x -> pows(floor(logs(x))) }, { x -> pows(ceil(logs(x))) })
     }
 
     override fun deinterpolate(a: Double, b: Double): (Double) -> Double {
-        val b2 = Math.log(b / a)
+        val b2 = ln(b / a)
         return when {
-            b2.isTruthy() -> { x -> Math.log(x / a) / b }
+            b2.isTruthy() -> { x -> ln(x / a) / b }
             else -> { _ -> b2 }
         }
     }
 
     override fun reinterpolate(a: Double, b: Double): (Double) -> Double = when {
-        a < 0 -> { t -> -Math.pow(-b, t) * Math.pow(-a, 1 - t) }
-        else -> { t -> Math.pow(b, t) * Math.pow(a, 1 - t)}
+        a < 0 -> { t -> -pow(-b, t) * pow(-a, 1 - t) }
+        else -> { t -> pow(b, t) * pow(a, 1 - t)}
     }
 
     override fun rescale() {
@@ -52,13 +53,13 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
     private fun powp(base: Double): (Double) -> Double = when(base) {
         10.0 -> this::pow10
         Math.E -> ::exp
-        else -> { x -> Math.pow(base, x) }
+        else -> { x -> pow(base, x) }
     }
 
     private fun logp(base: Double): (Double) -> Double = when(base) {
-        Math.E -> ::log
+        Math.E -> ::ln
         10.0 -> ::log10
-        else -> { x -> Math.log(x) / Math.log(base) }
+        else -> { x -> ln(x) / ln(base) }
     }
 
     private fun reflect(f: (Double) -> Double): (Double) -> Double = { x -> -f(-x) }
@@ -78,7 +79,7 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
         val j = logs(v)
         var z: List<Double>? = null
         if(!(base % 1).isTruthy() && j - i < count) {
-            i = (Math.round(i) - 1).toDouble()
+            i = (round(i) - 1).toDouble()
             if(u > 0) {
                 while(i < j) {
                     val p = pows(i)

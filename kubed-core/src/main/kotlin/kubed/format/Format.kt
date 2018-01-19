@@ -1,11 +1,14 @@
 package kubed.format
 
-import kubed.util.MoreMath
+import kubed.math.toExponential
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
 
 data class Result(val coefficient: String, val exponent: Int)
 
 fun formatDecimal(value: Double, precision: Int = 20): Result {
-    val exp = MoreMath.toExponential(value, precision)
+    val exp = value.toExponential(precision)
 
     val i = exp.indexOf("E")
     if(i < 0) throw IllegalArgumentException() // NaN, ±Infinity
@@ -21,7 +24,7 @@ fun formatDecimal(value: Double, precision: Int = 20): Result {
 
 fun formatPrefixAuto(x: Double, p: Int): String {
     val (coefficient, exponent) = formatDecimal(x, p)
-    val i = (exponent - (Math.max(-8.0, Math.min(8.0, Math.floor(exponent / 3.0))) * 3) + 1).toInt()
+    val i = (exponent - (max(-8.0, min(8.0, floor(exponent / 3.0))) * 3) + 1).toInt()
     val n = coefficient.length
     if(i == n)
         return coefficient

@@ -11,12 +11,13 @@ import kubed.color.scheme.schemeCategory10
 import kubed.scale.scaleOrdinal
 import kubed.selection.selectAll
 import kubed.shape.*
+import kotlin.math.min
 
 class PieChartDemo: Application() {
     override fun start(primaryStage: Stage) {
         val width = 960.0
         val height = 500.0
-        val radius = Math.min(width, height) / 2.0
+        val radius = min(width, height) / 2.0
 
         val root = Group()
         root.translateXProperty().bind(primaryStage.widthProperty().divide(2))

@@ -12,6 +12,7 @@ import kubed.axis.axisLeft
 import kubed.interpolate.interpolateRound
 import kubed.scale.LinearScale
 import kubed.scale.scaleBand
+import kubed.scale.scaleLinear
 import kubed.selection.selectAll
 import kubed.shape.rect
 
@@ -40,8 +41,10 @@ class BarChartDemo: Application() {
             padding(0.1)
         }
 
-        val y = LinearScale(::interpolateRound).range(innerHeight, 0.0)
-                                               .domain(0.0, data.map { it.frequency }.max() ?: 0.0)
+        val y = scaleLinear(::interpolateRound) {
+            range(innerHeight, 0.0)
+            domain(0.0, data.map { it.frequency }.max() ?: 0.0)
+        }
 
         val xAxis = axisBottom(x)
         xAxis(root.selectAll<Nothing>(".xAxis")

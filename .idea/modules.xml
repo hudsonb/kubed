@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo.iml" />
     </modules>
   </component>
 </project>

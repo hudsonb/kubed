@@ -15,6 +15,7 @@ import kubed.ease.*
 import kubed.selection.selectAll
 import kubed.shape.*
 import kubed.transition.*
+import java.lang.Math.random
 import java.util.*
 
 class SelectionDemo: Application() {
@@ -99,6 +100,6 @@ class SelectionDemo: Application() {
 
     private fun randomChars(): List<Char> {
         val shuffled = shuffle(alphabet)
-        return shuffled.subList(0, ((Math.random() * 25) + 1).toInt()).sorted()
+        return shuffled.subList(0, ((random() * 25) + 1).toInt()).sorted()
     }
 }

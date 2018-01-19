@@ -24,9 +24,9 @@ import javafx.scene.layout.Pane
 import javafx.scene.layout.Region
 import javafx.scene.shape.Rectangle
 import javafx.scene.transform.Affine
+import kubed.math.lerp
+import kubed.math.norm
 import kubed.transform.scaleX
-import kubed.util.MoreMath.Companion.lerp
-import kubed.util.MoreMath.Companion.norm
 
 /**
  * An [InfiniteCanvas] provides a means to render a portion of a

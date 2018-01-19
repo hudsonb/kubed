@@ -1,7 +1,7 @@
 package kubed.shape.curve
 
+import kubed.math.EPSILON
 import kubed.path.Context
-import kubed.util.MoreMath
 import kubed.util.isTruthy
 
 abstract class AbstractCatmullRomCurve(val context: Context, val alpha: Double = 0.5) : Curve {
@@ -41,14 +41,14 @@ abstract class AbstractCatmullRomCurve(val context: Context, val alpha: Double =
         val x2a = x2
         val y2a = y2
 
-        if(l01_a > MoreMath.EPSILON) {
+        if(l01_a > EPSILON) {
             val a = 2 * l01_2a + 3 * l01_a * l12_a + l12_2a
             val n = 3 * l01_a * (l01_a + l12_a)
             x1 = (x1 * a - x0 * l12_2a + x2 * l01_2a) / n
             y1 = (y1 * a - y0 * l12_2a + y2 * l01_2a) / n
         }
 
-        if(l23_a > MoreMath.EPSILON) {
+        if(l23_a > EPSILON) {
             val b = 2 * l23_2a + 3 * l23_a * l12_a + l12_2a
             val m = 3 * l23_a * (l23_a + l12_a)
             x2 = (x2 * b + x1 * l23_2a - x * l12_2a) / m
