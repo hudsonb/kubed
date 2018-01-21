@@ -49,7 +49,11 @@ This is an experimental API and is subject to breaking changes until a first maj
 
 ## Roadmap
 
-The following features are being added to Kubed in the near future:
-* Voronoi
-* Force Layout
-* Hierarchical Layout
+### Upcoming Features
+
+* Geospatials support, derived from (d3-geo)[https://github.com/d3/d3-geo]
+
+### Miscellanous
+
+* Adopting Kotlin-style builders rather than call chaining throughout the entire API.
+* Rework of the entire transition system.
