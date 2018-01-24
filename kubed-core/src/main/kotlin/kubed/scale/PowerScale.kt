@@ -7,10 +7,9 @@ open class PowerScale<R>(val exponent: Double, interpolate: (R, R) -> (Double) -
         val da = raise(a, exponent)
         val db = raise(b, exponent) - da
 
-        return when(db) {
-            -0.0, +0.0, Double.NaN -> { _ -> db }
-            else -> {
-                x -> (raise(x, exponent) - da) / db }
+        return when {
+            db == -0.0 || db == +0.0 || db.isNaN() -> { _ -> db }
+            else -> { x -> (raise(x, exponent) - da) / db }
         }
     }
 

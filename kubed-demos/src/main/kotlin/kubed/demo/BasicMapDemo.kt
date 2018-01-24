@@ -3,13 +3,15 @@ package kubed.demo
 import javafx.application.Application
 import javafx.scene.Group
 import javafx.scene.Scene
+import javafx.scene.paint.Color
+import javafx.scene.shape.Path
 import javafx.stage.Stage
-import kubed.geo.Sphere
-import kubed.geo.graticule
+import kubed.geo.*
 import kubed.geo.path.geoPath
 import kubed.geo.projection.*
 import kubed.math.TAU
 import kubed.path.PathContext
+import java.io.File
 import kotlin.math.PI
 
 
@@ -19,12 +21,13 @@ class BasicMapDemo : Application() {
 
         val width = 960.0
         val height = 960.0
-
+//
 //        val projection = orthographic {
 //            scale = 475.0
 //            translate = doubleArrayOf(width / 2, height / 2)
 //            clipAngle = 90.0
 //            precision = .1
+//            rotate = doubleArrayOf(90.0, -10.0)
 //        }
 
 //        val projection = equirectangular {
@@ -65,20 +68,49 @@ class BasicMapDemo : Application() {
 //            precision = .1
 //        }
 
-        val projection = stereographic {
-            scale = 245.0
+        // This has a clipping issue or something
+//        val projection = conicEqualArea()
+
+        val projection = conicEquidistant() {
+            center = doubleArrayOf(0.0, 15.0)
+            scale = 128.0
             translate = doubleArrayOf(width / 2, height / 2)
-            rotate = doubleArrayOf(-20.0, 0.0)
-            clipAngle = 180 - 1e-4
-            clipExtent = arrayOf(doubleArrayOf(0.0, 0.0), doubleArrayOf(width, height))
             precision = .1
         }
 
+//        val projection = stereographic {
+//            scale = 245.0
+//            translate = doubleArrayOf(width / 2, height / 2)
+//            rotate = doubleArrayOf(-20.0, 0.0)
+//            clipAngle = 180 - 1e-4
+//            clipExtent = arrayOf(doubleArrayOf(0.0, 0.0), doubleArrayOf(width, height))
+//            precision = .1
+//        }
+
         val path = geoPath(projection, PathContext())
-        root.children += path(graticule().graticule())
-        //graticule().lines().forEach { root.children += path(it) }
-        //root.children += path(graticule().outline())
-        root.children += path(Sphere())
+        //val url = URL("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_land.geojson")
+        val url = File("/Users/hudsonb/Downloads/world.json").toURI().toURL()
+        geoJson(url) { geo: GeoJSON ->
+            println("Data loaded")
+            geo as FeatureCollection
+            root.children += path(geo).apply {
+                this as Path
+                stroke = Color.DARKGRAY
+                fill = Color.web("#222")
+            }
+            println("Path added")
+        }
+
+        root.children += path(graticule().graticule()).apply {
+            this as Path
+            stroke = Color.web("#777", 0.5)
+            strokeWidth = 0.5
+        }
+        root.children += path(Sphere()).apply {
+            this as Path
+            strokeWidth = 0.5
+            stroke = Color.BLACK
+        }
 
         val scene = Scene(root)
         primaryStage?.width = width

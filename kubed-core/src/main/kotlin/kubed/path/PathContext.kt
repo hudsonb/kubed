@@ -6,7 +6,6 @@ import kubed.math.EPSILON
 import kubed.math.TAU
 import kubed.math.TAU_EPSILON
 import kubed.util.isFalsy
-import kubed.util.isTruthy
 import java.util.*
 import kotlin.math.*
 
@@ -27,6 +26,7 @@ open class PathContext : Context {
         y1 = y
 
         elements += MoveTo(x, y)
+
         return this
     }
 
@@ -53,6 +53,7 @@ open class PathContext : Context {
         y1 = y
 
         elements += CubicCurveTo(controlX, controlY, controlX2, controlY2, x, y)
+
         return this
     }
 
@@ -69,7 +70,7 @@ open class PathContext : Context {
         val l01_2 = x01 * x01 + y01 * y01
 
         // Is this path empty? Move to (x1, y1)
-        if(x1 == Double.NaN) {
+        if(this.x1.isNaN()) {
             this.x1 = x1
             this.y1 = y1
             elements += MoveTo(x1, y1)
@@ -168,11 +169,12 @@ open class PathContext : Context {
         elements += VLineTo(h)
         elements += HLineTo(-w)
         elements += ClosePath()
+
         return this
     }
 
     override fun closePath(): PathContext {
-        if(x1 != Double.NaN) {
+        if(!x1.isNaN()) {
             x1 = x0
             y1 = y0
 

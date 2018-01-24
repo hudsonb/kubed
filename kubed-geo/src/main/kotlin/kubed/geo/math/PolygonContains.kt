@@ -6,7 +6,7 @@ import kubed.geo.cartesianNormalizeInPlace
 import kubed.math.EPSILON
 import kubed.math.QUARTER_PI
 import kubed.math.TAU
-import kubed.math.asin
+import kubed.geo.math.asin
 import kubed.util.isTruthy
 import java.math.BigDecimal
 import kotlin.math.PI
@@ -27,11 +27,11 @@ fun polygonContains(polygon: List<List<DoubleArray>>, point: DoubleArray): Boole
         val ring = polygon[i]
         if(ring.isEmpty()) continue
 
-        val point0 = ring.last()
-        val lambda0 = point0[0]
+        var point0 = ring.last()
+        var lambda0 = point0[0]
         val phi0 = point0[1] / 2 +  QUARTER_PI
-        val sinPhi0 = sin(phi0)
-        val cosPhi0 = cos(phi0)
+        var sinPhi0 = sin(phi0)
+        var cosPhi0 = cos(phi0)
 
         for(j in ring.indices) {
             val point1 = ring[j]
@@ -55,11 +55,16 @@ fun polygonContains(polygon: List<List<DoubleArray>>, point: DoubleArray): Boole
                 cartesianNormalizeInPlace(arc)
                 val intersection = cartesianCross(normal, arc)
                 cartesianNormalizeInPlace(intersection)
-                val phiArc = (if(antimeridian xor (delta >= 0)) 1 else -1) * asin(intersection[2])
-                if(phi > phiArc || phi == phiArc && (arc[0].isTruthy() || arc[1].isTruthy())) {
+                val phiArc = (if(antimeridian xor (delta >= 0)) -1 else 1) * asin(intersection[2])
+                if(phi > phiArc || (phi == phiArc && (arc[0].isTruthy() || arc[1].isTruthy()))) {
                     winding += if(antimeridian xor (delta >= 0)) 1 else -1
                 }
             }
+
+            lambda0 = lambda1
+            sinPhi0 = sinPhi1
+            cosPhi0 = cosPhi1
+            point0 = point1
         }
     }
 
@@ -74,5 +79,5 @@ fun polygonContains(polygon: List<List<DoubleArray>>, point: DoubleArray): Boole
     // from the point to the South pole.  If it is zero, then the point is the
     // same side as the South pole.
 
-    return (angle < -EPSILON || angle < EPSILON && sum.toDouble() < -EPSILON) xor ((winding and 1) != 0)
+    return (angle < -EPSILON || angle < EPSILON && sum.toDouble() < -EPSILON) xor ((winding and 1).isTruthy())
 }

@@ -1,6 +1,6 @@
 package kubed.geo.projection
 
-import kubed.math.acos
+import kubed.geo.math.acos
 import kubed.util.isTruthy
 import kotlin.math.sin
 

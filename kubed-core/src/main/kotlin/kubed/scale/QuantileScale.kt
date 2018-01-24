@@ -21,7 +21,7 @@ class QuantileScale<R> : Scale<Double, R> {
     fun domain(vararg d: Double) = domain(d.toList())
     fun domain(d: List<Double>): QuantileScale<R> {
         domain.clear()
-        domain.addAll(d.filter { it != Double.NaN })
+        domain.addAll(d.filter { !it.isNaN() })
         domain.sort()
         rescale()
 

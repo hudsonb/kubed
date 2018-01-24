@@ -16,7 +16,7 @@ class ThresholdScale<R> : Scale<Double, R> {
     fun domain(vararg d: Double) = domain(d.toList())
     fun domain(d: List<Double>): ThresholdScale<R> {
         domain.clear()
-        domain.addAll(d.filter { it != Double.NaN })
+        domain.addAll(d.filter { it.isNaN() })
         return this
     }
 

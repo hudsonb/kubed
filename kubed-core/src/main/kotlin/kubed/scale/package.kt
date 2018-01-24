@@ -7,6 +7,7 @@ import kubed.color.scheme.schemeCategory20
 import kubed.color.scheme.schemeCategory20b
 import kubed.color.scheme.schemeCategory20c
 import kubed.interpolate.color.interpolateRgb
+import java.lang.Double.isNaN
 import kotlin.reflect.full.isSubclassOf
 
 inline fun <reified R> scaleLinear(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
@@ -68,8 +69,8 @@ inline fun <reified R> uninterpolator(): ((R, R) -> (R) -> Double)? {
             val an = (a as Number).toDouble()
             val bn = (b as Number).toDouble()
             val d = bn - an
-            when(d) {
-                -0.0, +0.0, Double.NaN -> { _ -> d }
+            when {
+                d == -0.0 || d == +0.0 || d.isNaN() -> { _ -> d }
                 else -> { x: R -> ((x as Number).toDouble() - an) / d }
             }
         }

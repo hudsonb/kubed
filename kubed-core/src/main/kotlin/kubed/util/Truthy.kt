@@ -2,29 +2,29 @@
 
 package kubed.util
 
-inline fun Any?.isTruthy() = this != null
-inline fun Any?.isFalsy() = !isTruthy()
+inline fun Any?.isTruthy() = !isFalsy()
+inline fun Any?.isFalsy() = this == null
 
-inline fun Boolean?.isTruthy() = this != null && this
-inline fun Boolean?.isFalsy() = this == null || this
+inline fun Boolean?.isTruthy() = !isFalsy()
+inline fun Boolean?.isFalsy() = this == null || this == false
 
-inline fun Byte?.isTruthy() = this != null && this != 0.toByte()
-inline fun Byte?.isFalsy() = !isTruthy()
+inline fun Byte?.isTruthy() = !isFalsy()
+inline fun Byte?.isFalsy() = this == null || this == 0.toByte()
 
-inline fun Double?.isTruthy() = this != null && this != 0.0 && this != Double.NaN
-inline fun Double?.isFalsy() = !isTruthy()
+inline fun Double?.isTruthy() = !isFalsy()
+inline fun Double?.isFalsy() = this == null || this == -0.0 || this == 0.0 || isNaN()
 
-inline fun Float?.isTruthy() = this != null && this != 0f && this != Float.NaN
-inline fun Float?.isFalsy() = !isTruthy()
+inline fun Float?.isTruthy() = !isFalsy()
+inline fun Float?.isFalsy() = this == null || this == -0f || this == 0f || isNaN()
 
-inline fun Int?.isTruthy() = this != null && this != 0
-inline fun Int?.isFalsy() = !isTruthy()
+inline fun Int?.isTruthy() = !isFalsy()
+inline fun Int?.isFalsy() = this == null || this == 0
 
-inline fun Long?.isTruthy(): Boolean = this != null && this != 0L
-inline fun Long?.isFalsy() = !isTruthy()
+inline fun Long?.isTruthy() = !isFalsy()
+inline fun Long?.isFalsy() = this == null || this == 0L
 
-inline fun Short?.isTruthy(): Boolean = this != null && this != 0.toShort()
-inline fun Short?.isFalsy() = !isTruthy()
+inline fun Short?.isTruthy() = !isFalsy()
+inline fun Short?.isFalsy() = this == null || this == 0.toShort()
 
-inline fun String?.isTruthy(): Boolean = this != null && isNotEmpty()
-inline fun String?.isFalsy() = !isTruthy()
+inline fun String?.isTruthy() = !isFalsy()
+inline fun String?.isFalsy() = this == null || isEmpty()

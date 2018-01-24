@@ -16,18 +16,6 @@ const val RADIANS = PI / 180.0
 const val EPSILON = 1e-6
 const val TAU_EPSILON = TAU - EPSILON
 
-inline fun acos(x: Double) = when {
-    x > 1 -> 0.0
-    x < -1 -> PI
-    else -> kotlin.math.acos(x)
-}
-
-inline fun asin(x: Double) = when {
-    x > 1 -> HALF_PI
-    x < -1 -> -HALF_PI
-    else -> kotlin.math.asin(x)
-}
-
 inline fun haversin(x: Double): Double {
     val xs = sin(x / 2)
     return xs * xs

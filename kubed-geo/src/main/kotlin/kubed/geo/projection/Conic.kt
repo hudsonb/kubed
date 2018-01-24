@@ -1,6 +1,7 @@
 package kubed.geo.projection
 
 import kubed.math.toDegrees
+import kubed.math.toRadians
 import kotlin.math.PI
 
 fun conicProjection(factory: ConicProjectorFactory, init: ConicProjection.() -> Unit) = ConicProjection(factory).apply(init)
@@ -25,8 +26,8 @@ class ConicProjection(factory: ConicProjectorFactory) : Projection(factory) {
 
         set(value) {
             factory as ConicProjectorFactory
-            factory.phi0 = value[0]
-            factory.phi1 = value[1]
+            factory.phi0 = value[0].toRadians()
+            factory.phi1 = value[1].toRadians()
             project = factory.create()
         }
 }

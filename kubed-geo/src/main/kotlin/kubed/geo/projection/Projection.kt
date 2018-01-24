@@ -79,7 +79,7 @@ open class Projection(protected val factory: ProjectorFactory) {
     var clipAngle: Double
         get() = theta
         set(value) {
-            if(value == Double.NaN) {
+            if(value.isNaN()) {
                 theta = Double.NaN
                 preclip = clipAntimeridian()
             }
@@ -105,7 +105,7 @@ open class Projection(protected val factory: ProjectorFactory) {
     private var y1 = 0.0
     var postclip = identity
     open var clipExtent: Array<DoubleArray>?
-        get() = if(x0 == Double.NaN) null else arrayOf(doubleArrayOf(x0, y0), doubleArrayOf(x1, y1))
+        get() = if(x0.isNaN()) null else arrayOf(doubleArrayOf(x0, y0), doubleArrayOf(x1, y1))
         set(value) {
             if(value == null) {
                 x0 = Double.NaN

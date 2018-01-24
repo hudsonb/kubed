@@ -2,7 +2,7 @@ package kubed.geo
 
 import kubed.math.EPSILON
 import kubed.math.TAU
-import kubed.math.acos
+import kubed.geo.math.acos
 import kubed.util.isFalsy
 import kotlin.math.cos
 import kotlin.math.sin

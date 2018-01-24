@@ -1,6 +1,6 @@
 package kubed.geo
 
-import kubed.math.asin
+import kubed.geo.math.asin
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin

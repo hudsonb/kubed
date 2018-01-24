@@ -1,7 +1,7 @@
 package kubed.geo.projection
 
 import kubed.math.TAU
-import kubed.math.asin
+import kubed.geo.math.asin
 import kubed.math.toDegrees
 import kubed.math.toRadians
 import kubed.util.isTruthy

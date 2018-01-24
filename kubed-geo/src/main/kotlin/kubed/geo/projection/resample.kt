@@ -6,7 +6,7 @@ import kubed.geo.GeometryStream
 import kubed.geo.MutableGeometryStream
 import kubed.geo.cartesian
 import kubed.math.EPSILON
-import kubed.math.asin
+import kubed.geo.math.asin
 import kubed.math.toRadians
 import kubed.util.isTruthy
 import kotlin.math.abs
@@ -150,6 +150,7 @@ private fun _resample(project: Projector, delta2: Double): Transformer {
             }
 
             override fun polygonEnd() {
+                stream.polygonEnd()
                 streamingPolygon = false
             }
         }

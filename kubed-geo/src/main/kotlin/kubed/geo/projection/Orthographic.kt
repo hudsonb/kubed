@@ -1,7 +1,7 @@
 package kubed.geo.projection
 
 import kubed.math.EPSILON
-import kubed.math.asin
+import kubed.geo.math.asin
 import kotlin.math.cos
 import kotlin.math.sin
 

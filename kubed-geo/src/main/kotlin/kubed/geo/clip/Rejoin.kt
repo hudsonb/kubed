@@ -4,39 +4,13 @@ import kubed.geo.GeometryStream
 import kubed.geo.pointsEqual
 import java.util.*
 
-data class Intersection(val x: DoubleArray,
+class Intersection(val x: DoubleArray,
                         val z: List<DoubleArray>?,
                         var o: Intersection?,
                         var e: Boolean,
                         var v: Boolean = false,
                         var n: Intersection? = null,
-                        var p: Intersection? = null) {
-    override fun equals(other: Any?): Boolean {
-        if(this === other) return true
-        if(other !is Intersection) return false
-
-        if(!Arrays.equals(x, other.x)) return false
-        if(z != other.z) return false
-        if(o != other.o) return false
-        if(e != other.e) return false
-        if(v != other.v) return false
-        if(n != other.n) return false
-        if(p != other.p) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = Arrays.hashCode(x)
-        result = 31 * result + (z?.hashCode() ?: 0)
-        result = 31 * result + (o?.hashCode() ?: 0)
-        result = 31 * result + e.hashCode()
-        result = 31 * result + v.hashCode()
-        result = 31 * result + (n?.hashCode() ?: 0)
-        result = 31 * result + (p?.hashCode() ?: 0)
-        return result
-    }
-}
+                        var p: Intersection? = null)
 
 fun clipRejoin(segments: List<List<DoubleArray>>, compareIntersection: Comparator<Intersection>,
                startInside: Boolean, interpolate: (DoubleArray, DoubleArray, Int, GeometryStream) -> Unit, stream: GeometryStream) {
@@ -74,6 +48,7 @@ fun clipRejoin(segments: List<List<DoubleArray>>, compareIntersection: Comparato
 
         x = Intersection(p1, segment, null, false)
         subject += x
+
         o = Intersection(p1, null, x, true)
         x.o = o
         clip += o
@@ -92,7 +67,6 @@ fun clipRejoin(segments: List<List<DoubleArray>>, compareIntersection: Comparato
     }
 
     val start = subject.first()
-    var points: List<DoubleArray>
 
     while(true) {
         var current: Intersection? = start
@@ -103,7 +77,7 @@ fun clipRejoin(segments: List<List<DoubleArray>>, compareIntersection: Comparato
             if(current == start) return
         }
 
-        points = current?.z ?: emptyList()
+        var points = current?.z ?: emptyList()
         stream.lineStart()
         do {
             current?.o?.v = true

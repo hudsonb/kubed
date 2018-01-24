@@ -4,7 +4,7 @@ import kubed.geo.GeometryStream
 import kubed.math.TAU
 import kubed.path.Context
 
-class PathStream(val context: Context) : GeometryStream {
+class PathStream(private val context: Context) : GeometryStream {
     var pointRadius = 4.5
 
     private var line = false
@@ -28,7 +28,7 @@ class PathStream(val context: Context) : GeometryStream {
     }
 
     override fun point(x: Double, y: Double, z: Double) {
-        when (point) {
+        when(point) {
             0 -> {
                 context.moveTo(x, y)
                 point = 1

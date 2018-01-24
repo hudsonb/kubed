@@ -6,7 +6,6 @@ import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kubed.util.isTruthy
 import java.util.*
-import java.util.Collections.addAll
 import kotlin.Comparator
 
 interface IntersectStream : GeometryStream {
@@ -52,8 +51,13 @@ open class ClipStream(val clip: Clip, val stream: GeometryStream) : MutableGeome
                 val compareIntersection = Comparator<Intersection> { i1, i2 ->
                     val a = i1.x
                     val b = i2.x
+                    val ca = if(a[0] < 0) a[1] - HALF_PI - EPSILON else HALF_PI - a[1]
+                    val cb = if(b[0] < 0) b[1] - HALF_PI - EPSILON else HALF_PI - b[1]
+                    ca.compareTo(cb)
+                    /*
                     ((if(a[0] < 0) a[1] - HALF_PI - EPSILON else HALF_PI - a[1])
                             - (if(b[0] < 0) b[1] - HALF_PI - EPSILON else HALF_PI - b[1])).toInt()
+                            */
                 }
                 clipRejoin(flattenedSegments, compareIntersection, startInside, clip::interpolate, stream)
             }
@@ -129,14 +133,18 @@ open class ClipStream(val clip: Clip, val stream: GeometryStream) : MutableGeome
             // No intersections
             if((clean and 1).isTruthy()) {
                 val segment = ringSegments[0]
-                if(segment != null && segment.size - 1 > 0) {
-                    if(!polygonStarted) {
-                        stream.polygonStart()
-                        polygonStarted = true
+                if(segment != null) {
+                    val m = segment.size - 1
+                    if(m > 0) {
+                        if(!polygonStarted) {
+                            stream.polygonStart()
+                            polygonStarted = true
+                        }
+                        stream.lineStart()
+                        (0 until m).map { segment[it] }
+                                   .forEach { stream.point(it[0], it[1], 0.0) }
+                        stream.lineEnd()
                     }
-                    stream.lineStart()
-                    for(p in segment) stream.point(p[0], p[1], 0.0)
-                    stream.lineEnd()
                 }
                 return
             }

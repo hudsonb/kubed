@@ -46,7 +46,7 @@ open class MercatorProjection(projector: Projector) : Projection(projector) {
         }
 
     override var clipExtent: Array<DoubleArray>?
-        get() = if(x0 == Double.NaN) null else arrayOf(doubleArrayOf(x0, y0), doubleArrayOf(x1, y1))
+        get() = if(x0.isNaN()) null else arrayOf(doubleArrayOf(x0, y0), doubleArrayOf(x1, y1))
         set(value) {
             if(value == null) {
                 x0 = Double.NaN
@@ -68,10 +68,12 @@ open class MercatorProjection(projector: Projector) : Projection(projector) {
         val k = PI * scale
         val t = super.invoke(rotation(rotate).invert(0.0, 0.0))
 
-        super.clipExtent = when {
-            x0 == Double.NaN -> arrayOf(doubleArrayOf(t[0] - k, t[1] - k), doubleArrayOf(t[0] + k, t[1] + k))
-            project::class == MercatorProjector::class -> arrayOf(doubleArrayOf(max(t[0] - k, x0), y0), doubleArrayOf(min(t[0] + k, x1), y1))
-            else -> arrayOf(doubleArrayOf(x0, max(t[1] - k, y0)), doubleArrayOf(x1, min(t[1] + k, y1)))
-        }
+        val e = when {
+                    x0.isNaN() -> arrayOf(doubleArrayOf(t[0] - k, t[1] - k), doubleArrayOf(t[0] + k, t[1] + k))
+                    project::class == MercatorProjector::class -> arrayOf(doubleArrayOf(max(t[0] - k, x0), y0), doubleArrayOf(min(t[0] + k, x1), y1))
+                    else -> arrayOf(doubleArrayOf(x0, max(t[1] - k, y0)), doubleArrayOf(x1, min(t[1] + k, y1)))
+                }
+
+        super.clipExtent = e
     }
 }

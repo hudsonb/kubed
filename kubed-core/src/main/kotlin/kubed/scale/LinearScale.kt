@@ -9,8 +9,8 @@ open class LinearScale<R>(interpolate: (R, R) -> (Double) -> R,
                           rangeComparator: Comparator<R>? = null) : ContinuousScale<R>(interpolate, uninterpolate, rangeComparator) {
     override fun deinterpolate(a: Double, b: Double): (Double) -> Double {
         val b2 = b - a
-        return when(b2) {
-            -0.0, +0.0, Double.NaN -> { _ -> b2 }
+        return when {
+            b2 == -0.0 || b2 == +0.0 || b2.isNaN() -> { _ -> b2 }
             else -> { x -> (x - a) / b2 }
         }
     }

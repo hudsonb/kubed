@@ -181,12 +181,10 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
     }
 
     override fun interpolate(from: DoubleArray?, to: DoubleArray?, direction: Int, stream: GeometryStream) {
-        if(to == null) throw IllegalArgumentException("to must not be null")
-
         var a = if(from == null) 0 else corner(from, direction)
         val a1 = if(from == null) 0 else corner(to, direction)
 
-        if(from == null || a != a1 || (comparePoint(from, to) < 0) xor (direction > 0)) {
+        if(from == null || a != a1 || to != null && (comparePoint(from, to) < 0) xor (direction > 0)) {
             do {
                 stream.point(if(a == 0 || a == 3) x0 else x1,
                         if(a > 1) y1 else y0,
@@ -194,17 +192,19 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
                 a = (a + direction + 4) % 4
             } while(a != a1)
         }
-        else stream.point(to[0], to[1], 0.0)
+        else if(to != null) stream.point(to[0], to[1], 0.0)
     }
 
-    private fun corner(p: DoubleArray, direction: Int) = when {
+    private fun corner(p: DoubleArray?, direction: Int) = when {
         direction > 0 -> when {
+            p == null -> 3
             abs(p[0] - x0) < EPSILON -> 0
             abs(p[0] - x1) < EPSILON -> 2
             abs(p[1] - y1) < EPSILON -> 1
             else -> 3
         }
         else -> when {
+            p == null -> 2
             abs(p[0] - x0) < EPSILON -> 3
             abs(p[0] - x1) < EPSILON -> 1
             abs(p[1] - y1) < EPSILON -> 0
@@ -216,12 +216,19 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
         val ca = corner(a, 1)
         val cb = corner(b, 1)
 
-        return if(ca != cb) ca - cb else when(ca) {
+        return when {
+            ca != cb -> ca.compareTo(cb)
+            ca == 0 -> b[1].compareTo(a[1])
+            ca == 1 -> a[0].compareTo(b[0])
+            ca == 2 -> a[1].compareTo(b[1])
+            else -> b[0].compareTo(a[0])
+        }
+        /*return if(ca != cb) ca - cb else when(ca) {
             0 -> (b[1] - a[1]).toInt()
             1 -> (a[0] - b[0]).toInt()
             2 -> (a[1] - b[1]).toInt()
             else -> (b[0] - a[0]).toInt()
-        }
+        }*/
     }
 }
 

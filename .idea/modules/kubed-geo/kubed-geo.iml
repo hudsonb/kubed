@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id=":kubed-geo" external.linked.project.path="$MODULE_DIR$/../../../kubed-geo" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="org.kubed" external.system.module.version="0.1-SNAPSHOT" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="kotlin-language" name="Kotlin">
+      <configuration version="3" platform="JVM 1.8" useProjectSettings="false">
+        <compilerSettings />
+        <compilerArguments>
+          <option name="jvmTarget" value="1.8" />
+          <option name="languageVersion" value="1.2" />
+          <option name="apiVersion" value="1.2" />
+        </compilerArguments>
+      </configuration>
+    </facet>
+  </component>
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../../kubed-geo/out/production/classes" />
     <output-test url="file://$MODULE_DIR$/../../../kubed-geo/out/test/classes" />
@@ -11,7 +23,6 @@
       <sourceFolder url="file://$MODULE_DIR$/../../../kubed-geo/src/test/kotlin" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../../kubed-geo/src/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../../kubed-geo/src/test/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../kubed-geo/src/kotlin" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../../../kubed-geo/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../../kubed-geo/build" />
       <excludeFolder url="file://$MODULE_DIR$/../../../kubed-geo/out" />
@@ -21,9 +32,13 @@
     <orderEntry type="module" module-name="kubed-core" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.20" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.2.20" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.20" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.20" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.0" level="project" />
   </component>
 </module>
