@@ -1,6 +1,7 @@
 package kubed.color
 
 import javafx.scene.paint.Color
+import kubed.math.toDegrees
 import kubed.math.toRadians
 import kotlin.math.atan2
 import kotlin.math.sqrt
@@ -20,7 +21,7 @@ class Hcl(val h: Double, var c: Double, var l: Double, var opacity: Double = 1.0
             else -> {
                 try {
                     val lab = Lab.convert(value)
-                    val h = atan2(lab.b, lab.a).toRadians()
+                    val h = atan2(lab.b, lab.a).toDegrees()
                     Hcl(if(h < 0) h + 360 else h, sqrt(lab.a * lab.a + lab.b * lab.b), lab.l, lab.opacity)
                 }
                 catch(e: Exception) {
