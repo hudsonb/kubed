@@ -1,5 +1,6 @@
 package kubed.geo.projection
 
+import javafx.beans.property.SimpleDoubleProperty
 import kubed.geo.FilterGeometryStream
 import kubed.geo.GeometryStream
 import kubed.geo.clip.clipAntimeridian
@@ -13,6 +14,18 @@ fun projection(projector: Projector) = projection(projector) {}
 fun projection(projector: Projector, init: Projection.() -> Unit) = Projection(projector).apply(init)
 fun projection(factory: ProjectorFactory) = Projection(factory)
 fun projection(factory: ProjectorFactory, init: Projection.() -> Unit) = Projection(factory).apply(init)
+
+interface IProjection {
+    var precision: Double
+    var scale: Double
+    var translate: DoubleArray
+
+    operator fun invoke(point: DoubleArray): DoubleArray
+    fun invert(coordinates: DoubleArray)
+    fun stream(stream: GeometryStream): GeometryStream
+}
+
+
 
 open class Projection(protected val factory: ProjectorFactory) {
     constructor(projector: Projector) : this(object : ProjectorFactory {

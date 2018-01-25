@@ -54,10 +54,6 @@ open class ClipStream(val clip: Clip, val stream: GeometryStream) : MutableGeome
                     val ca = if(a[0] < 0) a[1] - HALF_PI - EPSILON else HALF_PI - a[1]
                     val cb = if(b[0] < 0) b[1] - HALF_PI - EPSILON else HALF_PI - b[1]
                     ca.compareTo(cb)
-                    /*
-                    ((if(a[0] < 0) a[1] - HALF_PI - EPSILON else HALF_PI - a[1])
-                            - (if(b[0] < 0) b[1] - HALF_PI - EPSILON else HALF_PI - b[1])).toInt()
-                            */
                 }
                 clipRejoin(flattenedSegments, compareIntersection, startInside, clip::interpolate, stream)
             }

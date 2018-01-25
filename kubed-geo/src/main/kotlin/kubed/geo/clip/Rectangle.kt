@@ -14,7 +14,7 @@ const val CLIP_MIN = -CLIP_MAX
 fun clipRectangle(x0: Double, y0: Double, x1: Double, y1: Double) = RectangleClip(x0, y0, x1, y1)::clipLine
 
 class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Double) : Clip {
-    override var start = doubleArrayOf(0.0, 0.0) // Unused?
+    override var start = doubleArrayOf(0.0, 0.0) // Unused
 
     override fun isVisible(x: Double, y: Double) = x in x0..x1 && y in y0..y1
 
@@ -223,32 +223,5 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
             ca == 2 -> a[1].compareTo(b[1])
             else -> b[0].compareTo(a[0])
         }
-        /*return if(ca != cb) ca - cb else when(ca) {
-            0 -> (b[1] - a[1]).toInt()
-            1 -> (a[0] - b[0]).toInt()
-            2 -> (a[1] - b[1]).toInt()
-            else -> (b[0] - a[0]).toInt()
-        }*/
     }
 }
-
-/*
-class Rectangle(val x0: Double, val y0: Double, val x1: Double, val y1: Double, stream: GeometryStream) : ClipStream(stream) {
-    override var start: DoubleArray = doubleArrayOf(0.0, 0.0) // Unused???
-
-
-
-    override var clean = 0
-
-
-
-
-
-
-
-
-
-
-
-}
-*/

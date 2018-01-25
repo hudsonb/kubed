@@ -5,7 +5,7 @@ import kotlin.math.*
 
 fun transverseMercator() = transverseMercator {}
 fun transverseMercator(init: TransverseMercatorProjection.() -> Unit) = transverseMercatorProjection {
-    rotate = doubleArrayOf(0.0, 0.0, 90.0)
+    rotate = doubleArrayOf(0.0, 0.0, 0.0)
     scale = 159.155
     init()
 }
@@ -15,7 +15,7 @@ fun transverseMercatorProjection(init: TransverseMercatorProjection.() -> Unit) 
 
 
 class TransverseMercatorProjector : InvertableProjector {
-    override fun invoke(lambda: Double, phi: Double) = doubleArrayOf(ln(tan((HALF_PI + PI) / 2)), -lambda)
+    override fun invoke(lambda: Double, phi: Double) = doubleArrayOf(ln(tan((HALF_PI + phi) / 2)), -lambda)
     override fun invert(x: Double, y: Double) = doubleArrayOf(-y, 2 * atan(exp(x)) - HALF_PI)
 }
 
@@ -35,6 +35,6 @@ class TransverseMercatorProjection : MercatorProjection(TransverseMercatorProjec
             return doubleArrayOf(r[0], r[1], r[2] - 90)
         }
         set(r) {
-            super.rotate = doubleArrayOf(r[0], r[1], (if(r.size > 2) r[2] else 90.0) + 90)
+            super.rotate = doubleArrayOf(r[0], r[1], if(r.size > 2) r[2] + 90.0 else 90.0)
         }
 }

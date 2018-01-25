@@ -3,6 +3,7 @@ package kubed.demo
 import javafx.animation.Animation
 import javafx.animation.Interpolator
 import javafx.application.Application
+import javafx.application.Application.launch
 import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Scene
@@ -12,6 +13,7 @@ import javafx.util.Duration
 import kubed.interpolate.color.interpolateRgb
 import kubed.selection.selectAll
 import kubed.shape.rect
+import kubed.transition.active
 import kubed.transition.transition
 import java.lang.Math.random
 
@@ -53,17 +55,20 @@ class ChainedTransitionDemo : Application() {
                 .data(data)
                 .enter().append { d, _, _ -> r(d) }
                 .transition()
+                .cycleCount(-1)
                 .interpolator(Interpolator.LINEAR)
                 .delay { _, i, _ -> Duration.millis(i + random() * n / 4.0) }
                 .fill(Color.STEELBLUE)
                 .transition()
                 .delay(Duration.seconds(1.0))
+                .cycleCount(-1)
                 .fill(Color.ORANGE)
                 .transition()
                 .fill(Color.LIGHTGRAY)
-                .on(Animation.Status.STOPPED) {
-                    repeat(this)
-                }
+                .cycleCount(-1)
+                //.on(Animation.Status.STOPPED) {
+                //    repeat(this)
+                //}
 
 
 
@@ -75,20 +80,20 @@ class ChainedTransitionDemo : Application() {
         primaryStage?.show()
     }
 
-    fun repeat(node: Node) {
-        //println("repeat")
-        /*node.selectAll<>()
-        node.active()?.fill(Color.STEELBLUE)
-                ?.transition()
-                ?.delay(Duration.seconds(1.0))
-                ?.fill(Color.ORANGE)
-                ?.transition()
-                ?.delay(Duration.seconds(1.0))
-                ?.fill(Color.LIGHTGRAY)
-                ?.transition()
-                ?.delay(Duration.millis(n))
-                ?.on(Animation.Status.RUNNING) { println("2nd repeat"); repeat(this) }*/
-    }
+//    fun repeat(node: Node) {
+//        println("repeat")
+//        //node.selectAll<>()
+//        node.active()?.fill(Color.STEELBLUE)
+//                ?.transition()
+//                ?.delay(Duration.seconds(1.0))
+//                ?.fill(Color.ORANGE)
+//                ?.transition()
+//                ?.delay(Duration.seconds(1.0))
+//                ?.fill(Color.LIGHTGRAY)
+//                ?.transition()
+//                ?.delay(Duration.millis(n))
+//                ?.on(Animation.Status.RUNNING) { println("2nd repeat"); repeat(this) }
+//    }
 
     companion object {
         @JvmStatic

@@ -17,7 +17,12 @@ class AntimeridianClip : Clip {
         var sign0 = Double.NaN
 
         return object : IntersectStream {
-            override var clean = 0
+            private var _clean = 0
+            override var clean
+                get() = 2 - _clean
+                set(value) {
+                    _clean = value
+                }
 
             override fun lineStart() {
                 stream.lineStart()
