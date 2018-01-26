@@ -17,9 +17,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import javafx.application.Platform
 import java.net.URL
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import java.util.concurrent.ForkJoinPool
 
 @JsonTypeInfo(
@@ -36,11 +34,11 @@ import java.util.concurrent.ForkJoinPool
         Type(value = GeometryCollection::class, name="GeometryCollection"),
         Type(value = Feature::class, name="Feature"),
         Type(value = FeatureCollection::class, name="FeatureCollection"))
-interface GeoJSON {
+interface GeoJson {
     val type: String
 }
 
-interface Geometry<out T> : GeoJSON {
+interface Geometry<out T> : GeoJson {
     val coordinates: T
 }
 
@@ -87,22 +85,24 @@ data class MultiPolygon(override val coordinates: List<List<List<Position>>>) : 
     override val type = "MultiPolygon"
 }
 
-data class GeometryCollection(val geometries: List<Geometry<*>>) : GeoJSON {
+data class GeometryCollection(val geometries: List<Geometry<*>>) : GeoJson {
     @JsonIgnore
     override val type = "GeometryCollection"
 }
 
-data class Feature(val geometry: Geometry<*>, val properties: Map<String, *>) : GeoJSON {
+data class Feature(val geometry: Geometry<*>, val properties: Map<String, *>) : GeoJson {
     @JsonIgnore
     override val type = "Feature"
+
+    var id: String? = null
 }
 
-data class FeatureCollection(val features: List<Feature>) : GeoJSON {
+data class FeatureCollection(val features: List<Feature>) : GeoJson {
     @JsonIgnore
     override val type = "FeatureCollection"
 }
 
-class Sphere : GeoJSON {
+class Sphere : GeoJson {
     @JsonIgnore
     override val type = "Sphere"
 }
@@ -145,11 +145,16 @@ private class PositionDeserializer(t: Class<Position>?) : StdDeserializer<Positi
     }
 }
 
-fun geoJson(url: URL, service: ExecutorService = ForkJoinPool.commonPool(), callback: (GeoJSON) -> Unit) {
+fun geoJson(url: URL, service: ExecutorService = ForkJoinPool.commonPool(), callback: (GeoJson) -> Unit) {
     service.submit {
         val mapper = jacksonObjectMapper()
-        val geo = mapper.readValue<GeoJSON>(url, GeoJSON::class.java)
-        Platform.runLater { callback(geo) }
+        try {
+            val geo = mapper.readValue<GeoJson>(url, GeoJson::class.java)
+            Platform.runLater { callback(geo) }
+        }
+        catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
 
@@ -162,6 +167,6 @@ fun main(args: Array<String>) {
     val ls = LineString(arrayListOf(Position(0.0, 0.0), Position(10.0, 10.0)))
     println(mapper.writeValueAsString(ls))
 
-    val g = mapper.readValue<GeoJSON>(geojson, GeoJSON::class.java)
+    val g = mapper.readValue<GeoJson>(geojson, GeoJson::class.java)
     println(mapper.writeValueAsString(g))
 }

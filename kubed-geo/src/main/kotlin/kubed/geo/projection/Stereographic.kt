@@ -5,7 +5,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun stereographic() = stereographic {}
-fun stereographic(init: Projection.() -> Unit) = projection(StereographicProjector()) {
+fun stereographic(init: MutableProjection.() -> Unit) = projection(StereographicProjector()) {
     scale = 250.0
     clipAngle = 142.0
 

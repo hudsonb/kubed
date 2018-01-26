@@ -5,7 +5,7 @@ import kubed.util.isTruthy
 import kotlin.math.sin
 
 fun azimuthalEquidistant() = azimuthalEqualArea {}
-fun azimuthalEquidistant(init: Projection.() -> Unit) = projection(AzimuthalEquidistant()) {
+fun azimuthalEquidistant(init: MutableProjection.() -> Unit) = projection(AzimuthalEquidistant()) {
     scale = 124.75
     clipAngle = 180 - 1e-3
 

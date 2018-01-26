@@ -2,8 +2,15 @@ package kubed.geo.projection
 
 import kubed.geo.GeometryStream
 import kubed.geo.MultiplexStream
-/*
-class AlbersUsa : Projection() {
+import kubed.math.EPSILON
+
+fun albersUsa() = albersUsa {}
+fun albersUsa(init: AlbersUsa.() -> Unit) = AlbersUsa().apply {
+    scale = 1070.0
+    init()
+}
+
+class AlbersUsa : StreamCacheProjection() {
     val lower48 = albers()
     lateinit var lower48Point: GeometryStream
 
@@ -21,8 +28,56 @@ class AlbersUsa : Projection() {
     }
     lateinit var hawaiiPoint: GeometryStream
 
-    var point: DoubleArray? = null
-    val pointStream = object : GeometryStream {
+    override var precision: Double
+        get() = lower48.precision
+        set(value) {
+            lower48.precision = value
+            alaska.precision = value
+            hawaii.precision = value
+        }
+
+    override var scale: Double
+        get() = lower48.scale
+        set(value) {
+            lower48.scale = value
+            alaska.scale = value * 0.35
+            hawaii.scale = value
+            translate = lower48.translate
+        }
+
+    override var translate: DoubleArray
+        get() = lower48.translate
+        set(value) {
+            val k = lower48.scale
+            val x = value[0]
+            val y = value[1]
+
+            with(lower48) {
+                translate = value
+                clipExtent = arrayOf(doubleArrayOf(x - 0.455 * k, y - 0.238 * k),
+                                     doubleArrayOf(x + 0.455 * k, y + 0.238 * k))
+            }
+            lower48Point = lower48.stream(pointStream)
+
+            with(alaska) {
+                translate = doubleArrayOf(x - 0.307 * k, y + 0.201 * k)
+                clipExtent = arrayOf(doubleArrayOf(x - 0.425 * k + EPSILON, y + 0.120 * k + EPSILON),
+                                     doubleArrayOf(x - 0.214 * k - EPSILON, y + 0.234 * k - EPSILON))
+            }
+            alaskaPoint = alaska.stream(pointStream)
+
+            with(hawaii) {
+                translate = doubleArrayOf(x - 0.205 * k, y + 0.212 * k)
+                clipExtent = arrayOf(doubleArrayOf(x - 0.214 * k + EPSILON, y + 0.166 * k + EPSILON),
+                                     doubleArrayOf(x - 0.115 * k - EPSILON, y + 0.234 * k - EPSILON))
+            }
+            hawaiiPoint = hawaii.stream(pointStream)
+
+            reset()
+        }
+
+    private var point: DoubleArray? = null
+    private val pointStream = object : GeometryStream {
         override fun point(x: Double, y: Double, z: Double) {
             point = doubleArrayOf(x, y)
         }
@@ -49,11 +104,11 @@ class AlbersUsa : Projection() {
         throw Exception("Bug in AlbersUsa.invoke")
     }
 
-    override fun invert(point: DoubleArray): DoubleArray {
+    override fun invert(coordinates: DoubleArray): DoubleArray {
         val k = lower48.scale
         val t = lower48.translate
-        val x = (point[0] - t[0]) / k
-        val y = (point[1] - t[1]) / k
+        val x = (coordinates[0] - t[0]) / k
+        val y = (coordinates[1] - t[1]) / k
 
         val p = when {
             y in 0.120..0.234 && x in -0.425..-0.214 -> alaska
@@ -61,20 +116,16 @@ class AlbersUsa : Projection() {
             else -> lower48
         }
 
-        return p.invert(point)
+        return p.invert(coordinates)
     }
 
-    override fun stream(stream: GeometryStream): GeometryStream {
-        val cs = cache
-        return when {
-            cs != null && cacheStream == stream -> cs
-            else -> {
-                cacheStream = stream
-                val ms = MultiplexStream(listOf(lower48.stream(stream), alaska.stream(stream), hawaii.stream(stream)))
-                cache = ms
-                ms
-            }
+    override fun stream(forStream: GeometryStream): GeometryStream {
+        var stream = getCachedStream(forStream)
+        if(stream == null) {
+            stream = MultiplexStream(listOf(lower48.stream(forStream), alaska.stream(forStream), hawaii.stream(forStream)))
+            cache(forStream, stream)
         }
+
+        return stream
     }
 }
-        */

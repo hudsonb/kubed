@@ -4,7 +4,7 @@ import kubed.geo.math.asin
 import kotlin.math.sqrt
 
 fun azimuthalEqualArea() = azimuthalEqualArea {}
-fun azimuthalEqualArea(init: Projection.() -> Unit) = projection(AzimuthalEqualArea()) {
+fun azimuthalEqualArea(init: MutableProjection.() -> Unit) = projection(AzimuthalEqualArea()) {
     scale = 124.75
     clipAngle = 180 - 1e-3
 

@@ -9,7 +9,7 @@ interface GeometryStream {
     fun sphere() {}
 }
 
-fun stream(geo: GeoJSON, stream: GeometryStream) {
+fun stream(geo: GeoJson, stream: GeometryStream) {
     when(geo) {
         is Geometry<*> -> streamGeometry(geo, stream)
         is GeometryCollection -> streamGeometryCollection(geo, stream)

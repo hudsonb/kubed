@@ -1,7 +1,7 @@
 package kubed.geo.projection
 
 fun equirectangular() = equirectangular {}
-fun equirectangular(init: Projection.() -> Unit) = projection(EquirectangularProjector()) {
+fun equirectangular(init: MutableProjection.() -> Unit) = projection(EquirectangularProjector()) {
     scale = 152.63
 
     init()

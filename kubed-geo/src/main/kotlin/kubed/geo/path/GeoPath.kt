@@ -1,7 +1,7 @@
 package kubed.geo.path
 
 import javafx.scene.Node
-import kubed.geo.GeoJSON
+import kubed.geo.GeoJson
 import kubed.geo.projection.Projection
 import kubed.geo.stream
 import kubed.path.Context
@@ -21,27 +21,27 @@ class GeoPath(val projection: Projection, val context: Context) {
             pathStream.pointRadius = value
         }
 
-    operator fun invoke(geo: GeoJSON): Node {
+    operator fun invoke(geo: GeoJson): Node {
         stream(geo, projection.stream(pathStream))
         return context()
     }
 
-    fun area(geo: GeoJSON): Double {
+    fun area(geo: GeoJson): Double {
         stream(geo, projection.stream(pathArea))
         return pathArea.result()
     }
 
-    fun bounds(geo: GeoJSON): Array<DoubleArray> {
+    fun bounds(geo: GeoJson): Array<DoubleArray> {
         stream(geo, projection.stream(pathBounds))
         return pathBounds.result()
     }
 
-    fun centroid(geo: GeoJSON): DoubleArray {
+    fun centroid(geo: GeoJson): DoubleArray {
         stream(geo, projection.stream(pathCentroid))
         return pathCentroid.result()
     }
 
-    fun measure(geo: GeoJSON): Double {
+    fun measure(geo: GeoJson): Double {
         stream(geo, projection.stream(pathMeasure))
         return pathMeasure.result()
     }

@@ -11,7 +11,7 @@ abstract class ConicProjectorFactory : ProjectorFactory {
     var phi1 = PI / 3
 }
 
-class ConicProjection(factory: ConicProjectorFactory) : Projection(factory) {
+class ConicProjection(factory: ConicProjectorFactory) : MutableProjection(factory) {
     init {
         factory.phi0 = 0.0
         factory.phi1 = PI / 3

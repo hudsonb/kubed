@@ -4,7 +4,7 @@ import kubed.math.EPSILON
 import kotlin.math.abs
 
 fun naturalEarth() = naturalEarth {}
-fun naturalEarth(init: Projection.() -> Unit) = projection(NaturalEarthProjector()) {
+fun naturalEarth(init: MutableProjection.() -> Unit) = projection(NaturalEarthProjector()) {
     scale = 175.295
     init()
 }

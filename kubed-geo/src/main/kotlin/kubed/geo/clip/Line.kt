@@ -2,7 +2,7 @@ package kubed.geo.clip
 
 import kubed.util.isFalsy
 
-fun clipLine(a: DoubleArray, b: DoubleArray, x0: Double, y0: Double, x1: Double, y1: Double): Boolean {
+fun  clipLine(a: DoubleArray, b: DoubleArray, x0: Double, y0: Double, x1: Double, y1: Double): Boolean {
     val ax = a[0]
     val ay = a[1]
     val bx = b[0]
@@ -13,7 +13,7 @@ fun clipLine(a: DoubleArray, b: DoubleArray, x0: Double, y0: Double, x1: Double,
     val dy = by - ay
     var r = x0 - ax
 
-    if(dx.isFalsy() && r < 0) return false
+    if(dx.isFalsy() && r > 0) return false
     r /= dx
     if(dx < 0) {
         if(r < t0) return false

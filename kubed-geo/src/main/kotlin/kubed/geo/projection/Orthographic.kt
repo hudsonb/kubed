@@ -6,7 +6,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun orthographic() = orthographic {}
-fun orthographic(init: Projection.() -> Unit) = projection(OrthographicProjector()) {
+fun orthographic(init: MutableProjection.() -> Unit) = projection(OrthographicProjector()) {
     scale = 249.5
     clipAngle = 90 + EPSILON
 

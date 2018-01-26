@@ -32,7 +32,7 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
             private var x_ = Double.NaN
             private var y_ = Double.NaN
             private var v_ = false
-            private val segments = ArrayList<List<List<DoubleArray>>>()
+            private var segments: ArrayList<List<List<DoubleArray>>>? = null
             private var ring: ArrayList<DoubleArray>? = null
             private var polygon: ArrayList<List<DoubleArray>>? = null
             private var first = false
@@ -59,16 +59,18 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
             }
 
             override fun lineEnd() {
-                linePoint(x__, y__)
-                if(v__ && v_) bufferStream.rejoin()
-                segments.add(bufferStream.result())
+                if(segments != null) {
+                    linePoint(x__, y__)
+                    if (v__ && v_) bufferStream.rejoin()
+                    segments!!.add(bufferStream.result())
+                }
                 streamingLine = false
                 if(v_) activeStream.lineEnd()
             }
 
             override fun polygonStart() {
                 activeStream = bufferStream
-                segments.clear()
+                segments = ArrayList()
                 polygon = ArrayList()
                 clean = 1
             }
@@ -76,7 +78,7 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
             override fun polygonEnd() {
                 val startInside = polygonInside().isTruthy()
                 val cleanInside = clean.isTruthy() && startInside
-                val flattenedSegments = segments.flatten()
+                val flattenedSegments = segments?.flatten() ?: emptyList()
                 val visible = flattenedSegments.isNotEmpty()
 
                 if(cleanInside || visible) {
@@ -90,7 +92,7 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
                     stream.polygonEnd()
                 }
                 activeStream = stream
-                segments.clear()
+                segments = null
                 polygon = null
                 ring = null
             }

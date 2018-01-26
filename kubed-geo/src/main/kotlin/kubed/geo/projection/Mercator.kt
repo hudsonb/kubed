@@ -18,7 +18,7 @@ class MercatorProjector : InvertableProjector {
     override fun invert(x: Double, y: Double): DoubleArray = doubleArrayOf(x, 2 * atan(exp(y)) - HALF_PI)
 }
 
-open class MercatorProjection(projector: Projector) : Projection(projector) {
+open class MercatorProjection(projector: Projector) : MutableProjection(projector) {
     private var x0 = Double.NaN
     private var y0 = Double.NaN
     private var x1 = Double.NaN

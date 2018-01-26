@@ -1,4 +1,6 @@
 dependencies {
 	compile project(':kubed-core')
 	compile project(':kubed-geo')
+
+	compile group: 'com.univocity', name: 'univocity-parsers', version: '2.5.9'
 }

@@ -32,7 +32,7 @@ class SeeThroughGlobeDemo : Application() {
 
         val graticule = graticule().graticule()
         val url = File("/Users/hudsonb/Downloads/world.json").toURI().toURL()
-        geoJson(url) { geo: GeoJSON ->
+        geoJson(url) { geo: GeoJson ->
             geo as FeatureCollection
 
             val speed = -1e-2
