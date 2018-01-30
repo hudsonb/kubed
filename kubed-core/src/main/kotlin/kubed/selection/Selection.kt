@@ -16,6 +16,14 @@ import javafx.scene.transform.Transform
 import java.util.*
 import kotlin.comparisons.compareBy
 
+fun <T> select(node: Node): Selection<T> {
+    val sel = Selection<T>()
+    val group = Group(node)
+    sel += group
+
+    return sel
+}
+
 open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
     val groups = ArrayList<Group>()
 
