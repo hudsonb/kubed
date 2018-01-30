@@ -6,6 +6,7 @@ import kubed.util.isFalsy
 import kubed.util.isTruthy
 import kotlin.math.*
 
+fun aitoff() = aitoff {}
 fun aitoff(init: MutableProjection.() -> Unit) = projection(AitoffProjector()) {
     scale = 152.63
 }
