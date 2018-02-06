@@ -4,34 +4,33 @@ import kubed.geo.GeometryStream
 import kubed.math.QUARTER_PI
 import kubed.math.TAU
 import kubed.math.toRadians
-import java.math.BigDecimal
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
 class Area : GeometryStream {
     val area: Double
-        get() = areaSum.toDouble()
+        get() = areaAccumulator.sum
 
-    private var areaSum = BigDecimal.ZERO
-    internal var areaRingSum = BigDecimal.ZERO
+    private val areaAccumulator = Accumulator()
+    internal val areaRingAccumulator = Accumulator()
     private var lambda00 = Double.NaN
     private var phi00 = Double.NaN
     private var lambda0 = Double.NaN
     private var cosPhi0 = Double.NaN
     private var sinPhi0 = Double.NaN
 
-    var streamingPolygon = false
-    var firstPoint = false
+    private var streamingPolygon = false
+    private var firstPoint = false
 
     override fun polygonStart() {
-        areaRingSum = BigDecimal.ZERO
+        areaRingAccumulator.set(0.0)
         streamingPolygon = true
     }
 
     override fun polygonEnd() {
-        val ars = areaRingSum.toDouble()
-        areaSum = areaSum.add(if(ars < 0) (TAU + ars).toBigDecimal() else areaRingSum)
+        val ars = areaRingAccumulator.sum
+        areaAccumulator += if(ars < 0) (TAU + ars) else areaRingAccumulator.sum
         streamingPolygon = false
     }
 
@@ -71,7 +70,7 @@ class Area : GeometryStream {
             val k = sinPhi0 * sinPhi
             val u = cosPhi0 * cosPhi + k * cos(adLambda)
             val v = k * sdLambda * sin(adLambda)
-            areaRingSum.add(atan2(v, u).toBigDecimal())
+            areaRingAccumulator += atan2(v, u)
 
             // Advance the previous points.
             lambda0 = lambda
@@ -81,6 +80,6 @@ class Area : GeometryStream {
     }
 
     override fun sphere() {
-        areaSum = areaSum.add(TAU.toBigDecimal())
+        areaAccumulator += TAU
     }
 }

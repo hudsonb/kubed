@@ -1,9 +1,9 @@
 import kubed.geo.*
+import kubed.geo.math.Accumulator
 import kubed.geo.math.Area
 import kubed.math.EPSILON
 import kubed.math.toDegrees
 import kubed.math.toRadians
-import java.math.BigDecimal
 import kotlin.math.abs
 
 class Bounds : MutableGeometryStream() {
@@ -15,7 +15,7 @@ class Bounds : MutableGeometryStream() {
     private var lambda00 = Double.NaN
     private var phi00 = Double.NaN // first point
     private var p0: DoubleArray? = null // previous 3D point
-    private var deltaSum = BigDecimal.ZERO
+    private val deltaAccumulator = Accumulator()
     private lateinit var ranges: ArrayList<DoubleArray>
     private lateinit var range: DoubleArray
 
@@ -29,7 +29,7 @@ class Bounds : MutableGeometryStream() {
             point = ::boundsRingPoint
             lineStart = ::boundsRingStart
             lineEnd = ::boundsRingEnd
-            deltaSum = BigDecimal.ZERO
+            deltaAccumulator.set(0.0)
             areaStream.polygonStart()
         }
         polygonEnd = {
@@ -37,14 +37,14 @@ class Bounds : MutableGeometryStream() {
             point = ::boundsPoint
             lineStart = ::boundsLineStart
             lineEnd = ::boundsLineEnd
-            if(areaStream.areaRingSum.toDouble() < 0) {
+            if(areaStream.areaRingAccumulator.sum < 0) {
                 lambda1 = 180.0
                 lambda0 = -lambda1
                 phi1 = 90.0
                 phi0 = -phi1
             }
             else {
-                val sum = deltaSum.toDouble()
+                val sum = deltaAccumulator.sum
                 if(sum > EPSILON) phi1 = 90.0
                 else if(sum < -EPSILON) phi0 = -90.0
             }
@@ -139,7 +139,7 @@ class Bounds : MutableGeometryStream() {
     {
         if(p0 != null) {
             val delta = lambda - lambda2
-            deltaSum.add(if(abs(delta) > 180) (delta + (if(delta > 0) 360  else -360)).toBigDecimal() else delta.toBigDecimal())
+            deltaAccumulator += if(abs(delta) > 180) (delta + (if(delta > 0) 360  else -360)) else delta
         }
         else {
             lambda00 = lambda
@@ -154,7 +154,7 @@ class Bounds : MutableGeometryStream() {
     private fun boundsRingEnd() {
         boundsRingPoint(lambda00, phi00, 0.0)
         areaStream.lineEnd()
-        if(abs(deltaSum.toDouble()) > EPSILON) {
+        if(abs(deltaAccumulator.sum) > EPSILON) {
             lambda0 = -180.0
             lambda1 = 180.0
         }

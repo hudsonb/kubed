@@ -6,9 +6,7 @@ import kubed.geo.cartesianNormalizeInPlace
 import kubed.math.EPSILON
 import kubed.math.QUARTER_PI
 import kubed.math.TAU
-import kubed.geo.math.asin
 import kubed.util.isTruthy
-import java.math.BigDecimal
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -21,7 +19,7 @@ fun polygonContains(polygon: List<List<DoubleArray>>, point: DoubleArray): Boole
     var angle = 0.0
     var winding = 0
 
-    var sum = BigDecimal.ZERO
+    val accumulator = Accumulator()
 
     for(i in polygon.indices) {
         val ring = polygon[i]
@@ -45,7 +43,7 @@ fun polygonContains(polygon: List<List<DoubleArray>>, point: DoubleArray): Boole
             val antimeridian = absDelta > PI
             val k = sinPhi0 * sinPhi1
 
-            sum = sum.add(atan2(k * sign * sin(absDelta), cosPhi0 * cosPhi1 + k * cos(absDelta)).toBigDecimal())
+            accumulator += atan2(k * sign * sin(absDelta), cosPhi0 * cosPhi1 + k * cos(absDelta))
             angle += if(antimeridian) delta + sign * TAU else delta
 
             // Are the longitudes either side of the point’s meridian (lambda),
@@ -79,5 +77,5 @@ fun polygonContains(polygon: List<List<DoubleArray>>, point: DoubleArray): Boole
     // from the point to the South pole.  If it is zero, then the point is the
     // same side as the South pole.
 
-    return (angle < -EPSILON || angle < EPSILON && sum.toDouble() < -EPSILON) xor ((winding and 1).isTruthy())
+    return (angle < -EPSILON || angle < EPSILON && accumulator.sum < -EPSILON) xor ((winding and 1).isTruthy())
 }
