@@ -1,6 +1,7 @@
 package kubed.geo
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
@@ -34,6 +35,7 @@ import java.util.concurrent.ForkJoinPool
         Type(value = GeometryCollection::class, name="GeometryCollection"),
         Type(value = Feature::class, name="Feature"),
         Type(value = FeatureCollection::class, name="FeatureCollection"))
+@JsonIgnoreProperties(ignoreUnknown = true)
 interface GeoJson {
     val type: String
 }
