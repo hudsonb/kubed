@@ -354,7 +354,7 @@ class Transition<T> internal constructor(val parent: Transition<T>?, internal va
         return this
     }
 
-    override fun fill(paint: (d: T, i: Int, group: List<Node?>) -> Paint): Transition<T> {
+    override fun fill(paint: (d: T, i: Int, group: List<Node?>) -> Paint?): Transition<T> {
         selection.forEach<Shape> { d, i, group ->
             getTransition(this, index)?.children?.add(fillTo(paint(d, i, group) as Color))
         }
@@ -362,25 +362,25 @@ class Transition<T> internal constructor(val parent: Transition<T>?, internal va
         return this
     }
 
-    override fun fill(paint: Paint): Transition<T> {
+    override fun fill(paint: Paint?): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Shape>()
-                .forEach { getTransition(it, index)?.children?.add(it.fillTo(paint as Color)) }
+                .forEach { getTransition(it, index)?.children?.add(it.fillTo((paint as Color?) ?: Color.TRANSPARENT)) }
 
         return this
     }
 
-    override fun stroke(paint: Paint): Transition<T> {
+    override fun stroke(paint: Paint?): Transition<T> {
         selection.groups.flatMap { it }
                 .filterIsInstance<Shape>()
-                .forEach { getTransition(it, index)?.children?.add(it.strokeTo(paint as Color)) }
+                .forEach { getTransition(it, index)?.children?.add(it.strokeTo((paint as Color?) ?: Color.TRANSPARENT)) }
 
         return this
     }
 
-    override fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint): Transition<T> {
+    override fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint?): Transition<T> {
         selection.forEach<Shape> { d, i, group ->
-            getTransition(this, index)?.children?.add(strokeTo(paint(d, i, group) as Color))
+            getTransition(this, index)?.children?.add(strokeTo((paint(d, i, group) as Color?) ?: Color.TRANSPARENT))
         }
 
         return this

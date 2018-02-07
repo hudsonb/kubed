@@ -8,11 +8,14 @@ import javafx.event.EventType
 import javafx.geometry.Point3D
 import javafx.scene.Cursor
 import javafx.scene.Node
+import javafx.scene.control.Tooltip
 import javafx.scene.effect.Effect
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Shape
 import javafx.scene.transform.Rotate
 import javafx.scene.transform.Transform
+import kubed.fx.setTooltip
+import java.awt.SystemColor.text
 import java.util.*
 import kotlin.comparisons.compareBy
 
@@ -785,7 +788,7 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
     fun <P> unbind(accessor: Node.(d: T, i: Int, group: List<Node?>) -> Property<P>?) =
             forEach<Node> { d, i, group -> accessor(d, i, group)?.unbind() }
 
-    override fun fill(paint: Paint): Selection<T> {
+    override fun fill(paint: Paint?): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Shape>()
                 .forEach { it.fill = paint }
@@ -793,10 +796,10 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
         return this
     }
 
-    override fun fill(paint: (d: T, i: Int, group: List<Node?>) -> Paint) =
+    override fun fill(paint: (d: T, i: Int, group: List<Node?>) -> Paint?) =
             forEach<Shape> { d, i, group -> fill = paint(d, i, group) }
 
-    override fun stroke(paint: Paint): Selection<T> {
+    override fun stroke(paint: Paint?): Selection<T> {
         groups.flatMap { it }
                 .filterIsInstance<Shape>()
                 .forEach { it.stroke = paint }
@@ -804,8 +807,22 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
         return this
     }
 
-    override fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint) =
+    override fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint?) =
             forEach<Shape> { d, i, group -> stroke = paint(d, i, group) }
+
+    fun tooltip(tooltip: Tooltip?): Selection<T> {
+        groups.flatMap { it }
+                .filterIsInstance<Node>()
+                .forEach {
+                    if(text != null) it.setTooltip(tooltip)
+                    else it.setTooltip(null)
+                }
+
+        return this
+    }
+
+    fun tooltip(tooltip: (d: T, i: Int, group: List<Node?>) -> Tooltip?) =
+            forEach<Node> { d, i, group -> setTooltip(tooltip(d, i, group)) }
 
     fun <E : Event, ET : EventType<E>> on(type: ET, handler: Node.(E) -> Unit): Selection<T> {
         groups.flatMap { it }

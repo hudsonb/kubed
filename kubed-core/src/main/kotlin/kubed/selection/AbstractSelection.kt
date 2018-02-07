@@ -45,9 +45,9 @@ abstract class AbstractSelection<S : AbstractSelection<S, T>, T> {
     abstract fun translateZ(z: Double): S
     abstract fun translateZ(z: (d: T, i: Int, group: List<Node?>) -> Double): S
 
-    abstract fun fill(paint: Paint): S
-    abstract fun fill(paint: (d: T, i: Int, group: List<Node?>) -> Paint): S
+    abstract fun fill(paint: Paint?): S
+    abstract fun fill(paint: (d: T, i: Int, group: List<Node?>) -> Paint?): S
 
-    abstract fun stroke(paint: Paint): S
-    abstract fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint): S
+    abstract fun stroke(paint: Paint?): S
+    abstract fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint?): S
 }
