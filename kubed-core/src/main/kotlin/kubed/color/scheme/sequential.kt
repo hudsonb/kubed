@@ -20,7 +20,7 @@ fun schemeOranges(k: Int = 9) = scheme(k, Oranges)
 fun schemePurples(k: Int = 9) = scheme(k, Purples)
 fun schemeReds(k: Int = 9) = scheme(k, Reds)
 
-private val BuGn = arrayOf(
+private val BuGn = listOf(
         "e5f5f999d8c92ca25f",
         "edf8fbb2e2e266c2a4238b45",
         "edf8fbb2e2e266c2a42ca25f006d2c",
@@ -30,7 +30,7 @@ private val BuGn = arrayOf(
         "f7fcfde5f5f9ccece699d8c966c2a441ae76238b45006d2c00441b"
 )
 
-private val BuPu = arrayOf(
+private val BuPu = listOf(
         "e0ecf49ebcda8856a7",
         "edf8fbb3cde38c96c688419d",
         "edf8fbb3cde38c96c68856a7810f7c",
@@ -40,7 +40,7 @@ private val BuPu = arrayOf(
         "f7fcfde0ecf4bfd3e69ebcda8c96c68c6bb188419d810f7c4d004b"
 )
 
-private val GnBu = arrayOf(
+private val GnBu = listOf(
         "e0f3dba8ddb543a2ca",
         "f0f9e8bae4bc7bccc42b8cbe",
         "f0f9e8bae4bc7bccc443a2ca0868ac",
@@ -50,7 +50,7 @@ private val GnBu = arrayOf(
         "f7fcf0e0f3dbccebc5a8ddb57bccc44eb3d32b8cbe0868ac084081"
 )
 
-private val OrRd = arrayOf(
+private val OrRd = listOf(
         "fee8c8fdbb84e34a33",
         "fef0d9fdcc8afc8d59d7301f",
         "fef0d9fdcc8afc8d59e34a33b30000",
@@ -60,7 +60,7 @@ private val OrRd = arrayOf(
         "fff7ecfee8c8fdd49efdbb84fc8d59ef6548d7301fb300007f0000"
 )
 
-private val PuBu = arrayOf(
+private val PuBu = listOf(
         "ece7f2a6bddb2b8cbe",
         "f1eef6bdc9e174a9cf0570b0",
         "f1eef6bdc9e174a9cf2b8cbe045a8d",
@@ -70,7 +70,7 @@ private val PuBu = arrayOf(
         "fff7fbece7f2d0d1e6a6bddb74a9cf3690c00570b0045a8d023858"
 )
 
-private val PuBuGn = arrayOf(
+private val PuBuGn = listOf(
         "ece2f0a6bddb1c9099",
         "f6eff7bdc9e167a9cf02818a",
         "f6eff7bdc9e167a9cf1c9099016c59",
@@ -80,7 +80,7 @@ private val PuBuGn = arrayOf(
         "fff7fbece2f0d0d1e6a6bddb67a9cf3690c002818a016c59014636"
 )
 
-private val PuRd = arrayOf(
+private val PuRd = listOf(
         "e7e1efc994c7dd1c77",
         "f1eef6d7b5d8df65b0ce1256",
         "f1eef6d7b5d8df65b0dd1c77980043",
@@ -90,7 +90,7 @@ private val PuRd = arrayOf(
         "f7f4f9e7e1efd4b9dac994c7df65b0e7298ace125698004367001f"
 )
 
-private val RdPu = arrayOf(
+private val RdPu = listOf(
         "fde0ddfa9fb5c51b8a",
         "feebe2fbb4b9f768a1ae017e",
         "feebe2fbb4b9f768a1c51b8a7a0177",
@@ -100,7 +100,7 @@ private val RdPu = arrayOf(
         "fff7f3fde0ddfcc5c0fa9fb5f768a1dd3497ae017e7a017749006a"
 )
 
-private val YlGn = arrayOf(
+private val YlGn = listOf(
         "f7fcb9addd8e31a354",
         "ffffccc2e69978c679238443",
         "ffffccc2e69978c67931a354006837",
@@ -110,7 +110,7 @@ private val YlGn = arrayOf(
         "ffffe5f7fcb9d9f0a3addd8e78c67941ab5d238443006837004529"
 )
 
-private val YlGnBu = arrayOf(
+private val YlGnBu = listOf(
         "edf8b17fcdbb2c7fb8",
         "ffffcca1dab441b6c4225ea8",
         "ffffcca1dab441b6c42c7fb8253494",
@@ -120,7 +120,7 @@ private val YlGnBu = arrayOf(
         "ffffd9edf8b1c7e9b47fcdbb41b6c41d91c0225ea8253494081d58"
 )
 
-private val YlOrBr = arrayOf(
+private val YlOrBr = listOf(
         "fff7bcfec44fd95f0e",
         "ffffd4fed98efe9929cc4c02",
         "ffffd4fed98efe9929d95f0e993404",
@@ -130,7 +130,7 @@ private val YlOrBr = arrayOf(
         "ffffe5fff7bcfee391fec44ffe9929ec7014cc4c02993404662506"
 )
 
-private val YlOrRd = arrayOf(
+private val YlOrRd = listOf(
         "ffeda0feb24cf03b20",
         "ffffb2fecc5cfd8d3ce31a1c",
         "ffffb2fecc5cfd8d3cf03b20bd0026",
@@ -141,7 +141,7 @@ private val YlOrRd = arrayOf(
 )
 
 
-private val Blues = arrayOf(
+private val Blues = listOf(
         "deebf79ecae13182bd",
         "eff3ffbdd7e76baed62171b5",
         "eff3ffbdd7e76baed63182bd08519c",
@@ -151,7 +151,7 @@ private val Blues = arrayOf(
         "f7fbffdeebf7c6dbef9ecae16baed64292c62171b508519c08306b"
 )
 
-private val Greens = arrayOf(
+private val Greens = listOf(
         "e5f5e0a1d99b31a354",
         "edf8e9bae4b374c476238b45",
         "edf8e9bae4b374c47631a354006d2c",
@@ -161,7 +161,7 @@ private val Greens = arrayOf(
         "f7fcf5e5f5e0c7e9c0a1d99b74c47641ab5d238b45006d2c00441b"
 )
 
-private val Grays = arrayOf(
+private val Grays = listOf(
         "f0f0f0bdbdbd636363",
         "f7f7f7cccccc969696525252",
         "f7f7f7cccccc969696636363252525",
@@ -171,7 +171,7 @@ private val Grays = arrayOf(
         "fffffff0f0f0d9d9d9bdbdbd969696737373525252252525000000"
 )
 
-private val Oranges = arrayOf(
+private val Oranges = listOf(
         "fee6cefdae6be6550d",
         "feeddefdbe85fd8d3cd94701",
         "feeddefdbe85fd8d3ce6550da63603",
@@ -181,7 +181,7 @@ private val Oranges = arrayOf(
         "fff5ebfee6cefdd0a2fdae6bfd8d3cf16913d94801a636037f2704"
 )
 
-private val Purples = arrayOf(
+private val Purples = listOf(
         "efedf5bcbddc756bb1",
         "f2f0f7cbc9e29e9ac86a51a3",
         "f2f0f7cbc9e29e9ac8756bb154278f",
@@ -191,7 +191,7 @@ private val Purples = arrayOf(
         "fcfbfdefedf5dadaebbcbddc9e9ac8807dba6a51a354278f3f007d"
 )
 
-private val Reds = arrayOf(
+private val Reds = listOf(
         "fee0d2fc9272de2d26",
         "fee5d9fcae91fb6a4acb181d",
         "fee5d9fcae91fb6a4ade2d26a50f15",

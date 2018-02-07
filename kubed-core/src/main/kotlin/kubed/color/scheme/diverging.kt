@@ -10,7 +10,7 @@ fun schemeRdYlBu(k: Int = 11) = scheme(k, RdYlBu)
 fun schemeRdYlGn(k: Int = 11) = scheme(k, RdYlGn)
 fun schemeSpectral(k: Int = 11) = scheme(k, Spectral)
 
-private val BrBG = arrayOf(
+private val BrBG = listOf(
         "d8b365f5f5f55ab4ac",
         "a6611adfc27d80cdc1018571",
         "a6611adfc27df5f5f580cdc1018571",
@@ -22,7 +22,7 @@ private val BrBG = arrayOf(
         "5430058c510abf812ddfc27df6e8c3f5f5f5c7eae580cdc135978f01665e003c30"
 )
 
-private val PRGn = arrayOf(
+private val PRGn = listOf(
         "af8dc3f7f7f77fbf7b",
         "7b3294c2a5cfa6dba0008837",
         "7b3294c2a5cff7f7f7a6dba0008837",
@@ -34,7 +34,7 @@ private val PRGn = arrayOf(
         "40004b762a839970abc2a5cfe7d4e8f7f7f7d9f0d3a6dba05aae611b783700441b"
 )
 
-private val PiYG = arrayOf(
+private val PiYG = listOf(
         "e9a3c9f7f7f7a1d76a",
         "d01c8bf1b6dab8e1864dac26",
         "d01c8bf1b6daf7f7f7b8e1864dac26",
@@ -46,7 +46,7 @@ private val PiYG = arrayOf(
         "8e0152c51b7dde77aef1b6dafde0eff7f7f7e6f5d0b8e1867fbc414d9221276419"
 )
 
-private val PuOr = arrayOf(
+private val PuOr = listOf(
         "998ec3f7f7f7f1a340",
         "5e3c99b2abd2fdb863e66101",
         "5e3c99b2abd2f7f7f7fdb863e66101",
@@ -58,7 +58,7 @@ private val PuOr = arrayOf(
         "2d004b5427888073acb2abd2d8daebf7f7f7fee0b6fdb863e08214b358067f3b08"
 )
 
-private val RdBu = arrayOf(
+private val RdBu = listOf(
         "ef8a62f7f7f767a9cf",
         "ca0020f4a58292c5de0571b0",
         "ca0020f4a582f7f7f792c5de0571b0",
@@ -70,7 +70,7 @@ private val RdBu = arrayOf(
         "67001fb2182bd6604df4a582fddbc7f7f7f7d1e5f092c5de4393c32166ac053061"
 )
 
-private val RdGy = arrayOf(
+private val RdGy = listOf(
         "ef8a62ffffff999999",
         "ca0020f4a582bababa404040",
         "ca0020f4a582ffffffbababa404040",
@@ -82,7 +82,7 @@ private val RdGy = arrayOf(
         "67001fb2182bd6604df4a582fddbc7ffffffe0e0e0bababa8787874d4d4d1a1a1a"
 )
 
-private val RdYlBu = arrayOf(
+private val RdYlBu = listOf(
         "fc8d59ffffbf91bfdb",
         "d7191cfdae61abd9e92c7bb6",
         "d7191cfdae61ffffbfabd9e92c7bb6",
@@ -94,7 +94,7 @@ private val RdYlBu = arrayOf(
         "a50026d73027f46d43fdae61fee090ffffbfe0f3f8abd9e974add14575b4313695"
 )
 
-private val RdYlGn = arrayOf(
+private val RdYlGn = listOf(
         "fc8d59ffffbf91cf60",
         "d7191cfdae61a6d96a1a9641",
         "d7191cfdae61ffffbfa6d96a1a9641",
@@ -106,7 +106,7 @@ private val RdYlGn = arrayOf(
         "a50026d73027f46d43fdae61fee08bffffbfd9ef8ba6d96a66bd631a9850006837"
 )
 
-private val Spectral = arrayOf(
+private val Spectral = listOf(
         "fc8d59ffffbf99d594",
         "d7191cfdae61abdda42b83ba",
         "d7191cfdae61ffffbfabdda42b83ba",

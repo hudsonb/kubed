@@ -17,8 +17,8 @@ fun interpolateRgb(start: Any, end: Any, gamma: Double = 1.0): (Double) -> Color
     return { t -> Color(r(t), g(t), b(t), opacity(t)) }
 }
 
-fun interpolateRgbBasis(vararg colors: Any) = interpolate(colors.asList(), ::basis)
-fun interpolateRgbBasisClosed(vararg colors: Any) = interpolate(colors.asList(), ::basisClosed)
+fun interpolateRgbBasis(colors: List<Any>) = interpolate(colors, ::basis)
+fun interpolateRgbBasisClosed(colors: List<Any>) = interpolate(colors, ::basisClosed)
 
 private fun interpolate(colors: List<Any>, spline: (DoubleArray) -> (Double) -> Double): (Double) -> Color {
     val n = colors.size

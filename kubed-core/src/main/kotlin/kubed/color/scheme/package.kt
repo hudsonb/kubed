@@ -13,12 +13,12 @@ internal fun colors(s: String): List<Color> {
     return colors
 }
 
-internal fun colors2(s: String) = Array<Color>(s.length / 6) {
+internal fun colors2(s: String) = List<Color>(s.length / 6) {
     val i = it * 6
     Color.web(s.substring(i, i + 6))
 }
 
-internal fun scheme(k: Int, schemes: Array<String>): Array<Color> {
+internal fun scheme(k: Int, schemes: List<String>): List<Color> {
     val i = k - 3
     require(i in schemes.indices)
     return colors2(schemes[i])
