@@ -807,6 +807,17 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
         return this
     }
 
+    fun strokeWidth(width: (d: T, i: Int, group: List<Node?>) -> Double) =
+            forEach<Shape> { d, i, group -> strokeWidth = width(d, i, group) }
+
+    fun strokeWidth(width: Double): Selection<T> {
+        groups.flatMap { it }
+                .filterIsInstance<Shape>()
+                .forEach { it.strokeWidth = width }
+
+        return this
+    }
+
     override fun stroke(paint: (d: T, i: Int, group: List<Node?>) -> Paint?) =
             forEach<Shape> { d, i, group -> stroke = paint(d, i, group) }
 
