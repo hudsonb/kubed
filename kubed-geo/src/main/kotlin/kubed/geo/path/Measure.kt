@@ -1,11 +1,11 @@
 package kubed.geo.path
 
 import kubed.geo.GeometryStream
-import java.math.BigDecimal
+import kubed.geo.math.Accumulator
 import kotlin.math.sqrt
 
 class Measure : GeometryStream {
-    private var lengthSum = BigDecimal.ZERO
+    private val lengthAccumulator = Accumulator()
     private var lengthRing = false
     private var x00 = Double.NaN
     private var y00 = Double.NaN
@@ -16,8 +16,8 @@ class Measure : GeometryStream {
     private var firstPoint = false
 
     fun result(): Double {
-        val r = lengthSum.toDouble()
-        lengthSum = BigDecimal.ZERO
+        val r = lengthAccumulator.sum
+        lengthAccumulator.set(0.0)
         return r
     }
 
@@ -49,7 +49,7 @@ class Measure : GeometryStream {
         else {
             x0 -= x
             y0 -= y
-            lengthSum = lengthSum.add(sqrt(x0 * x0 + y0 * y0).toBigDecimal())
+            lengthAccumulator += sqrt(x0 * x0 + y0 * y0)
         }
 
         x0 = x

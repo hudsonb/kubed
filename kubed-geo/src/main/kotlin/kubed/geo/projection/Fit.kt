@@ -1,7 +1,7 @@
 package kubed.geo.projection
 
+import javafx.geometry.Rectangle2D
 import kubed.geo.GeoJson
-import kubed.geo.clip.Clip
 import kubed.geo.path.Bounds
 import kubed.geo.stream
 
@@ -14,7 +14,8 @@ fun fitExtent(projection: Projection, extent: Array<DoubleArray>, geo: GeoJson):
         val y = +extent[0][1] + (h - k * (b[1][1] + b[0][1])) / 2
         with(projection) {
             scale = 150 * k
-            translate = doubleArrayOf(x, y)
+            translateX = x
+            translateY = y
         }
     }
 
@@ -30,7 +31,8 @@ fun fitWidth(projection: Projection, width: Double, geo: GeoJson): Projection {
         val y = -k * b[0][1]
         with(projection) {
             scale = 150 * k
-            translate = doubleArrayOf(x, y)
+            translateX = x
+            translateY = y
         }
     }
 
@@ -44,7 +46,8 @@ fun fitHeight(projection: Projection, height: Double, geo: GeoJson): Projection 
         val y = (height - k * (b[1][1] + b[0][1])) / 2
         with(projection) {
             scale = 150 * k
-            translate = doubleArrayOf(x, y)
+            translateX = x
+            translateY = y
         }
     }
 
@@ -52,11 +55,12 @@ fun fitHeight(projection: Projection, height: Double, geo: GeoJson): Projection 
 }
 
 private fun fit(projection: Projection, fitBounds: (Array<DoubleArray>) -> Unit, geo: GeoJson): Projection {
-    var clip: Array<DoubleArray>? = null
+    var clip: Rectangle2D? = null
     if(projection is ClippedProjection) clip = projection.clipExtent
     with(projection) {
         scale = 150.0
-        translate = doubleArrayOf(0.0, 0.0)
+        translateX = 0.0
+        translateY = 0.0
         if(clip != null) (this as ClippedProjection).clipExtent = null
     }
 

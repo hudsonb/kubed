@@ -1,11 +1,12 @@
 package kubed.geo.path
 
 import kubed.geo.GeometryStream
-import java.math.BigDecimal
+import kubed.geo.math.Accumulator
+import kotlin.math.abs
 
 class Area : GeometryStream {
-    private var areaSum = BigDecimal.ZERO
-    private var areaRingSum = BigDecimal.ZERO
+    private var areaAccumulator = Accumulator()
+    private var areaRingAccumulator = Accumulator()
     private var x00 = Double.NaN
     private var y00 = Double.NaN
     private var x0 = Double.NaN
@@ -15,8 +16,8 @@ class Area : GeometryStream {
     private var firstPoint = false
 
     fun result(): Double {
-        val a = areaSum.divide(2.toBigDecimal()).toDouble()
-        areaSum = BigDecimal.ZERO
+        val a = areaAccumulator.sum / 2
+        areaAccumulator.set(0.0)
         return a
     }
 
@@ -26,8 +27,8 @@ class Area : GeometryStream {
 
     override fun polygonEnd() {
         streamingPolygon = false
-        areaSum.add(areaRingSum.abs())
-        areaRingSum = BigDecimal.ZERO
+        areaAccumulator += abs(areaRingAccumulator.sum)
+        areaRingAccumulator.set(0.0)
     }
 
     override fun lineStart() {
@@ -45,7 +46,7 @@ class Area : GeometryStream {
             firstPoint = false
         }
         else {
-            areaRingSum = areaRingSum.add((y0 * x - x0 * y).toBigDecimal())
+            areaRingAccumulator += y0 * x - x0 * y
             x0 = x
             y0 = y
         }
