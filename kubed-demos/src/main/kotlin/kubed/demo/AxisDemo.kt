@@ -57,27 +57,27 @@ class AxisDemo: Application() {
         root.selectAll<List<Int>>("Circle")
             .data(data)
             .enter()
-            //.append { d, _, _ -> circle(d as List<Int>) }
+            .append { d, _, _ -> circle(d) }
 
         val xAxis = axisBottom(xScale) {
             tickCount = 5
             formatter = { d -> d.toInt().toString() }
         }
 
-        xAxis(root.selectAll<Unit>("xAxis")
-                  .append { _, _, _ -> Group() }
-                  .classed("axis")
-                  .translateY(height - padding))
+        xAxis(root.selectAll<Unit>(".xAxis")
+                .append { -> Group() }
+                .classed("axis", "xAxis")
+                .translateY(height - padding))
 
         val yAxis = axisLeft(yScale) {
             tickCount = 4
             formatter = { d -> d.toInt().toString() }
         }
 
-        yAxis(root.selectAll<Unit>("yAxis")
-                  .append { _, _, _ -> Group() }
-                  .classed("axis")
-                  .translateX(padding))
+        yAxis(root.selectAll<Unit>()
+                .append { -> Group() }
+                .classed("axis", "yAxis")
+                .translateX(padding))
 
         val scene = Scene(root)
         primaryStage?.width = width + padding * 2
