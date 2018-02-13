@@ -9,6 +9,8 @@ import kotlin.math.*
 fun aitoff() = aitoff {}
 fun aitoff(init: MutableProjection.() -> Unit) = projection(AitoffProjector()) {
     scale = 152.63
+
+    init()
 }
 
 class AitoffProjector : InvertableProjector {

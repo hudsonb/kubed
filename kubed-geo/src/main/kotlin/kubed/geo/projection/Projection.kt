@@ -1,24 +1,42 @@
 package kubed.geo.projection
 
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleObjectProperty
+import javafx.geometry.Rectangle2D
 import kubed.geo.FilterGeometryStream
 import kubed.geo.GeoJson
 import kubed.geo.GeometryStream
+import kubed.geo.Position
 import kubed.geo.clip.clipAntimeridian
 import kubed.geo.clip.clipCircle
 import kubed.geo.clip.clipRectangle
 import kubed.math.toDegrees
 import kubed.math.toRadians
-import kotlin.math.sqrt
+import kubed.timer.timer
+import java.util.concurrent.CopyOnWriteArrayList
 
 fun projection(projector: Projector) = projection(projector) {}
 fun projection(projector: Projector, init: MutableProjection.() -> Unit) = MutableProjection(projector).apply(init)
 fun projection(factory: ProjectorFactory) = MutableProjection(factory)
 fun projection(factory: ProjectorFactory, init: MutableProjection.() -> Unit) = MutableProjection(factory).apply(init)
 
+interface ProjectionListener {
+    fun projectionChanged(projection: Projection)
+}
+
 interface Projection {
+    val precisionProperty: DoubleProperty
     var precision: Double
+
+    val scaleProperty: DoubleProperty
     var scale: Double
-    var translate: DoubleArray
+
+    val translateXProperty: DoubleProperty
+    var translateX: Double
+
+    val translateYProperty: DoubleProperty
+    var translateY: Double
 
     operator fun invoke(point: DoubleArray): DoubleArray
     fun invert(coordinates: DoubleArray): DoubleArray
@@ -28,11 +46,53 @@ interface Projection {
     fun fitSize(size: DoubleArray, geo: GeoJson) = kubed.geo.projection.fitSize(this, size, geo)
     fun fitWidth(width: Double, geo: GeoJson) = kubed.geo.projection.fitWidth(this, width, geo)
     fun fitHeight(height: Double, geo: GeoJson) = kubed.geo.projection.fitHeight(this, height, geo)
+
+    fun invalidate() {}
+
+    fun addListener(listener: ProjectionListener)
+    fun removeListener(listener: ProjectionListener): Boolean
 }
 
-abstract class StreamCacheProjection : Projection {
-    protected var cache: GeometryStream? = null
-    protected var cacheStream: GeometryStream? = null
+abstract class AbstractProjection : Projection {
+    private var invalidated = false
+
+    private val listeners = CopyOnWriteArrayList<ProjectionListener>()
+
+    init {
+        timer {
+            if(invalidated) {
+                invalidated = false
+                fireProjectionChanged()
+            }
+        }
+    }
+
+    /**
+     * Invalidates the projection, causing a projection change event to be sent to each listener on the next frame.
+     */
+    override fun invalidate() {
+        invalidated = true
+    }
+
+    /**
+     * Adds the given [ProjectionListener] to this projection. [ProjectionListener.projectionChanged] is called only once
+     * per frame, and is guaranteed to be called from the JavaFX thread.
+     */
+    override fun addListener(listener: ProjectionListener) {
+        if(!listeners.contains(listener)) listeners.add(listener)
+    }
+
+    /**
+     * Removes the given [ProjectionListener] from this projection.
+     */
+    override fun removeListener(listener: ProjectionListener): Boolean = listeners.remove(listener)
+
+    private fun fireProjectionChanged() = ArrayList(listeners).forEach { it.projectionChanged(this) }
+}
+
+abstract class StreamCacheProjection : AbstractProjection() {
+    private var cache: GeometryStream? = null
+    private var cacheStream: GeometryStream? = null
 
     protected fun getCachedStream(forStream: GeometryStream): GeometryStream? = when {
         cache != null && cacheStream == forStream -> cache
@@ -49,63 +109,51 @@ abstract class StreamCacheProjection : Projection {
      *
      * This should be invoked by subclasses whenever a change has been made which requires new streams be created.
      */
-    fun reset(): Projection {
+    protected fun reset() {
         cache = null
         cacheStream = null
-        return this
     }
 }
 
 abstract class ClippedProjection : StreamCacheProjection() {
     // Clip Angle
-    private var theta = Double.NaN
+    val clipAngleProperty = SimpleDoubleProperty(Double.NaN)
     var clipAngle: Double
-        get() = theta
-        set(value) {
-            if(value.isNaN()) {
-                theta = Double.NaN
-                preclip = clipAntimeridian()
-            }
-            else {
-                theta = value.toRadians()
-                preclip = clipCircle(theta)
-            }
-        }
+        get() = clipAngleProperty.get()
+        set(theta) = clipAngleProperty.set(theta)
 
-    var preclip: (GeometryStream) -> GeometryStream = clipAntimeridian()
+
+    protected var preclip: (GeometryStream) -> GeometryStream = clipAntimeridian()
         set(value) {
-            theta = Double.NaN
-            reset()
             field = value
+            reset()
         }
 
     // Clip extent
     private val identity = { stream: GeometryStream -> stream }
-    private var x0 = 0.0
-    private var y0 = 0.0
-    private var x1 = 0.0
-    private var y1 = 0.0
-    var postclip = identity
-    open var clipExtent: Array<DoubleArray>?
-        get() = if(x0.isNaN()) null else arrayOf(doubleArrayOf(x0, y0), doubleArrayOf(x1, y1))
-        set(value) {
-            if(value == null) {
-                x0 = Double.NaN
-                y0 = Double.NaN
-                x1 = Double.NaN
-                y1 = Double.NaN
-                postclip = identity
-            }
-            else {
-                x0 = value[0][0]
-                y0 = value[0][1]
-                x1 = value[1][0]
-                y1 = value[1][1]
-                postclip = clipRectangle(x0, y0, x1, y1)
-            }
+    protected var postclip = identity
+    var clipExtentProperty = SimpleObjectProperty<Rectangle2D?>(null)
+    var clipExtent: Rectangle2D?
+        get() = clipExtentProperty.get()
+        set(value) = clipExtentProperty.set(value)
+
+    init {
+        clipAngleProperty.addListener { _ ->
+            preclip = if(clipAngle.isNaN()) clipAntimeridian()
+            else clipCircle(clipAngle.toRadians())
+
+            invalidate()
+        }
+
+        clipExtentProperty.addListener { _ ->
+            val extent = clipExtent
+            postclip = if(extent == null) identity
+                       else clipRectangle(extent.minX, extent.minY, extent.maxX, extent.maxY)
 
             reset()
+            invalidate()
         }
+    }
 }
 
 open class MutableProjection(protected val factory: ProjectorFactory): ClippedProjection() {
@@ -118,78 +166,87 @@ open class MutableProjection(protected val factory: ProjectorFactory): ClippedPr
     protected var project: Projector = factory.create()
 
     // Scale
-    private var k = 150.0
-
+    final override val scaleProperty = SimpleDoubleProperty(150.0)
     override var scale: Double
-        get() = k
-        set(value){
-            k = value
-            recenter()
-        }
+        get() = scaleProperty.get()
+        set(value) = scaleProperty.set(value)
 
     // Translate
-    private var x = 480.0
-    private var y = 250.0
-    override var translate: DoubleArray
-        get() = doubleArrayOf(x, y)
-        set(value) {
-            x = value[0]
-            y = value[1]
-            recenter()
-        }
+    final override val translateXProperty = SimpleDoubleProperty(0.0)
+    override var translateX: Double
+        get() = translateXProperty.get()
+        set(x) = translateXProperty.set(x)
+
+    final override val translateYProperty = SimpleDoubleProperty(0.0)
+    override var translateY: Double
+        get() = translateYProperty.get()
+        set(y) = translateYProperty.set(y)
 
     // Center
     private var dx = 0.0
     private var dy = 0.0
-    private var lambda = 0.0
-    private var phi = 0.0
-    open var center
-        get() = doubleArrayOf(lambda.toDegrees(), phi.toDegrees())
-        set(value) {
-            lambda = (value[0] % 360).toRadians()
-            phi = (value[1] % 360).toRadians()
-            recenter()
-        }
+
+    val centerProperty = SimpleObjectProperty<Position>(Position(0.0, 0.0))
+    var center: Position
+        get() = centerProperty.get()
+        set(p) = centerProperty.set(p)
 
     // Rotate
-    private var deltaLambda = 0.0
-    private var deltaPhi = 0.0
-    private var deltaGamma = 0.0
     private lateinit var rotator: Transform
 
-    open var rotate: DoubleArray
-        get() = doubleArrayOf(deltaLambda.toDegrees(), deltaPhi.toDegrees(), deltaGamma.toDegrees())
-        set(value) {
-            deltaLambda = (value[0] % 360).toRadians()
-            deltaPhi = (value[1] % 360).toRadians()
-            deltaGamma = if(value.size > 2) (value[2] % 360).toRadians() else 0.0
-            recenter()
-        }
+    val rotateXProperty = SimpleDoubleProperty(0.0)
+    var rotateX: Double
+        get() = rotateXProperty.get()
+        set(x) = rotateXProperty.set(x)
+
+    val rotateYProperty = SimpleDoubleProperty(0.0)
+    var rotateY: Double
+        get() = rotateYProperty.get()
+        set(y) = rotateYProperty.set(y)
+
+    val rotateZProperty = SimpleDoubleProperty(0.0)
+    var rotateZ: Double
+        get() = rotateZProperty.get()
+        set(z) = rotateZProperty.set(z)
 
     private lateinit var projectRotate: Transform
 
     private val projectTransform = object : Transform {
         override fun invoke(lambda: Double, phi: Double): DoubleArray {
             val p = project(lambda, phi)
-            return doubleArrayOf(p[0] * k + dx, dy - p[1] * k)
+            return doubleArrayOf(p[0] * scale + dx, dy - p[1] * scale)
         }
     }
 
     // Precision
-    private var delta2 = 0.5
-    private var projectResample = resample(projectTransform, delta2)
+    private var projectResample = resample(projectTransform, 0.5)
+
+    final override val precisionProperty = SimpleDoubleProperty(0.5)
     override var precision: Double
-        get() = sqrt(delta2)
+        get() = precisionProperty.get()
         set(value) {
-            delta2 = value * value
-            projectResample = resample(projectTransform, delta2)
-            reset()
+            precisionProperty.set(value)
         }
 
     private val transformRadians = { stream: GeometryStream ->
         object : FilterGeometryStream(stream) {
             override fun point(x: Double, y: Double, z: Double) = stream.point(x.toRadians(), y.toRadians(), z.toRadians())
         }
+    }
+
+    init {
+        precisionProperty.addListener { _ ->
+            projectResample = resample(projectTransform, precision * precision)
+            reset()
+        }
+
+        translateXProperty.addListener { _ -> recenter(); }
+        translateYProperty.addListener { _ -> recenter(); }
+        scaleProperty.addListener { _ -> recenter(); }
+        centerProperty.addListener { _ -> recenter() }
+        rotateXProperty.addListener { _ -> recenter() }
+        rotateYProperty.addListener { _ -> recenter() }
+        rotateZProperty.addListener { _ -> recenter() }
     }
 
     private fun transformRotate(rotate: Transform) = { stream: GeometryStream ->
@@ -203,13 +260,13 @@ open class MutableProjection(protected val factory: ProjectorFactory): ClippedPr
 
     override operator fun invoke(point: DoubleArray): DoubleArray {
         val p = projectRotate(point[0].toRadians(), point[1].toRadians())
-        return doubleArrayOf(p[0] * k + dx, dy - p[1] * k)
+        return doubleArrayOf(p[0] * scale + dx, dy - p[1] * scale)
     }
 
     override fun invert(coordinates: DoubleArray): DoubleArray {
         val pr = projectRotate as? Invertable ?: throw UnsupportedOperationException()
 
-        val p = pr.invert((coordinates[0] - dx) / k, (dy - coordinates[1]) / k)
+        val p = pr.invert((coordinates[0] - dx) / scale, (dy - coordinates[1]) / scale)
         return doubleArrayOf(p[0].toDegrees(), p[1].toDegrees())
     }
 
@@ -223,12 +280,23 @@ open class MutableProjection(protected val factory: ProjectorFactory): ClippedPr
         return stream
     }
 
-    fun recenter(): Projection {
+    protected open fun recenter() {
+        val lambda = (center.longitude % 360).toRadians()
+        val phi = (center.latitude % 360).toRadians()
+        val deltaLambda = (rotateX % 360).toRadians()
+        val deltaPhi = (rotateY % 360).toRadians()
+        val deltaGamma = (rotateZ % 360).toRadians()
+        recenter(lambda, phi, deltaLambda, deltaPhi, deltaGamma)
+    }
+
+    protected fun recenter(lambda: Double, phi: Double, deltaLambda: Double, deltaPhi: Double, deltaGamma: Double)
+    {
         rotator = rotateRadians(deltaLambda, deltaPhi, deltaGamma)
         projectRotate = compose(rotator, project)
         val center = project(lambda, phi)
-        dx = x - center[0] * k
-        dy = y + center[1] * k
-        return reset()
+        dx = translateX - center[0] * scale
+        dy = translateY + center[1] * scale
+        reset()
+        invalidate()
     }
 }

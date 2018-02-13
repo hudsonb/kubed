@@ -19,9 +19,11 @@ class AiryDemo : Application() {
         val height = 960.0
 
         val projection = airy {
-            rotate = doubleArrayOf(90.0, -40.0)
+            rotateX = 90.0
+            rotateY = -40.0
             scale = 340.0
-            translate = doubleArrayOf(width / 2, height / 2)
+            translateX = width / 2
+            translateY = height / 2
             precision = 0.1
             clipAngle = 90.0
             radius = 90.0

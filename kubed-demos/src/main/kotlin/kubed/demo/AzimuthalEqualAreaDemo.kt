@@ -25,7 +25,8 @@ class AzimuthalEqualAreaDemo : Application() {
 
         val projection = azimuthalEqualArea {
             scale = 239.0
-            translate = doubleArrayOf(width / 2, height / 2)
+            translateX = width / 2
+            translateY = height / 2
             precision = 0.1
         }
 

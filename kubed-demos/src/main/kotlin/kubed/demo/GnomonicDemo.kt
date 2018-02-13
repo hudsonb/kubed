@@ -27,7 +27,8 @@ class GnomonicDemo : Application() {
         val projection = gnomonic {
             clipAngle = 90 - 1e-3
             scale = 150.0
-            translate = doubleArrayOf(width / 2, height / 2)
+            translateX = width / 2
+            translateY = height / 2
             precision = .1
         }
 

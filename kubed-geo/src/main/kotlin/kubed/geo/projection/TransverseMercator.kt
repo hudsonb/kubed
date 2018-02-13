@@ -1,11 +1,11 @@
 package kubed.geo.projection
 
 import kubed.math.HALF_PI
+import kubed.math.toRadians
 import kotlin.math.*
 
 fun transverseMercator() = transverseMercator {}
 fun transverseMercator(init: TransverseMercatorProjection.() -> Unit) = transverseMercatorProjection {
-    rotate = doubleArrayOf(0.0, 0.0, 0.0)
     scale = 159.155
     init()
 }
@@ -20,21 +20,12 @@ class TransverseMercatorProjector : InvertableProjector {
 }
 
 class TransverseMercatorProjection : MercatorProjection(TransverseMercatorProjector()) {
-    override var center: DoubleArray
-        get() {
-            val c = super.center
-            return doubleArrayOf(c[1], -c[0])
-        }
-        set(value) {
-            super.center = doubleArrayOf(-value[1], value[0])
-        }
-
-    override var rotate: DoubleArray
-        get() {
-            val r = super.rotate
-            return doubleArrayOf(r[0], r[1], r[2] - 90)
-        }
-        set(r) {
-            super.rotate = doubleArrayOf(r[0], r[1], if(r.size > 2) r[2] + 90.0 else 90.0)
-        }
+    override fun recenter() {
+        val lambda = (-center.latitude % 360).toRadians()
+        val phi = (center.longitude % 360).toRadians()
+        val deltaLambda = (rotateX % 360).toRadians()
+        val deltaPhi = (rotateY % 360).toRadians()
+        val deltaGamma = ((rotateZ + 90) % 360).toRadians()
+        recenter(lambda, phi, deltaLambda, deltaPhi, deltaGamma)
+    }
 }

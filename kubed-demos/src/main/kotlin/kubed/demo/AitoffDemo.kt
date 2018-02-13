@@ -20,7 +20,8 @@ class AitoffDemo : Application() {
 
         val projection = aitoff {
             scale = 150.0
-            translate = doubleArrayOf(width / 2, height / 2)
+            translateX = width / 2
+            translateY = height / 2
             precision = 0.1
         }
 

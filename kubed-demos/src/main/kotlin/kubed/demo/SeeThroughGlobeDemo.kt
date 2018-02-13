@@ -21,17 +21,18 @@ class SeeThroughGlobeDemo : Application() {
         val height = 960.0
 
         val projection = orthographic {
-            scale = 475.0
-            translate = doubleArrayOf(width / 2, height / 2)
+            scale = 125.0
+            translateX = width / 2
+            translateY = height / 2
             clipAngle = 90.0
-            // precision = .1
-            rotate = doubleArrayOf(90.0, -10.0)
+            rotateX = 90.0
+            rotateY = -10.0
         }
 
         val path = geoPath(projection, PathContext())
 
         val graticule = graticule().graticule()
-        val url = File("/Users/hudsonb/Downloads/world.json").toURI().toURL()
+        val url = javaClass.getResource("/world.json")
         geoJson(url) { geo: GeoJson ->
             geo as FeatureCollection
 
@@ -39,7 +40,8 @@ class SeeThroughGlobeDemo : Application() {
             timer { elapsed ->
                 root.children.clear()
 
-                projection.rotate = doubleArrayOf(speed * elapsed, -15.0)
+                projection.rotateX = speed * elapsed
+                projection.rotateY = -15.0
                 projection.clipAngle = 180.0
 
                 root.children += path(geo).apply {

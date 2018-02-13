@@ -1,12 +1,13 @@
 package kubed.geo.projection
 
+import kubed.geo.Position
 import kubed.math.EPSILON
 import kotlin.math.*
 
 fun conicEquidistant() = conicEquidistant {}
 fun conicEquidistant(init: ConicProjection.() -> Unit) = conicProjection(ConicEquidistantProjectorFactory()) {
     scale = 131.154
-    center = doubleArrayOf(0.0, 13.9389)
+    center = Position(0.0, 13.9389)
     init()
 }
 

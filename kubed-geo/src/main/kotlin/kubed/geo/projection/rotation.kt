@@ -73,8 +73,8 @@ fun rotationPhiGamma(deltaPhi: Double, deltaGamma: Double) = object : Invertable
     }
 }
 
-fun rotation(rotate: DoubleArray) : InvertableTransform {
-    val rotator = rotateRadians(rotate[0].toRadians(), rotate[1].toRadians(), if(rotate.size > 2) rotate[2].toRadians() else 0.0)
+fun rotation(rx: Double, ry: Double, rz: Double = 0.0) : InvertableTransform {
+    val rotator = rotateRadians(rx.toRadians(), ry.toRadians(), rz.toRadians())
 
     return object : InvertableTransform {
         override fun invoke(lambda: Double, phi: Double): DoubleArray {

@@ -1,5 +1,6 @@
 package kubed.geo.projection
 
+import kubed.geo.Position
 import kubed.math.EPSILON
 import kubed.geo.math.asin
 import kotlin.math.*
@@ -7,8 +8,7 @@ import kotlin.math.*
 fun conicEqualArea() = conicEqualArea {}
 fun conicEqualArea(init: ConicProjection.() -> Unit)= conicProjection(ConicEqualAreaProjectorFactory()) {
     scale = 155.424
-    center = doubleArrayOf(0.0, 33.6442)
-
+    center = Position(0.0, 33.6442)
     init()
 }
 

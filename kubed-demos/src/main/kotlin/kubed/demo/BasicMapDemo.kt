@@ -9,6 +9,7 @@ import javafx.stage.Stage
 import kubed.geo.*
 import kubed.geo.path.geoPath
 import kubed.geo.projection.*
+import kubed.math.TAU
 import kubed.path.PathContext
 import java.io.File
 
@@ -20,11 +21,13 @@ class BasicMapDemo : Application() {
         val height = 960.0
 
 //        val projection = orthographic {
-//            scale = 475.0
-//            translate = doubleArrayOf(width / 2, height / 2)
+//            scale = 125.0
+//            translateX = width / 2
+//            translateY = height / 2
 //            clipAngle = 90.0
 //           // precision = .1
-//            rotate = doubleArrayOf(90.0, -10.0)
+//            rotateX = 90.0
+//            rotateY = -10.0
 //        }
 
 //        val projection = equirectangular {
@@ -37,10 +40,11 @@ class BasicMapDemo : Application() {
 //            translate = doubleArrayOf(width / 2, height / 2)
 //        }
 
-//        val projection = transverseMercator {
-//            scale = (width - 3) / TAU
-//            translate = doubleArrayOf(width / 2, height / 2)
-//        }
+        val projection = transverseMercator {
+            scale = (width - 3) / TAU
+            translateX = width / 2
+            translateY = height / 2
+        }
 
 //        val projection = azimuthalEqualArea {
 //            scale = 239.0
@@ -86,8 +90,19 @@ class BasicMapDemo : Application() {
 //            precision = .1
 //        }
 
-        val projection = albersUsa()
+   //     val projection = albersUsa()
 
+//        val projection = baker {
+//            scale = 148.0
+//            translate = doubleArrayOf(width / 2, height / 2)
+//            precision = 0.1
+//        }
+
+//        val projection = august {
+//            scale = 88.0
+//            translate = doubleArrayOf(width / 2, height / 2)
+//            precision = 0.1
+//        }
 //        val projection = naturalEarth {
 //            scale = 167.0
 //            translate = doubleArrayOf(width / 2, height / 2)
@@ -95,7 +110,7 @@ class BasicMapDemo : Application() {
 //        }
 
         val path = geoPath(projection, PathContext())
-        //val url = URL("https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_land.geojson")
+       // val url = javaClass.getResource("/world.json")
 
         val graticule = graticule()
         val url = File("/Users/hudsonb/Downloads/us-states.json").toURI().toURL()
@@ -112,19 +127,20 @@ class BasicMapDemo : Application() {
 //                .enter()
 //                .append { d, i, _ -> path(d) }
 //                .stroke { _, i, _ -> if(i % 2 == 0) Color.RED else Color.BLACK }
-//            root.children += path(graticule.graticule()).apply {
-//                this as Path
-//                stroke = Color.rgb(119, 119, 119, .5)
-//                strokeWidth = 0.5
-//            }
+
         }
 
+                    root.children += path(graticule.graticule()).apply {
+                this as Path
+                stroke = Color.rgb(119, 119, 119, .5)
+                strokeWidth = 0.5
+            }
 
-//        root.children += path(Sphere()).apply {
-//            this as Path
-//            strokeWidth = 0.5
-//            stroke = Color.BLACK
-//        }
+        root.children += path(Sphere()).apply {
+            this as Path
+            strokeWidth = 0.5
+            stroke = Color.BLACK
+        }
 
         val scene = Scene(root)
         primaryStage?.width = width
