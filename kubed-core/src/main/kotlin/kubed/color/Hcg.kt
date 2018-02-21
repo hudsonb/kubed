@@ -68,6 +68,6 @@ class Hcg(val h: Double, var c: Double, var g: Double, var opacity: Double = 1.0
     override fun darker(k: Double) = rgb().darker().hcg()
 
     private fun hcg2rgb(r: Double, g: Double, b: Double, m: Double, a: Double): Rgb {
-        return Rgb(((r + m) * 255).toInt(), ((g + m) * 255).toInt(), ((b + m) * 255).toInt(), a)
+        return Rgb((r + m) * 255, (g + m) * 255, (b + m) * 255, a)
     }
 }

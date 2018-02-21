@@ -57,9 +57,9 @@ class Cubehelix(var h: Double, var s: Double, var l: Double, var opacity: Double
         val cosh = cos(h)
         val sinh = sin(h)
 
-        return Rgb(min(255.0, 255 * (l + a * (A * cosh + B * sinh))).toInt(),
-                   min(255.0, 255 * (l + a * (C * cosh + D * sinh))).toInt(),
-                   min(255.0, 255 * (l + a * (E * cosh))).toInt(),
+        return Rgb(255 * (l + a * (A * cosh + B * sinh)),
+                   255 * (l + a * (C * cosh + D * sinh)),
+                   255 * (l + a * (E * cosh)),
                    opacity)
     }
 

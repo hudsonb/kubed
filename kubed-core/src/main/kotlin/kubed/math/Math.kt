@@ -2,9 +2,7 @@ package kubed.math
 
 import kubed.format.formatDecimal
 import java.text.DecimalFormat
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.sin
+import kotlin.math.*
 
 const val HALF_PI = PI * .5
 const val QUARTER_PI = PI * .25
@@ -29,6 +27,10 @@ fun exponent(x: Double): Int {
     val f = formatDecimal(abs(x))
     return f.exponent
 }
+
+fun Double.clamp(min: Double, max: Double) = max(min, min(this, max))
+fun Float.clamp(min: Float, max: Float) = max(min, min(this, max))
+fun Int.clamp(min: Int, max: Int) = max(min, min(this, max))
 
 /**
  * Linear interpolation between [min] and [max] at the given

@@ -1,17 +1,15 @@
 package kubed.color
 
 import javafx.scene.paint.Color
+import kubed.math.clamp
 import java.lang.Math.pow
 
 /**
  * Returns a representation of this color in the Rgb color space
  */
-fun Color.rgb(): Rgb = Rgb((red * 255).toInt(),
-        (green * 255).toInt(),
-        (blue * 255).toInt(),
-        opacity)
+fun Color.rgb(): Rgb = Rgb(red * 255,green * 255, blue * 255, opacity)
 
-class Rgb(var r: Int, var g: Int, var b: Int, var opacity: Double = 1.0) : ColorSpace<Rgb> {
+class Rgb(var r: Double, var g: Double, var b: Double, var opacity: Double = 1.0) : ColorSpace<Rgb> {
     companion object {
         @JvmStatic
         fun convert(value: Any): Rgb = when(value)  {
@@ -24,7 +22,7 @@ class Rgb(var r: Int, var g: Int, var b: Int, var opacity: Double = 1.0) : Color
         }
 
         @JvmStatic
-        fun rgbn(n: Int) = Rgb(n shr 16 and 0xff, n shr 8 and 0xff, n and 0xff, 1.0)
+        fun rgbn(n: Int) = Rgb((n shr 16 and 0xff).toDouble(), (n shr 8 and 0xff).toDouble(), (n and 0xff).toDouble(), 1.0)
     }
 
     override fun rgb(): Rgb = this
@@ -33,21 +31,18 @@ class Rgb(var r: Int, var g: Int, var b: Int, var opacity: Double = 1.0) : Color
         val t = if(k == BRIGHTER) BRIGHTER
                 else pow(BRIGHTER, k)
 
-        return Rgb((r * t).toInt(),
-                   (g * t).toInt(),
-                   (b * t).toInt(),
-                   opacity)
+        return Rgb(r * t,g * t, b * t, opacity)
     }
 
     override fun darker(k: Double): Rgb {
         val t = if(k == DARKER) DARKER
                 else pow(DARKER, k)
 
-        return Rgb((r * t).toInt(),
-                   (g * t).toInt(),
-                   (b * t).toInt(),
-                   opacity)
+        return Rgb(r * t,g * t,b * t, opacity)
     }
 
-    override fun toColor(): Color = Color.rgb(r, g, b, opacity)
+    override fun toColor(): Color = Color.rgb(r.clamp(0.0, 255.0).toInt(),
+                                              g.clamp(0.0, 255.0).toInt(),
+                                              b.clamp(0.0, 255.0).toInt(),
+                                              opacity.clamp(0.0, 1.0))
 }

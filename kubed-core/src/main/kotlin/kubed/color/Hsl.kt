@@ -75,7 +75,7 @@ class Hsl(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0
     }
 
     /* From FvD 13.37, CSS Color Module Level 3 */
-    private fun hsl2rgb(h: Double, m1: Double, m2: Double): Int {
+    private fun hsl2rgb(h: Double, m1: Double, m2: Double): Double {
         val t = when {
             h < 60.0 -> m1 + (m2 - m1) * h / 60.0
             h < 180.0 -> m2
@@ -83,6 +83,6 @@ class Hsl(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0
             else -> m1
         }
 
-        return (t * 255.0).toInt()
+        return t * 255.0
     }
 }

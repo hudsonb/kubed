@@ -30,7 +30,7 @@ fun Rgb.lab(): Lab {
     return Lab(116 * y - 16, 500 * (x - y), 200 * (y - z), opacity)
 }
 
-internal fun rgb2xyz(x: Int): Double {
+internal fun rgb2xyz(x: Double): Double {
     val x2 = x / 255.0
     return if(x2 <= 0.04045) x2 / 12.92 else pow((x2 + 0.055) / 1.055, 2.4)
 }
@@ -67,9 +67,9 @@ class Lab(val l: Double, val a: Double, val b: Double, val opacity: Double = 1.0
         x = Xn * lab2xyz(x)
         z = Zn * lab2xyz(z)
 
-        return Rgb(xyz2rgb(3.2404542 * x - 1.571385 * y - 0.4985314 * z).toInt(),  // D65 -> sRGB
-                   xyz2rgb(-0.9692660 * x + 1.8760108 * y + 0.0415560 * z).toInt(),
-                   xyz2rgb( 0.0556434 * x - 0.2040259 * y + 1.0572252 * z).toInt(),
+        return Rgb(xyz2rgb(3.2404542 * x - 1.571385 * y - 0.4985314 * z),  // D65 -> sRGB
+                   xyz2rgb(-0.9692660 * x + 1.8760108 * y + 0.0415560 * z),
+                   xyz2rgb( 0.0556434 * x - 0.2040259 * y + 1.0572252 * z),
                    opacity)
     }
 
