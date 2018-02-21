@@ -11,15 +11,15 @@ class Circle<T> : Shape<Circle<T>, T>() {
         return this
     }
 
-    fun centerX(r: Double) = radius { _, _ -> r }
-    fun centerX(r: (T, Int) -> Double): Circle<T> {
-        centerX = r
+    fun centerX(cx: Double) = centerX { _, _ -> cx }
+    fun centerX(cx: (T, Int) -> Double): Circle<T> {
+        centerX = cx
         return this
     }
 
-    fun centerY(r: Double) = radius { _, _ -> r }
-    fun centerY(r: (T, Int) -> Double): Circle<T> {
-        centerY = r
+    fun centerY(cy: Double) = centerY { _, _ -> cy }
+    fun centerY(cy: (T, Int) -> Double): Circle<T> {
+        centerY = cy
         return this
     }
 
