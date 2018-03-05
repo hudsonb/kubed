@@ -3,9 +3,17 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" group="kubed-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core_main.iml" group="kubed-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core_test.iml" group="kubed-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" group="kubed-demos" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos_main.iml" group="kubed-demos" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos_test.iml" group="kubed-demos" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo.iml" group="kubed-geo" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo_main.iml" group="kubed-geo" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo_test.iml" group="kubed-geo" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed_main.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed_main.iml" group="kubed" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed_test.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed_test.iml" group="kubed" />
     </modules>
   </component>
 </project>
