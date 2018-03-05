@@ -6,15 +6,39 @@ import kubed.color.scheme.schemeCategory10
 import kubed.color.scheme.schemeCategory20
 import kubed.color.scheme.schemeCategory20b
 import kubed.color.scheme.schemeCategory20c
+import kubed.interpolate.DeinterpolatorFactory
+import kubed.interpolate.InterpolatorFactory
 import kubed.interpolate.color.interpolateRgb
 import java.lang.Double.isNaN
 import kotlin.reflect.full.isSubclassOf
 
-inline fun <reified R> scaleLinear(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
-                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
+inline fun <reified R> interpolator() = when {
+    R::class.isSubclassOf(Number::class) -> ::interpolateNumber
+    R::class == Color::class -> ::interpolateRgb
+    else -> throw IllegalArgumentException()
+}
+
+inline fun <reified R> uninterpolator(): ((R, R) -> (R) -> Double)? {
+    return when {
+        R::class.isSubclassOf(Number::class) -> { a: R, b: R ->
+            val an = (a as Number).toDouble()
+            val bn = (b as Number).toDouble()
+            val d = bn - an
+            when {
+                d == -0.0 || d == +0.0 || d.isNaN() -> { _ -> d }
+                else -> { x: R -> ((x as Number).toDouble() - an) / d }
+            }
+        }
+        else -> null
+    }
+}
+
+inline fun <reified R> scaleLinear(noinline interpolate: InterpolatorFactory<R>? = null,
+                                   noinline uninterpolate: DeinterpolatorFactory<R>? = null,
                                    rangeComparator: Comparator<R>? = null): LinearScale<R> = scaleLinear {}
-inline fun <reified R> scaleLinear(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
-                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
+
+inline fun <reified R> scaleLinear(noinline interpolate: InterpolatorFactory<R>? = null,
+                                   noinline uninterpolate: DeinterpolatorFactory<R>? = null,
                                    rangeComparator: Comparator<R>? = null,
                                    init: LinearScale<R>.() -> Unit): LinearScale<R> {
     // TODO: Default comparators
@@ -56,24 +80,3 @@ fun <D> scaleCategory10() = OrdinalScale<D, Color>().apply { range(schemeCategor
 fun <D> scaleCategory20() = OrdinalScale<D, Color>().apply { range(schemeCategory20()) }
 fun <D> scaleCategory20b() = OrdinalScale<D, Color>().apply { range(schemeCategory20b()) }
 fun <D> scaleCategory20c() = OrdinalScale<D, Color>().apply { range(schemeCategory20c()) }
-
-inline fun <reified R> interpolator() = when {
-    R::class.isSubclassOf(Number::class) -> ::interpolateNumber
-    R::class == Color::class -> ::interpolateRgb
-    else -> throw IllegalArgumentException()
-}
-
-inline fun <reified R> uninterpolator(): ((R, R) -> (R) -> Double)? {
-    return when {
-        R::class.isSubclassOf(Number::class) -> { a: R, b: R ->
-            val an = (a as Number).toDouble()
-            val bn = (b as Number).toDouble()
-            val d = bn - an
-            when {
-                d == -0.0 || d == +0.0 || d.isNaN() -> { _ -> d }
-                else -> { x: R -> ((x as Number).toDouble() - an) / d }
-            }
-        }
-        else -> null
-    }
-}

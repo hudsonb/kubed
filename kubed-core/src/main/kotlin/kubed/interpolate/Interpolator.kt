@@ -4,6 +4,14 @@ import javafx.scene.paint.Color
 import kubed.color.ColorSpace
 import kubed.color.Rgb
 
+typealias Interpolator<T> = (Double) -> T
+typealias Deinterpolator<T> = (T) -> Double
+
+typealias InterpolatorFactory<T> = (T, T) -> Interpolator<T>
+typealias DeinterpolatorFactory<T> = (T, T) -> Deinterpolator<T>
+
+typealias PiecewiseInterpolatorFactory<T> = (List<Double>, List<T>, DeinterpolatorFactory<Double>, InterpolatorFactory<T>) -> Interpolator<T>
+typealias PiecewiseDeinterpolatorFactory<T> = (List<T>, List<Double>, DeinterpolatorFactory<T>, InterpolatorFactory<Double>) -> Deinterpolator<T>
 
 // Consider: Remove this? Seems pointless given you've gotta provide the types
 //fun <T, R> interpolate(a: T, b: T): (Double) -> R {
@@ -28,12 +36,12 @@ import kubed.color.Rgb
 
 // Consider: Add this as an extension function to String
 private fun isColor(str: String): Boolean {
-    try {
+    return try {
         Color.web(str)
-        return true
+        true
     }
     catch(e: Exception) {
-        return false
+        false
     }
 }
 
