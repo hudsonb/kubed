@@ -1,10 +1,13 @@
+apply plugin: 'org.junit.platform.gradle.plugin'
+
 buildscript {
-    ext.kotlin_version = '1.2.20'
+    ext.kotlin_version = '1.2.30'
     repositories {
         jcenter()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
     }
 }
 
@@ -22,8 +25,20 @@ subprojects {
     }
 
     dependencies {
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-        compile "org.jetbrains.kotlin:kotlin-reflect"
+        compile 'org.jetbrains.kotlin:kotlin-stdlib:1.2.30'
+        compile 'org.jetbrains.kotlin:kotlin-reflect:1.2.30'
+
+        testCompile(
+                // This dependency provides the public API for writing tests and extensions.
+                'org.junit.jupiter:junit-jupiter-api:5.1.0'
+        )
+        testRuntime (
+                // Use the test engine of JUnit 5 for running tests.
+                'org.junit.jupiter:junit-jupiter-engine:5.1.0',
+                // Provides a public API for configuring and launching tests.
+                // This API is typically used by IDEs and build tools.
+                'org.junit.platform:junit-platform-launcher:1.1.0'
+        )
     }
 }
 
