@@ -14,7 +14,7 @@
 # Gradle:
 .idea/**/gradle.xml
 .idea/**/libraries
-/build/
+build/
 
 # Mongo Explorer plugin:
 .idea/**/mongoSettings.xml
@@ -25,7 +25,7 @@
 ## Plugin-specific files:
 
 # IntelliJ
-/out/
+out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/

@@ -27,7 +27,7 @@ class ThresholdScale<R> : Scale<Double, R> {
     }
 
     /**
-     * Given a value in the input domain, retirns the corresponding value in the output range.
+     * Given a value in the input domain, returns the corresponding value in the output range.
      */
     override fun invoke(d: Double): R = range[bisect(domain, d, naturalOrder(), 0, Math.min(domain.size, range.size - 1))]
 
