@@ -8,7 +8,7 @@ val E5 = sqrt(10.0)
 val E2 = sqrt(2.0)
 val LN10 = ln(10.0)
 
-fun range(start: Double, stop: Double, step: Double): DoubleArray {
+fun range(start: Double, stop: Double, step: Double = 1.0): DoubleArray {
     val n = max(0.0, ceil((stop - start) / step)).toInt()
     return DoubleArray(n, {start + it * step })
 }
