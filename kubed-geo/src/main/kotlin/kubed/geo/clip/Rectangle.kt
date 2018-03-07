@@ -1,12 +1,10 @@
 package kubed.geo.clip
 
-import kubed.geo.Buffer
 import kubed.geo.GeometryStream
 import kubed.math.EPSILON
+import kubed.math.clamp
 import kubed.util.isTruthy
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 const val CLIP_MAX = 1e9
 const val CLIP_MIN = -CLIP_MAX
@@ -19,7 +17,6 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
     override fun isVisible(x: Double, y: Double) = x in x0..x1 && y in y0..y1
 
     override fun clipLine(stream: GeometryStream): IntersectStream {
-
         return object : IntersectStream {
             override var clean: Int = 0
 
@@ -61,7 +58,7 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
             override fun lineEnd() {
                 if(segments != null) {
                     linePoint(x__, y__)
-                    if (v__ && v_) bufferStream.rejoin()
+                    if(v__ && v_) bufferStream.rejoin()
                     segments!!.add(bufferStream.result())
                 }
                 streamingLine = false
@@ -116,10 +113,10 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
                 else {
                     if(v && v_) activeStream.point(x, y, 0.0)
                     else {
-                        x_ = max(CLIP_MIN, min(CLIP_MAX, x_))
-                        y_ = max(CLIP_MIN, min(CLIP_MAX, y_))
-                        x = max(CLIP_MIN, min(CLIP_MAX, x))
-                        y = max(CLIP_MIN, min(CLIP_MAX, y))
+                        x_ = x_.clamp(CLIP_MIN, CLIP_MAX)
+                        y_ = y_.clamp(CLIP_MIN, CLIP_MAX)
+                        x = x.clamp(CLIP_MIN, CLIP_MAX)
+                        y = y.clamp(CLIP_MIN, CLIP_MAX)
                         val a = doubleArrayOf(x_, y_)
                         val b = doubleArrayOf(x, y)
 
@@ -171,8 +168,10 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
                         point = ring[j]
                         b0 = point[0]
                         b1 = point[1]
-                        if(a1 <= y1) { if(b1 > y1 && (b0 - a0) * (y1 - a1) > (b1 - a1) * (x0 - a0)) ++winding; }
-                        else if(b1 <= y1 && (b0 - a0) * (y1 - a1) < (b1 - a1) * (x0 - a0)) --winding
+                        if(a1 <= y1) {
+                            if(b1 > y1 && ((b0 - a0) * (y1 - a1)) > ((b1 - a1) * (x0 - a0))) ++winding
+                        }
+                        else if(b1 <= y1 && ((b0 - a0) * (y1 - a1)) < ((b1 - a1) * (x0 - a0))) --winding
                         ++j
                     }
                 }
@@ -188,7 +187,8 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
 
         if(from == null || a != a1 || to != null && (comparePoint(from, to) < 0) xor (direction > 0)) {
             do {
-                stream.point(if(a == 0 || a == 3) x0 else x1,
+                stream.point(
+                        if(a == 0 || a == 3) x0 else x1,
                         if(a > 1) y1 else y0,
                         0.0)
                 a = (a + direction + 4) % 4
@@ -202,14 +202,14 @@ class RectangleClip(val x0: Double, val y0: Double, val x1: Double, val y1: Doub
             p == null -> 3
             abs(p[0] - x0) < EPSILON -> 0
             abs(p[0] - x1) < EPSILON -> 2
-            abs(p[1] - y1) < EPSILON -> 1
+            abs(p[1] - y0) < EPSILON -> 1
             else -> 3
         }
         else -> when {
             p == null -> 2
             abs(p[0] - x0) < EPSILON -> 3
             abs(p[0] - x1) < EPSILON -> 1
-            abs(p[1] - y1) < EPSILON -> 0
+            abs(p[1] - y0) < EPSILON -> 0
             else -> 2
         }
     }
