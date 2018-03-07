@@ -1,6 +1,5 @@
 package kubed.geo.projection
 
-import kubed.ease.BounceOutInterpolator.Companion.b0
 import kubed.geo.FilterGeometryStream
 import kubed.geo.GeometryStream
 import kubed.geo.MutableGeometryStream
@@ -70,92 +69,6 @@ private fun _resample(project: Projector, delta2: Double): Transformer {
     }
 
     return { stream: GeometryStream ->
-        object : GeometryStream {
-            // First point
-            var lambda00 = Double.NaN
-            var x00 = Double.NaN
-            var y00 = Double.NaN
-            var a00 = Double.NaN
-            var b00 = Double.NaN
-            var c00 = Double.NaN
-
-            // Previous point
-            var lambda0 = Double.NaN
-            var x0 = Double.NaN
-            var y0 = Double.NaN
-            var a0 = Double.NaN
-            var b0 = Double.NaN
-            var c0 = Double.NaN
-
-            var streamingLine = false
-            var streamingPolygon = false
-            var streamingRing = false
-            var firstPoint = false
-
-            override fun point(x: Double, y: Double, z: Double) {
-                when {
-                    firstPoint -> {
-                        firstPoint = false
-                        lambda00 = x
-                        val p = project(x, y)
-                        stream.point(p[0], p[1], 0.0)
-                        x00 = x0
-                        y00 = y0
-                        a00 = a0
-                        b00 = b0
-                        c00 = c0
-                    }
-                    streamingLine -> {
-                        val c = cartesian(doubleArrayOf(x, y))
-                        val p = project(x, y)
-                        resampleLineTo(x0, y0, lambda0, a0, b0, c0, p[0], p[1], x, c[0], c[1], c[2], MAX_DEPTH, stream)
-                        x0 = p[0]
-                        y0 = p[1]
-                        lambda0 = x
-                        a0 = c[0]
-                        b0 = c[1]
-                        c0 = c[2]
-                        stream.point(x0, y0, z)
-                    }
-                    else -> {
-                        val p = project(x, y)
-                        stream.point(p[0], p[1], 0.0)
-                   }
-                }
-            }
-
-            override fun lineStart() {
-                x0 = Double.NaN
-                stream.lineStart()
-                streamingLine = true
-
-                if(streamingPolygon) {
-                    streamingRing = true
-                }
-            }
-
-            override fun lineEnd() {
-                if(streamingRing) {
-                    resampleLineTo(x0, y0, lambda0, a0, b0, c0, x00, y00, lambda00, a00, b00, c00, MAX_DEPTH, stream)
-                    streamingRing = false
-                }
-
-                stream.lineEnd()
-                streamingLine = false
-            }
-
-            override fun polygonStart() {
-                stream.polygonStart()
-                streamingPolygon = true
-            }
-
-            override fun polygonEnd() {
-                stream.polygonEnd()
-                streamingPolygon = false
-            }
-        }
-
-    /*return { stream: GeometryStream ->
         object : MutableGeometryStream() {
             // First point
             var lambda00 = Double.NaN
@@ -174,19 +87,19 @@ private fun _resample(project: Projector, delta2: Double): Transformer {
             var c0 = Double.NaN
 
             init {
-                point = ::_point
-                lineStart = ::_lineStart
-                lineEnd = ::_lineEnd
+                point = ::defaultPoint
+                lineStart = ::defaultLineStart
+                lineEnd = ::defaultLineEnd
                 polygonStart = { stream.polygonStart(); lineStart = ::ringStart }
-                polygonEnd = { stream.polygonEnd(); lineStart = ::_lineStart }
+                polygonEnd = { stream.polygonEnd(); lineStart = ::defaultLineStart }
             }
 
-            private fun _point(x: Double, y: Double, z: Double) {
+            private fun defaultPoint(x: Double, y: Double, z: Double) {
                 val p = project(x, y)
                 stream.point(p[0], p[1], 0.0)
             }
 
-            private fun _lineStart() {
+            private fun defaultLineStart() {
                 x0 = Double.NaN
                 point = ::linePoint
                 stream.lineStart()
@@ -202,15 +115,16 @@ private fun _resample(project: Projector, delta2: Double): Transformer {
                 a0 = c[0]
                 b0 = c[1]
                 c0 = c[2]
+                stream.point(x0, y0, z)
             }
 
-            private fun _lineEnd() {
-                point = ::_point
+            private fun defaultLineEnd() {
+                point = ::defaultPoint
                 stream.lineEnd()
             }
 
             private fun ringStart() {
-                _lineStart()
+                defaultLineStart()
                 point = ::ringPoint
                 lineEnd = ::ringEnd
             }
@@ -228,9 +142,9 @@ private fun _resample(project: Projector, delta2: Double): Transformer {
 
             private fun ringEnd() {
                 resampleLineTo(x0, y0, lambda0, a0, b0, c0, x00, y00, lambda00, a00, b00, c00, MAX_DEPTH, stream)
-                lineEnd = ::_lineEnd
-                _lineEnd()
+                lineEnd = ::defaultLineEnd
+                lineEnd()
             }
-        }*/
+        }
     }
 }
