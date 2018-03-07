@@ -7,6 +7,8 @@ import kotlin.math.ln
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+val SQRT2 = sqrt(2.0)
+
 inline fun acos(x: Double) = when {
     x > 1 -> 0.0
     x < -1 -> PI

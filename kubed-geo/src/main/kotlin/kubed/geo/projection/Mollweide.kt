@@ -1,11 +1,10 @@
 package kubed.geo.projection
 
+import jdk.nashorn.internal.objects.NativeMath.SQRT2
 import kubed.geo.math.asin
 import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kotlin.math.*
-
-private val SQRT2 = sqrt(2.0)
 
 fun mollweide() = mollweide {}
 fun mollweide(init: MutableProjection.() -> Unit) = projection(MollweideProjector(SQRT2 / HALF_PI, SQRT2, PI)).apply {
