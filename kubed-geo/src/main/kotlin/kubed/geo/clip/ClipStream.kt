@@ -21,10 +21,18 @@ open class ClipStream(val clip: Clip, val stream: GeometryStream) : MutableGeome
     private val segments: LinkedList<List<List<DoubleArray>>> = LinkedList()
     private var ring: LinkedList<DoubleArray>? = null
 
+    private val compareIntersection = Comparator<Intersection> { i1, i2 ->
+        val a = i1.x
+        val b = i2.x
+        val ca = if(a[0] < 0) a[1] - HALF_PI - EPSILON else HALF_PI - a[1]
+        val cb = if(b[0] < 0) b[1] - HALF_PI - EPSILON else HALF_PI - b[1]
+        ca.compareTo(cb)
+    }
+
     init {
-        point = ::_point
-        lineStart = ::_lineStart
-        lineEnd = ::_lineEnd
+        point = ::defaultPoint
+        lineStart = ::defaultLineStart
+        lineEnd = ::defaultLineEnd
 
         polygonStart = {
             point = ::pointRing
@@ -35,27 +43,19 @@ open class ClipStream(val clip: Clip, val stream: GeometryStream) : MutableGeome
         }
 
         polygonEnd = {
-            point = ::_point
-            lineStart = ::_lineStart
-            lineEnd = ::_lineEnd
-            val flattenedSegments = segments.flatten()
+            point = ::defaultPoint
+            lineStart = ::defaultLineStart
+            lineEnd = ::defaultLineEnd
 
             val startInside = polygonContains(polygon, clip.start)
 
-            if(flattenedSegments.isNotEmpty()) {
+            if(segments.isNotEmpty()) {
                 if(!polygonStarted) {
                     stream.polygonStart()
                     polygonStarted = true
                 }
 
-                val compareIntersection = Comparator<Intersection> { i1, i2 ->
-                    val a = i1.x
-                    val b = i2.x
-                    val ca = if(a[0] < 0) a[1] - HALF_PI - EPSILON else HALF_PI - a[1]
-                    val cb = if(b[0] < 0) b[1] - HALF_PI - EPSILON else HALF_PI - b[1]
-                    ca.compareTo(cb)
-                }
-                clipRejoin(flattenedSegments, compareIntersection, startInside, clip::interpolate, stream)
+                clipRejoin(segments.flatten(), compareIntersection, startInside, clip::interpolate, stream)
             }
             else if(startInside) {
                 if(!polygonStarted) {
@@ -85,17 +85,17 @@ open class ClipStream(val clip: Clip, val stream: GeometryStream) : MutableGeome
         }
     }
 
-    private fun _point(x: Double, y: Double, z: Double) {
+    private fun defaultPoint(x: Double, y: Double, z: Double) {
         if(clip.isVisible(x, y)) stream.point(x, y, z)
     }
 
-    private fun _lineStart() {
+    private fun defaultLineStart() {
         point = ::pointLine
         line.lineStart()
     }
 
-    private fun _lineEnd() {
-        point = ::_point
+    private fun defaultLineEnd() {
+        point = ::defaultPoint
         line.lineEnd()
     }
 
@@ -130,7 +130,7 @@ open class ClipStream(val clip: Clip, val stream: GeometryStream) : MutableGeome
             if((clean and 1).isTruthy()) {
                 val segment = ringSegments[0]
                 if(segment != null) {
-                    val m = segment.size - 1
+                    val m = segment.lastIndex
                     if(m > 0) {
                         if(!polygonStarted) {
                             stream.polygonStart()
@@ -147,7 +147,9 @@ open class ClipStream(val clip: Clip, val stream: GeometryStream) : MutableGeome
 
             // Rejoin connected segments
             if(ringSegments.size > 1 && (clean and 2).isTruthy()) {
-                ringSegments.add(ringSegments.removeLast().toMutableList().apply { addAll(ringSegments.removeFirst()) })
+                val concat = LinkedList(ringSegments.removeLast())
+                concat.addAll(ringSegments.removeFirst())
+                ringSegments.add(concat)
             }
 
             segments.add(ringSegments.filter { it.size > 1 })

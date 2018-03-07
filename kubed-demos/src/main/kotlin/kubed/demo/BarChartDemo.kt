@@ -3,14 +3,12 @@ package kubed.demo
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import kubed.axis.axisBottom
 import kubed.axis.axisLeft
 import kubed.interpolate.interpolateRound
-import kubed.scale.LinearScale
 import kubed.scale.scaleBand
 import kubed.scale.scaleLinear
 import kubed.selection.selectAll
@@ -36,7 +34,7 @@ class BarChartDemo: Application() {
         val data = letterFrequencies()
 
         val x = scaleBand<Char> {
-            rangeRound(listOf(0.0, innerWidth))
+            rangeRound(0.0, innerWidth)
             domain(data.map { it.letter })
             padding(0.1)
         }

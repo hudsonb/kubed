@@ -21,10 +21,6 @@ fun projection(projector: Projector, init: MutableProjection.() -> Unit) = Mutab
 fun projection(factory: ProjectorFactory) = MutableProjection(factory)
 fun projection(factory: ProjectorFactory, init: MutableProjection.() -> Unit) = MutableProjection(factory).apply(init)
 
-interface ProjectionListener {
-    fun projectionChanged(projection: Projection)
-}
-
 interface Projection {
     val precisionProperty: DoubleProperty
     var precision: Double
@@ -49,14 +45,14 @@ interface Projection {
 
     fun invalidate() {}
 
-    fun addListener(listener: ProjectionListener)
-    fun removeListener(listener: ProjectionListener): Boolean
+    fun addListener(listener: (Projection) -> Unit)
+    fun removeListener(listener: (Projection) -> Unit)
 }
 
 abstract class AbstractProjection : Projection {
     private var invalidated = false
 
-    private val listeners = CopyOnWriteArrayList<ProjectionListener>()
+    private val listeners = CopyOnWriteArrayList<(Projection) -> Unit>()
 
     init {
         timer {
@@ -75,19 +71,21 @@ abstract class AbstractProjection : Projection {
     }
 
     /**
-     * Adds the given [ProjectionListener] to this projection. [ProjectionListener.projectionChanged] is called only once
+     * Adds the given listener to this projection. The listener is called only once
      * per frame, and is guaranteed to be called from the JavaFX thread.
      */
-    override fun addListener(listener: ProjectionListener) {
+    override fun addListener(listener: (Projection) -> Unit) {
         if(!listeners.contains(listener)) listeners.add(listener)
     }
 
     /**
-     * Removes the given [ProjectionListener] from this projection.
+     * Removes the given listener from this projection.
      */
-    override fun removeListener(listener: ProjectionListener): Boolean = listeners.remove(listener)
+    override fun removeListener(listener: (Projection) -> Unit) {
+        listeners.remove(listener)
+    }
 
-    private fun fireProjectionChanged() = ArrayList(listeners).forEach { it.projectionChanged(this) }
+    private fun fireProjectionChanged() = ArrayList(listeners).forEach { it(this) }
 }
 
 abstract class StreamCacheProjection : AbstractProjection() {
@@ -240,9 +238,9 @@ open class MutableProjection(protected val factory: ProjectorFactory): ClippedPr
             reset()
         }
 
-        translateXProperty.addListener { _ -> recenter(); }
-        translateYProperty.addListener { _ -> recenter(); }
-        scaleProperty.addListener { _ -> recenter(); }
+        translateXProperty.addListener { _ -> recenter() }
+        translateYProperty.addListener { _ -> recenter() }
+        scaleProperty.addListener { _ -> recenter() }
         centerProperty.addListener { _ -> recenter() }
         rotateXProperty.addListener { _ -> recenter() }
         rotateYProperty.addListener { _ -> recenter() }

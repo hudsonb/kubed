@@ -11,8 +11,6 @@ class Line<T> : PathShape<Line<T>, List<T>>() {
     var defined: (T, Int, List<T>) -> Boolean = { _, _, _ -> true }
     var curve: (Context) -> Curve = curveLinear()
 
-    fun constant(value: Double) = { _: T, _: Int, _: List<T> -> value }
-
     fun x(value: Double) = x { _, _, _ -> value }
     fun x(func: (T, Int, List<T>) -> Double): Line<T> {
         x = func

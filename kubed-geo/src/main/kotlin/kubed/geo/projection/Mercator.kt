@@ -34,13 +34,13 @@ open class MercatorProjection(projector: Projector) : MutableProjection(projecto
         reclipping = true
 
         val k = PI * scale
-        val t = super.invoke(rotation(rotateX, rotateY, rotateZ).invert(0.0, 0.0))
+        val t = invoke(rotation(rotateX, rotateY, rotateZ).invert(0.0, 0.0))
 
         val e = clipExtent
         val extent = when {
-                    e == null -> Rectangle2D(t[0] - k, t[1] - k, k, k)
-                    project::class == MercatorProjector::class -> Rectangle2D(max(t[0] - k, e.minX), e.minY, min(k, e.width), e.height)
-                    else -> Rectangle2D(e.minX, max(t[1] - k, e.minY), e.width, min(k, e.height))
+                    e == null -> Rectangle2D(t[0] - k, t[1] - k, k * 2, k * 2)
+                    project is MercatorProjector -> Rectangle2D(max(t[0] - k, e.minX), e.minY, max(0.0, min(k * 2, e.width)), e.height)
+                    else -> Rectangle2D(e.minX, max(t[1] - k, e.minY), e.width, min(k * 2, e.height))
                 }
 
         clipExtent = extent

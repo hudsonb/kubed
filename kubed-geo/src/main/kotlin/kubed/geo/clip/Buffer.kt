@@ -1,5 +1,6 @@
-package kubed.geo
+package kubed.geo.clip
 
+import kubed.geo.GeometryStream
 import java.util.*
 
 class Buffer : GeometryStream {

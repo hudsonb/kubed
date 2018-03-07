@@ -588,7 +588,7 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
     inline fun <reified N : Node> forEach(action: N.(d: T, i: Int, group: List<Node?>) -> Unit): Selection<T> {
         for(i in groups.indices) {
             val group = groups[i]
-            val nodes = group.map { if(it is N) it else null }
+            val nodes = group.map { it as? N }
             for(j in group.indices) {
                 val e = group[j]
                 if(e is N) action(e, e.datum as T, j, nodes)

@@ -45,9 +45,9 @@ class CircleClip(val radius: Double) : Clip {
                var point2: DoubleArray?
                var v = isVisible(x, y)
                val c = if(smallRadius) {
-                   if (v) 0 else code(x, y)
+                   if(v) 0 else code(x, y)
                }
-               else if (v) code(x + if (x < 0) PI else -PI, y)
+               else if(v) code(x + if (x < 0) PI else -PI, y)
                else 0
 
                if(point0 == null) {
@@ -82,12 +82,10 @@ class CircleClip(val radius: Double) : Clip {
                    point0 = point2
                }
                else if(notHemisphere && point0 != null && (smallRadius xor v)) {
-                   val t: Array<DoubleArray>?
-
-                   // If the codes for two points are different, o are both zero,
+                   // If the codes for two points are different, or are both zero,
                    // and this segment intersects with the small circle.
                    if((c and c0) == 0) {
-                       t = intersect2(point1, point0!!)
+                       val t = intersect2(point1, point0!!)
                        if(t != null) {
                            _clean = 0
                            if(smallRadius) {

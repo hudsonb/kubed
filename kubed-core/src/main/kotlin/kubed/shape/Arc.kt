@@ -230,7 +230,7 @@ class Arc<T> : PathShape<Arc<T>, T>() {
         else -> Math.asin(x)
     }
 
-    fun intersect(x0: Double, y0: Double, x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double): DoubleArray {
+    private fun intersect(x0: Double, y0: Double, x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double): DoubleArray {
         val x10 = x1 - x0
         val y10 = y1 - y0
         val x32 = x3 - x2
