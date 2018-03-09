@@ -5,7 +5,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 fun gnomonic() = gnomonic {}
-fun gnomonic(init: MutableProjection.() -> Unit) = projection(object : ProjectorFactory { override fun create() = GnomonicProjector() }).apply {
+fun gnomonic(init: MutableProjection.() -> Unit) = projection(GnomonicProjector()) {
     scale = 144.049
     clipAngle = 60.0
 

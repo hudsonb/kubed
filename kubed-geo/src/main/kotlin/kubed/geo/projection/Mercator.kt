@@ -39,7 +39,7 @@ open class MercatorProjection(projector: Projector) : MutableProjection(projecto
         val e = clipExtent
         val extent = when {
                     e == null -> Rectangle2D(t[0] - k, t[1] - k, k * 2, k * 2)
-                    project is MercatorProjector -> Rectangle2D(max(t[0] - k, e.minX), e.minY, max(0.0, min(k * 2, e.width)), e.height)
+                    projector is MercatorProjector -> Rectangle2D(max(t[0] - k, e.minX), e.minY, max(0.0, min(k * 2, e.width)), e.height)
                     else -> Rectangle2D(e.minX, max(t[1] - k, e.minY), e.width, min(k * 2, e.height))
                 }
 

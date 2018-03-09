@@ -3,27 +3,24 @@ package kubed.geo.projection
 import kubed.geo.Position
 import kubed.math.EPSILON
 import kubed.geo.math.asin
+import kubed.math.toRadians
 import kotlin.math.*
 
 fun conicEqualArea() = conicEqualArea {}
-fun conicEqualArea(init: ConicProjection.() -> Unit)= conicProjection(ConicEqualAreaProjectorFactory()) {
+fun conicEqualArea(init: ConicProjection.() -> Unit)= ConicEqualAreaProjection().apply {
     scale = 155.424
     center = Position(0.0, 33.6442)
     init()
-}
-
-class ConicEqualAreaProjectorFactory : ConicProjectorFactory() {
-    override fun create() = conicEqualAreaRaw(phi0, phi1)
 }
 
 fun conicEqualAreaRaw(y0: Double, y1: Double): Projector {
     val sy0 = sin(y0)
     val n = (sy0 + sin(y1)) / 2
     if(abs(n) < EPSILON) return CylindricalEqualArea(y0)
-    return ConicEqualArea(y0, y1)
+    return ConicEqualAreaProjector(y0, y1)
 }
 
-class ConicEqualArea(val y0: Double, val y1: Double) : InvertableProjector {
+class ConicEqualAreaProjector(val y0: Double, val y1: Double) : InvertableProjector {
     private val sy0 = sin(y0)
     private val n = (sy0 + sin(y1)) / 2
     private val c = 1 + sy0 * (2 * n - sy0)
@@ -40,5 +37,15 @@ class ConicEqualArea(val y0: Double, val y1: Double) : InvertableProjector {
         val r0y = r0 - y
         return doubleArrayOf(atan2(x, abs(r0y)) / n * sign(r0y),
                 asin((c - (x * x + r0y * r0y) * n * n) / (2 * n)))
+    }
+}
+
+class ConicEqualAreaProjection : ConicProjection(conicEqualAreaRaw(30.0, 30.0)) {
+    init {
+        parallelsProperty.addListener { _ ->
+            val phi0 = parallels[0].toRadians()
+            val phi1 = parallels[1].toRadians()
+            projector = conicEqualAreaRaw(phi0, phi1)
+        }
     }
 }

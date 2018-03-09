@@ -43,7 +43,7 @@ class AlbersUsa : StreamCacheProjection() {
 
     override val scaleProperty
         get() = lower48.scaleProperty
-    override var scale
+    override var scale: Double
         get() = lower48.scale
         set(k) {
             lower48.scale = k

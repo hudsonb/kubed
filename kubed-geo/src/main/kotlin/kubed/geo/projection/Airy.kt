@@ -1,8 +1,11 @@
 package kubed.geo.projection
 
+import javafx.beans.InvalidationListener
+import javafx.beans.property.SimpleDoubleProperty
 import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kubed.math.toDegrees
+import kubed.math.toRadians
 import kubed.util.isFalsy
 import kubed.util.isTruthy
 import java.lang.Math.tan
@@ -16,7 +19,7 @@ fun airy(init: AiryProjection.() -> Unit) = AiryProjection().apply {
     init()
 }
 
-class AiryProjector(val beta: Double) : InvertableProjector {
+class AiryProjector(private val beta: Double) : InvertableProjector {
     private val tanBeta2 = tan(beta / 2)
     private val b = 2 * ln(cos(beta / 2)) / (tanBeta2 * tanBeta2)
 
@@ -53,20 +56,13 @@ class AiryProjector(val beta: Double) : InvertableProjector {
     }
 }
 
-class AiryProjectorFactory : ProjectorFactory {
-    var beta = HALF_PI
+class AiryProjection : MutableProjection(AiryProjector(HALF_PI)) {
+    val radiusProperty = SimpleDoubleProperty(HALF_PI.toDegrees())
+    var radius
+        get() = radiusProperty.get()
+        set(f) = radiusProperty.set(f)
 
-    override fun create() = AiryProjector(beta)
-}
-
-class AiryProjection : MutableProjection(AiryProjectorFactory()) {
-    private val beta = HALF_PI
-
-    var radius: Double
-        get() = beta.toDegrees()
-        set(value) {
-            factory as AiryProjectorFactory
-            factory.beta = beta.toDegrees()
-            project = factory.create()
-        }
+    init {
+        radiusProperty.addListener(InvalidationListener { projector = AiryProjector(radius.toRadians()) })
+    }
 }

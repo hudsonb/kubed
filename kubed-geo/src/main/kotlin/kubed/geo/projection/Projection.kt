@@ -18,8 +18,6 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 fun projection(projector: Projector) = projection(projector) {}
 fun projection(projector: Projector, init: MutableProjection.() -> Unit) = MutableProjection(projector).apply(init)
-fun projection(factory: ProjectorFactory) = MutableProjection(factory)
-fun projection(factory: ProjectorFactory, init: MutableProjection.() -> Unit) = MutableProjection(factory).apply(init)
 
 interface Projection {
     val precisionProperty: DoubleProperty
@@ -154,15 +152,7 @@ abstract class ClippedProjection : StreamCacheProjection() {
     }
 }
 
-open class MutableProjection(protected val factory: ProjectorFactory): ClippedProjection() {
-    constructor(projector: Projector) : this(object : ProjectorFactory {
-        override fun create(): Projector {
-            return projector
-        }
-    })
-
-    protected var project: Projector = factory.create()
-
+open class MutableProjection(protected var projector: Projector): ClippedProjection() {
     // Scale
     final override val scaleProperty = SimpleDoubleProperty(150.0)
     override var scale: Double
@@ -211,7 +201,7 @@ open class MutableProjection(protected val factory: ProjectorFactory): ClippedPr
 
     private val projectTransform = object : Transform {
         override fun invoke(lambda: Double, phi: Double): DoubleArray {
-            val p = project(lambda, phi)
+            val p = projector(lambda, phi)
             return doubleArrayOf(p[0] * scale + dx, dy - p[1] * scale)
         }
     }
@@ -290,8 +280,8 @@ open class MutableProjection(protected val factory: ProjectorFactory): ClippedPr
     protected fun recenter(lambda: Double, phi: Double, deltaLambda: Double, deltaPhi: Double, deltaGamma: Double)
     {
         rotator = rotateRadians(deltaLambda, deltaPhi, deltaGamma)
-        projectRotate = compose(rotator, project)
-        val center = project(lambda, phi)
+        projectRotate = compose(rotator, projector)
+        val center = projector(lambda, phi)
         dx = translateX - center[0] * scale
         dy = translateY + center[1] * scale
         reset()
