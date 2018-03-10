@@ -2,11 +2,10 @@ package kubed.geo.projection
 
 import kubed.geo.Position
 import kubed.math.EPSILON
-import kubed.math.toRadians
 import kotlin.math.*
 
 fun conicEquidistant() = conicEquidistant {}
-fun conicEquidistant(init: ConicProjection.() -> Unit) = ConicEquidistantProjection().apply {
+fun conicEquidistant(init: ConicProjection.() -> Unit) = ConicProjection(::conicEqualAreaRaw).apply {
     scale = 131.154
     center = Position(0.0, 13.9389)
     init()
@@ -34,16 +33,6 @@ fun conicEquidistantRaw(phi0: Double, phi1: Double): Projector {
                 val gy = g - y
                 return doubleArrayOf(atan2(x, abs(gy)) / n * sign(gy), g - sign(n) * sqrt(x * x + gy * gy))
             }
-        }
-    }
-}
-
-class ConicEquidistantProjection : ConicProjection(conicEquidistantRaw(30.0, 30.0)) {
-    init {
-        parallelsProperty.addListener { _ ->
-            val phi0 = parallels[0].toRadians()
-            val phi1 = parallels[1].toRadians()
-            projector = conicEquidistantRaw(phi0, phi1)
         }
     }
 }
