@@ -5,6 +5,7 @@ import kubed.util.isTruthy
 import kotlin.math.*
 
 val SQRT2 = sqrt(2.0)
+val SQRT_PI = sqrt(PI)
 
 inline fun acos(x: Double) = when {
     x > 1 -> 0.0
