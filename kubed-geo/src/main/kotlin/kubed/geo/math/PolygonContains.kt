@@ -14,7 +14,7 @@ import kotlin.math.sin
 
 fun polygonContains(polygon: List<List<DoubleArray>>, point: DoubleArray): Boolean {
     val lambda = point[0]
-    val phi = point[1]
+    var phi = point[1]
     val normal = doubleArrayOf(sin(lambda), -cos(lambda), 0.0)
     var angle = 0.0
     var winding = 0
@@ -54,6 +54,8 @@ fun polygonContains(polygon: List<List<DoubleArray>>, point: DoubleArray): Boole
                 val intersection = cartesianCross(normal, arc)
                 cartesianNormalizeInPlace(intersection)
                 val phiArc = (if(antimeridian xor (delta >= 0)) -1 else 1) * asin(intersection[2])
+                val pole = sin(phi)
+                if(pole == -1.0 || pole == 1.0) phi += pole * EPSILON
                 if(phi > phiArc || (phi == phiArc && (arc[0].isTruthy() || arc[1].isTruthy()))) {
                     winding += if(antimeridian xor (delta >= 0)) 1 else -1
                 }
