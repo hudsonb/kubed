@@ -26,4 +26,6 @@ inline fun arsinh(x: Double) = ln(x + sqrt(x * x + 1))
 
 inline fun arcosh(x: Double) = ln(x + sqrt(x * x - 1))
 
-inline fun tany(y: Double): Double = tan((HALF_PI + y) / 2)
+inline fun tany(y: Double) = tan((HALF_PI + y) / 2)
+
+inline fun sqrt(x: Double) = if(x > 0) kotlin.math.sqrt(x) else 0.0

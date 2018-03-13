@@ -1,10 +1,15 @@
 package kubed.geo.projection
 
+import kubed.geo.math.acos
 import kubed.geo.math.sinci
+import kubed.geo.math.sqrt
 import kubed.math.EPSILON
 import kubed.util.isFalsy
 import kubed.util.isTruthy
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 
 fun aitoff() = aitoff {}
 fun aitoff(init: MutableProjection.() -> Unit) = projection(AitoffProjector()) {

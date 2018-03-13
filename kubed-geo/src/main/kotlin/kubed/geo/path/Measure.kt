@@ -2,7 +2,7 @@ package kubed.geo.path
 
 import kubed.geo.GeometryStream
 import kubed.geo.math.Accumulator
-import kotlin.math.sqrt
+import kubed.geo.math.sqrt
 
 class Measure : GeometryStream {
     private val lengthAccumulator = Accumulator()

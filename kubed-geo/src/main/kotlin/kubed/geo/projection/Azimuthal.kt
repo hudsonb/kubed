@@ -1,11 +1,11 @@
 package kubed.geo.projection
 
 import kubed.geo.math.asin
+import kubed.geo.math.sqrt
 import kubed.util.isTruthy
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 fun azimuthalInvert(angle: (Double) -> Double) = { x: Double, y: Double ->
     val z = sqrt(x * x + y * y)

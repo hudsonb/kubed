@@ -4,6 +4,37 @@ import kubed.geo.math.asin
 import kotlin.math.cos
 import kotlin.math.sin
 
+fun cylindricalEqualArea() = cylindricalEqualArea {}
+fun cylindricalEqualArea(init: Parallel1Projection.() -> Unit) = Parallel1Projection(::CylindricalEqualArea).apply {
+    scale = 195.044
+    parallel = 38.58
+    init()
+}
+
+fun lambertCylindricalEqualArea() = lambertCylindricalEqualArea {}
+fun lambertCylindricalEqualArea(init: Parallel1Projection.() -> Unit) = cylindricalEqualArea {
+    parallel = 0.0
+    init()
+}
+
+fun gallPeters() = gallPeters {}
+fun gallPeters(init: Parallel1Projection.() -> Unit) = cylindricalEqualArea {
+    parallel = 45.0
+    init()
+}
+
+fun hoboDyer() = hoboDyer {}
+fun hoboDyer(init: Parallel1Projection.() -> Unit) = cylindricalEqualArea {
+    parallel = 37.5
+    init()
+}
+
+fun tobler() = tobler {}
+fun tobler(init: Parallel1Projection.() -> Unit) = cylindricalEqualArea {
+    parallel = 55.6539665
+    init()
+}
+
 class CylindricalEqualArea(phi0: Double) : InvertableProjector {
     private val cosPhi0 = cos(phi0)
 

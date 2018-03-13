@@ -1,8 +1,8 @@
 package kubed.geo.path
 
 import kubed.geo.MutableGeometryStream
+import kubed.geo.math.sqrt
 import kubed.util.isTruthy
-import kotlin.math.sqrt
 
 class Centroid : MutableGeometryStream() {
     private var X0 = 0.0

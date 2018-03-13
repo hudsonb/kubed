@@ -1,7 +1,7 @@
 package kubed.geo.projection
 
 import kubed.geo.math.asin
-import kotlin.math.sqrt
+import kubed.geo.math.sqrt
 
 fun azimuthalEqualArea() = azimuthalEqualArea {}
 fun azimuthalEqualArea(init: MutableProjection.() -> Unit) = projection(AzimuthalEqualArea()) {

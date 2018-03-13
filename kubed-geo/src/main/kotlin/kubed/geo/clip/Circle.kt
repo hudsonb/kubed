@@ -1,13 +1,13 @@
 package kubed.geo.clip
 
 import kubed.geo.*
+import kubed.geo.math.sqrt
 import kubed.math.EPSILON
 import kubed.math.toRadians
 import kubed.util.isFalsy
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
-import kotlin.math.sqrt
 
 fun clipCircle(radius: Double) = { stream: GeometryStream -> ClipStream(CircleClip(radius), stream) }
 

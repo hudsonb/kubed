@@ -6,12 +6,12 @@ import kubed.geo.MutableGeometryStream
 import kubed.geo.cartesian
 import kubed.math.EPSILON
 import kubed.geo.math.asin
+import kubed.geo.math.sqrt
 import kubed.math.toRadians
 import kubed.util.isTruthy
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
-import kotlin.math.sqrt
 
 const val MAX_DEPTH = 16
 val COS_MIN_DISTANCE = cos(30.0.toRadians())

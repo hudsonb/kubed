@@ -1,5 +1,6 @@
 package kubed.geo.projection
 
+import kubed.geo.math.sqrt
 import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kubed.math.QUARTER_PI

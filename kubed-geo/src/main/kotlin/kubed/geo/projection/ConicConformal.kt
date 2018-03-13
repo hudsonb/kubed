@@ -1,9 +1,11 @@
 package kubed.geo.projection
 
+import kubed.geo.math.sqrt
 import kubed.geo.math.tany
 import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kubed.util.isFalsy
+import java.lang.Math.cos
 import java.lang.Math.pow
 import kotlin.math.*
 

@@ -4,6 +4,7 @@ import kubed.geo.math.arcosh
 import kubed.geo.math.arsinh
 import kubed.util.isFalsy
 import kubed.geo.math.asin
+import kubed.geo.math.sqrt
 import kubed.util.isTruthy
 import kotlin.math.*
 

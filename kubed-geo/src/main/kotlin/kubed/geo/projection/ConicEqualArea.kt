@@ -3,6 +3,7 @@ package kubed.geo.projection
 import kubed.geo.Position
 import kubed.math.EPSILON
 import kubed.geo.math.asin
+import kubed.geo.math.sqrt
 import kotlin.math.*
 
 fun conicEqualArea() = conicEqualArea {}
