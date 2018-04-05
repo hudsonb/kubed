@@ -1,24 +1,40 @@
-apply plugin: 'maven'
-
-group = 'org.kubed'
-version = '0.1-SNAPSHOT'
-
-jar {
-    baseName = 'kubed-cubed'
-    version = '0.1.0'
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
 }
 
-configure(install.repositories.mavenInstaller) {
-    pom.project {
-        inceptionYear '2016'
-        packaging 'jar'
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
-            }
+
+apply plugin: "maven"
+apply plugin: "maven-publish"
+
+publishing {
+    publications {
+        KubedCore(MavenPublication) {
+            from components.java
+            groupId 'org.kubed'
+            artifactId 'kubed-core'
+            version '0.1.0'
         }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+
+    publications = ['KubedCore']
+
+    pkg {
+        repo = 'maven'
+        name = 'kubed'
+
+        version {
+            name = "0.1.0"
+            desc = "kubed 0.1.0"
+            released = new Date()
+            vcsUrl = "https://github.com/hudsonb/kubed.git"
+        }
+
+        configurations = ['archives']
     }
 }
 

@@ -1,0 +1,14 @@
+apply plugin: 'kotlin'
+
+group = 'org.kubed'
+version = '0.1-SNAPSHOT'
+
+jar {
+    baseName = 'kubed-contour'
+    version = '0.1.0'
+}
+
+dependencies {
+    compile project(':kubed-core')
+    compile project(':kubed-geo')
+}
