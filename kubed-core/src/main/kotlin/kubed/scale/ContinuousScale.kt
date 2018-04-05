@@ -8,8 +8,8 @@ import kotlin.math.min
 abstract class ContinuousScale<R>(val interpolate: (R, R) -> (Double) -> R,
                                   val uninterpolate: ((R, R) -> (R) -> Double)? = null,
                                   val rangeComparator: Comparator<R>? = null) : Scale<Double, R> {
-    override val domain: MutableList<Double> = ArrayList(2)
-    override val range: MutableList<R> = ArrayList(2)
+    override val domain: MutableList<Double> = mutableListOf(0.0, 1.0)
+    override val range: MutableList<R> = mutableListOf()
     var clamp: Boolean = false
 
     var piecewiseOutput: ((List<Double>, List<R>,
