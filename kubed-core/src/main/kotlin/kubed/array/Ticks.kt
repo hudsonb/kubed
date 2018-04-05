@@ -26,9 +26,11 @@ fun tickStep(start: Double, stop: Double, count: Int): Double {
     val step0 = abs(stop - start) / count
     var step1 = pow(10.0, floor(ln(step0) / LN10))
     val error = step0 / step1
-    if(error >= E10) step1 *= 10
-    else if(error >= E5) step1 *= 5
-    else if(error >= E2) step1 *= 2
+    when {
+        error >= E10 -> step1 *= 10
+        error >= E5 -> step1 *= 5
+        error >= E2 -> step1 *= 2
+    }
     return when {
         stop < start -> -step1
         else -> step1
