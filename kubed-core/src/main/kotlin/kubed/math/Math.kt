@@ -14,6 +14,8 @@ const val RADIANS = PI / 180.0
 const val EPSILON = 1e-6
 const val TAU_EPSILON = TAU - EPSILON
 
+val LN2 = ln(2.0)
+
 inline fun haversin(x: Double): Double {
     val xs = sin(x / 2)
     return xs * xs
