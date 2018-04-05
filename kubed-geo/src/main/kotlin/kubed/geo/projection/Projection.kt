@@ -262,7 +262,7 @@ open class MutableProjection(protected var projector: Projector): ClippedProject
         var stream = getCachedStream(forStream)
         if(stream == null) {
             stream = transformRadians(transformRotate(rotator)(preclip(projectResample(postclip(forStream)))))
-            cache(stream, stream)
+            cache(forStream, stream)
         }
 
         return stream
