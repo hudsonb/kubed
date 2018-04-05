@@ -5,6 +5,26 @@ import kubed.util.isTruthy
 import java.lang.Math.*
 import kotlin.math.ln
 
+inline fun <reified R> scaleLog(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
+                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
+                                   rangeComparator: Comparator<R>? = null): LogScale<R> = scaleLog {}
+inline fun <reified R> scaleLog(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
+                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
+                                   rangeComparator: Comparator<R>? = null,
+                                   init: LogScale<R>.() -> Unit): LogScale<R> {
+    // TODO: Default comparators
+
+    val scale = LogScale(interpolate ?: interpolator<R>() as (R, R) -> (Double) -> R,
+            when {
+                uninterpolate != null -> uninterpolate
+                interpolate != null -> null
+                else -> null
+            },
+            rangeComparator)
+    scale.init()
+    return scale
+}
+
 class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
                   uninterpolate: ((R, R) -> (R) -> Double)? = null,
                   rangeComparator: Comparator<R>? = null) : ContinuousScale<R>(interpolate, uninterpolate, rangeComparator) {
@@ -25,7 +45,7 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
     override fun deinterpolate(a: Double, b: Double): (Double) -> Double {
         val b2 = ln(b / a)
         return when {
-            b2.isTruthy() -> { x -> ln(x / a) / b }
+            b2.isTruthy() -> { x -> ln(x / a) / b2 }
             else -> { _ -> b2 }
         }
     }
@@ -36,6 +56,8 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
     }
 
     override fun rescale() {
+        super.rescale()
+
         logs = logp(base)
         pows = powp(base)
         if(domain.first() < 0) {
