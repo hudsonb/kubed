@@ -6,9 +6,9 @@ import kubed.geo.projection.Projection
 import kubed.geo.stream
 import kubed.path.Context
 
-fun geoPath(projection: Projection, context: Context) = GeoPath(projection, context)
+fun geoPath(projection: Projection?, context: Context) = GeoPath(projection, context)
 
-class GeoPath(val projection: Projection, val context: Context) {
+class GeoPath(val projection: Projection?, val context: Context) {
     private val pathArea = Area()
     private val pathBounds = Bounds()
     private val pathCentroid = Centroid()
@@ -22,27 +22,27 @@ class GeoPath(val projection: Projection, val context: Context) {
         }
 
     operator fun invoke(geo: GeoJson): Node {
-        stream(geo, projection.stream(pathStream))
+        stream(geo, projection?.stream(pathStream) ?: pathStream)
         return context()
     }
 
     fun area(geo: GeoJson): Double {
-        stream(geo, projection.stream(pathArea))
+        stream(geo, projection?.stream(pathArea) ?: pathArea)
         return pathArea.result()
     }
 
     fun bounds(geo: GeoJson): Array<DoubleArray> {
-        stream(geo, projection.stream(pathBounds))
+        stream(geo, projection?.stream(pathBounds) ?: pathBounds)
         return pathBounds.result()
     }
 
     fun centroid(geo: GeoJson): DoubleArray {
-        stream(geo, projection.stream(pathCentroid))
+        stream(geo, projection?.stream(pathCentroid) ?: pathCentroid)
         return pathCentroid.result()
     }
 
     fun measure(geo: GeoJson): Double {
-        stream(geo, projection.stream(pathMeasure))
+        stream(geo, projection?.stream(pathMeasure) ?: pathMeasure)
         return pathMeasure.result()
     }
 }
