@@ -37,6 +37,23 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
     var logs = logp(10.0)
     var pows = powp(10.0)
 
+    /**
+     * As log(0) = -∞, a log scale domain must be strictly-positive or strictly-negative;
+     * the domain must not include or cross zero. A log scale with a positive domain has a well-defined
+     * behavior for positive values, and a log scale with a negative domain has a well-defined behavior for
+     * negative values. (For a negative domain, input and output values are implicitly multiplied by -1.)
+     * The behavior of the scale is undefined if you pass a negative value to a log scale with a positive
+     * domain or vice versa.
+     */
+    override fun domain(d: List<Double>): ContinuousScale<R> {
+        if(d.contains(0.0)) throw IllegalArgumentException("The domain must not contain 0.0, as log(0) = -∞.")
+        val pos = d.filter { it > 0 }.size
+        val neg = d.filter { it < 0 }.size
+        if(pos > 0 && neg > 0) throw IllegalArgumentException("The domain must contain all positive or all negative elements.")
+
+        return super.domain(d)
+    }
+
     fun nice() {
         domain.clear()
         domain += nice(domain, { x -> pows(floor(logs(x))) }, { x -> pows(ceil(logs(x))) })
@@ -67,13 +84,13 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
     }
 
     private fun pow10(x: Double): Double = when {
-        x.isFinite() -> ("1e" + x).toDouble()
+        x.isFinite() -> ("1e$x").toDouble()
         x < 0.0 -> 0.0
         else -> x
     }
 
     private fun powp(base: Double): (Double) -> Double = when(base) {
-        10.0 -> this::pow10
+        10.0 -> ::pow10
         Math.E -> ::exp
         else -> { x -> pow(base, x) }
     }
