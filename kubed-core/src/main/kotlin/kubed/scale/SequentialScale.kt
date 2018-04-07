@@ -6,7 +6,8 @@ import kubed.util.isTruthy
 import kotlin.math.ceil
 import kotlin.math.floor
 
-fun <R> scaleSequential(interpolator: ((Double) -> R)? = null): SequentialScale<R> = SequentialScale(interpolator)
+fun <R> scaleSequential(interpolator: ((Double) -> R)? = null) = kubed.scale.scaleSequential(interpolator) {}
+fun <R> scaleSequential(interpolator: ((Double) -> R)? = null, init: SequentialScale<R>.() -> Unit): SequentialScale<R> = SequentialScale(interpolator).apply(init)
 
 class SequentialScale<R>(var interpolator: ((Double) -> R)? = null) : Scale<Double, R> {
     override val domain = ArrayList<Double>(2)
