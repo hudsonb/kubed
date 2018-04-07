@@ -6,17 +6,15 @@ import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import kubed.color.scheme.schemeYlGnBu
 import kubed.contour.Contour
-import kubed.contour.ContourGenerator
 import kubed.contour.contours
 import kubed.geo.path.geoPath
 import kubed.geo.projection.identity
 import kubed.interpolate.color.interpolateYlGnBu
 import kubed.path.PathContext
-import kubed.scale.scaleLinear
 import kubed.scale.scaleLog
 import kubed.selection.selectAll
-import java.awt.Color.white
 import java.lang.Math.pow
 
 class ContourPlotDemo : Application() {
@@ -60,7 +58,7 @@ class ContourPlotDemo : Application() {
 
         val color = scaleLog<Color>({ _, _ -> interpolateYlGnBu() }) {
             domain(listOf(t.min()!!, t.max()!!))
-            range(listOf(Color.YELLOW, Color.GREEN, Color.BLUE))
+            range(schemeYlGnBu())
         }
 
         val projection = identity {
