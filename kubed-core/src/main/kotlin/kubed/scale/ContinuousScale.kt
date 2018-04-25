@@ -55,7 +55,7 @@ abstract class ContinuousScale<R>(
      * Converts the given interpolator factory to a clamping one:
      * x returned by factory produced interpolators is guaranteed to be in [a, b].
      */
-    protected fun clampInterpolatorFactory(reinterpolatorOf: ReinterpolatorFactory<Double>): ReinterpolatorFactory<Double> =
+    protected fun clampReinterpolatorFactory(reinterpolatorOf: ReinterpolatorFactory<Double>): ReinterpolatorFactory<Double> =
         { a, b ->
             val i = reinterpolatorOf(a, b);
             { t ->
@@ -107,7 +107,7 @@ abstract class ContinuousScale<R>(
             piecewiseDeinterpolator = piecewiseDeinterpolatorFactory?.invoke(range, domain,
                 deinterpolatorFactory,
                 if (clamp)
-                    clampInterpolatorFactory(::reinterpolatorOf)
+                    clampReinterpolatorFactory(::reinterpolatorOf)
                 else
                     ::reinterpolatorOf
             )
