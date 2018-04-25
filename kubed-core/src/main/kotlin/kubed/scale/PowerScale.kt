@@ -1,9 +1,11 @@
 package kubed.scale
 
+import kubed.interpolate.Deinterpolator
+import kubed.interpolate.Reinterpolator
 import kubed.interpolate.interpolateNumber
 
 open class PowerScale<R>(val exponent: Double, interpolate: (R, R) -> (Double) -> R) : ContinuousScale<R>(interpolate) {
-    override fun deinterpolate(a: Double, b: Double): (Double) -> Double {
+    override fun deinterpolatorOf(a: Double, b: Double): Deinterpolator<Double> {
         val da = raise(a, exponent)
         val db = raise(b, exponent) - da
 
@@ -13,7 +15,7 @@ open class PowerScale<R>(val exponent: Double, interpolate: (R, R) -> (Double) -
         }
     }
 
-    override fun reinterpolate(a: Double, b: Double): (Double) -> Double {
+    override fun reinterpolatorOf(a: Double, b: Double): Reinterpolator<Double> {
         val ra = raise(a, exponent)
         val rb = raise(b, exponent) - ra
         return { t -> raise(ra + rb * t, 1.0 / exponent) }

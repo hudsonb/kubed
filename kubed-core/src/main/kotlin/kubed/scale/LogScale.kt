@@ -1,33 +1,47 @@
 package kubed.scale
 
 import kubed.array.ticks
+import kubed.interpolate.Deinterpolator
+import kubed.interpolate.DeinterpolatorFactory
+import kubed.interpolate.Reinterpolator
+import kubed.interpolate.ReinterpolatorFactory
 import kubed.util.isTruthy
 import java.lang.Math.*
 import kotlin.math.ln
 
-inline fun <reified R> scaleLog(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
-                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
-                                   rangeComparator: Comparator<R>? = null): LogScale<R> = scaleLog {}
-inline fun <reified R> scaleLog(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
-                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
-                                   rangeComparator: Comparator<R>? = null,
-                                   init: LogScale<R>.() -> Unit): LogScale<R> {
+inline fun <reified R> scaleLog(
+    noinline reinterpolatorFactory: ReinterpolatorFactory<R>? = null,
+    noinline deinterpolatorFactory: DeinterpolatorFactory<R>? = null,
+    rangeComparator: Comparator<R>? = null
+): LogScale<R> = scaleLog {}
+
+inline fun <reified R> scaleLog(
+    noinline reinterpolatorFactory: ReinterpolatorFactory<R>? = null,
+    noinline deinterpolatorFactory: DeinterpolatorFactory<R>? = null,
+    rangeComparator: Comparator<R>? = null,
+    init: LogScale<R>.() -> Unit
+): LogScale<R> {
     // TODO: Default comparators
 
-    val scale = LogScale(interpolate ?: interpolator<R>() as (R, R) -> (Double) -> R,
-            when {
-                uninterpolate != null -> uninterpolate
-                interpolate != null -> null
-                else -> null
-            },
-            rangeComparator)
+    val scale = LogScale(
+        reinterpolatorFactory ?: interpolator<R>() as ReinterpolatorFactory<R>,
+        when {
+            deinterpolatorFactory != null -> deinterpolatorFactory
+            reinterpolatorFactory != null -> null
+            else -> null
+        },
+        rangeComparator
+    )
     scale.init()
     return scale
 }
 
-class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
-                  uninterpolate: ((R, R) -> (R) -> Double)? = null,
-                  rangeComparator: Comparator<R>? = null) : ContinuousScale<R>(interpolate, uninterpolate, rangeComparator) {
+class LogScale<R>(
+    reinterpolatorFactory: ReinterpolatorFactory<R>,
+    deinterpolatorFactory: DeinterpolatorFactory<R>? = null,
+    rangeComparator: Comparator<R>? = null
+) : ContinuousScale<R>(reinterpolatorFactory, deinterpolatorFactory, rangeComparator) {
+
     var base = 10.0
         set(value) {
             field = value
@@ -59,7 +73,7 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
         domain += nice(domain, { x -> pows(floor(logs(x))) }, { x -> pows(ceil(logs(x))) })
     }
 
-    override fun deinterpolate(a: Double, b: Double): (Double) -> Double {
+    override fun deinterpolatorOf(a: Double, b: Double): Deinterpolator<Double> {
         val b2 = ln(b / a)
         return when {
             b2.isTruthy() -> { x -> ln(x / a) / b2 }
@@ -67,9 +81,9 @@ class LogScale<R>(interpolate: (R, R) -> (Double) -> R,
         }
     }
 
-    override fun reinterpolate(a: Double, b: Double): (Double) -> Double = when {
+    override fun reinterpolatorOf(a: Double, b: Double): Reinterpolator<Double> = when {
         a < 0 -> { t -> -pow(-b, t) * pow(-a, 1 - t) }
-        else -> { t -> pow(b, t) * pow(a, 1 - t)}
+        else -> { t -> pow(b, t) * pow(a, 1 - t) }
     }
 
     override fun rescale() {
