@@ -30,7 +30,7 @@ abstract class ContinuousScale<R>(
     protected abstract fun deinterpolatorOf(a: Double, b: Double): Deinterpolator<Double>
 
     /**
-     * Creates an deinterpolator function from x in [a, b] to t in [0, 1].
+     * Creates a deinterpolator function from x in [a, b] to t in [0, 1].
      * Note: if x is not in [a, b], t can be outside [0, 1].
      */
     protected abstract fun reinterpolatorOf(a: Double, b: Double): Reinterpolator<Double>
@@ -57,12 +57,12 @@ abstract class ContinuousScale<R>(
      */
     protected fun clampReinterpolatorFactory(reinterpolatorOf: ReinterpolatorFactory<Double>): ReinterpolatorFactory<Double> =
         { a, b ->
-            val i = reinterpolatorOf(a, b);
+            val r = reinterpolatorOf(a, b);
             { t ->
                 when {
                     t <= 0.0 -> a
                     t >= 1.0 -> b
-                    else -> i(t)
+                    else -> r(t)
                 }
             }
         }
