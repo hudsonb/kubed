@@ -226,16 +226,15 @@ open class Selection<T>() : AbstractSelection<Selection<T>, T>() {
      *   * the current index (i)
      *   * the current group (nodes)
      *
-     * The value returned from the [value] function is then bound to the element. If null is returned, the element will
-     * be bound to [undefined].
+     * The value returned from the [value] function is then bound to the element..
      */
-    fun datum(value: (d: T, i: Int, nodes: List<Node?>) -> T?): Selection<T> {
+    fun datum(value: (d: Any?, i: Int, nodes: List<Node?>) -> T?): Selection<T> {
         for(g in groups) {
             for(i in g.indices) {
                 val e = g[i]
                 if(e is Node) {
                     val nodes = g.map { it as? Node }
-                    val datum = value(e.datum as T, i, nodes)
+                    val datum = value(e.datum, i, nodes)
                     e.datum = datum
                 }
             }
