@@ -2,7 +2,6 @@ package kubed.color
 
 import javafx.scene.paint.Color
 import kubed.math.toDegrees
-import kubed.math.toRadians
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -32,6 +31,6 @@ class Hcl(val h: Double, var c: Double, var l: Double, var opacity: Double = 1.0
     }
 
     override fun rgb(): Rgb = Lab.convert(this).rgb()
-    override fun brighter(k: Double) = Hcl(h, c, l + Kn * k, opacity)
-    override fun darker(k: Double) = Hcl(h, c, l - Kn * k, opacity)
+    override fun brighter(k: Double) = Hcl(h, c, l + K * k, opacity)
+    override fun darker(k: Double) = Hcl(h, c, l - K * k, opacity)
 }

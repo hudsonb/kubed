@@ -6,10 +6,10 @@ import java.lang.Math.pow
 import kotlin.math.cos
 import kotlin.math.sin
 
-internal const val Kn = 18.0
-internal const val Xn = 0.950470 // D65 standard referent
+internal const val K = 18.0
+internal const val Xn = 0.96422
 internal const val Yn = 1.0
-internal const val Zn = 1.088830
+internal const val Zn = 0.82521
 private const val T0 = 4.0 / 29.0
 private const val T1 = 6.0 / 29.0
 private const val T2 = 3.0 * T1 * T1
@@ -21,21 +21,30 @@ private const val T3 = T1 * T1 * T1
 fun Color.lab(): Lab = rgb().lab()
 
 fun Rgb.lab(): Lab {
-    val b = rgb2xyz(r)
-    val a = rgb2xyz(g)
-    val l = rgb2xyz(this.b)
-    val x = xyz2lab((0.4124564 * b + 0.3575761 * a + 0.1804375 * l) / Xn)
-    val y = xyz2lab((0.2126729 * b + 0.7151522 * a + 0.0721750 * l) / Yn)
-    val z = xyz2lab((0.0193339 * b + 0.1191920 * a + 0.9503041 * l) / Zn)
+    val r = rgb2lrgb(r)
+    g = rgb2lrgb(g)
+    b = rgb2lrgb(b)
+    val y = xyz2lab((0.2225045 * r + 0.7168786 * g + 0.0606169 * b) / Yn)
+    val x: Double
+    val z: Double
+    if(r == g && g == b) {
+        x = y
+        z = y
+    }
+    else {
+        x = xyz2lab((0.4360747 * r + 0.3850649 * g + 0.1430804 * b) / Xn)
+        z = xyz2lab((0.0139322 * r + 0.0971045 * g + 0.7141733 * b) / Zn)
+    }
     return Lab(116 * y - 16, 500 * (x - y), 200 * (y - z), opacity)
 }
 
-internal fun rgb2xyz(x: Double): Double {
-    val x2 = x / 255.0
+private fun rgb2lrgb(x: Double): Double {
+    val x2 = x / 255
     return if(x2 <= 0.04045) x2 / 12.92 else pow((x2 + 0.055) / 1.055, 2.4)
 }
 
-internal fun xyz2lab(t: Double): Double {
+
+private fun xyz2lab(t: Double): Double {
     return when {
         t > T3 -> pow(t, 1.0 / 3.0)
         else -> t / T2 + T0
@@ -63,27 +72,23 @@ class Lab(val l: Double, val a: Double, val b: Double, val opacity: Double = 1.0
         var x = if(a.isNaN()) y else y + a / 500.0
         var z = if(b.isNaN()) y else y - b / 200.0
 
-        y = Yn * lab2xyz(y)
         x = Xn * lab2xyz(x)
+        y = Yn * lab2xyz(y)
         z = Zn * lab2xyz(z)
 
-        return Rgb(xyz2rgb(3.2404542 * x - 1.571385 * y - 0.4985314 * z),  // D65 -> sRGB
-                   xyz2rgb(-0.9692660 * x + 1.8760108 * y + 0.0415560 * z),
-                   xyz2rgb( 0.0556434 * x - 0.2040259 * y + 1.0572252 * z),
+        return Rgb(lrgb2rgb(3.1338561 * x - 1.6168667 * y - 0.4906146 * z),
+                   lrgb2rgb(-0.9787684 * x + 1.9161415 * y + 0.0334540 * z),
+                   lrgb2rgb(0.0719453 * x - 0.2289914 * y + 1.4052427 * z),
                    opacity)
     }
 
-    override fun brighter(k: Double) = Lab(l + Kn * k, a, b, opacity)
-    override fun darker(k: Double) = Lab(l - Kn * k, a, b, opacity)
+    override fun brighter(k: Double) = Lab(l + K * k, a, b, opacity)
+    override fun darker(k: Double) = Lab(l - K * k, a, b, opacity)
 
-    private fun lab2xyz(t: Double): Double {
-        return when {
-            t > T1 -> t * t * t
-            else -> T2 * (t - T0)
-        }
+    private fun lab2xyz(t: Double) = when {
+        t > T1 -> t * t * t
+        else -> T2 * (t - T0)
     }
 
-    private fun xyz2rgb(x: Double): Double {
-        return 255.0 * (if(x <= 0.0031308) 12.92 * x else 1.055 * pow(x, 1.0 / 2.4) - 0.055)
-    }
+    private fun lrgb2rgb(x: Double) = 255 * (if(x <= 0.0031308) 12.92 * x else 1.055 * Math.pow(x, 1 / 2.4) - 0.055)
 }
