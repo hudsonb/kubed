@@ -61,7 +61,8 @@ class Delaunator<T>(data: List<T>, x: (T) -> Double, y: (T) -> Double) {
         var i2: Int = -1
 
         // Pick a seed point close to the centroid
-        for(i in points.indices) {
+        val n = points.size / 2
+        for(i in 0 until n) {
             val d = dist(cx, cy, points[2 * i], points[2 * i + 1])
             if(d < minDist) {
                 i0 = i
@@ -72,7 +73,7 @@ class Delaunator<T>(data: List<T>, x: (T) -> Double, y: (T) -> Double) {
         minDist = Double.POSITIVE_INFINITY
 
         // Find the point closest to the seed
-        for(i in points.indices) {
+        for(i in 0 until n) {
             if(i == i0) continue
             val d = dist(points[2 * i0], points[2 * i0 + 1],
                                  points[2 * i], points[2 * i + 1])
@@ -85,7 +86,7 @@ class Delaunator<T>(data: List<T>, x: (T) -> Double, y: (T) -> Double) {
         var minRadius = Double.POSITIVE_INFINITY
 
         // Find the third point which forms the smallest circumcircle with the first two
-        for(i in points.indices) {
+        for(i in 0 until n) {
             if(i == i0 || i == i1) continue
 
             val r = circumradius(points[2 * i0], points[2 * i0 + 1],
