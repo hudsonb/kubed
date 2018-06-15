@@ -22,28 +22,54 @@ class MercatorProjector : InvertableProjector {
 open class MercatorProjection(projector: Projector) : MutableProjection(projector) {
     private var reclipping = false
 
-    init {
-        scaleProperty.addListener { _ -> reclip() }
-        translateXProperty.addListener { _ -> reclip() }
-        translateYProperty.addListener { _ -> reclip() }
-        centerProperty.addListener { _ -> reclip() }
-        clipExtentProperty.addListener { _ -> if(!reclipping) reclip() }
-    }
+    private var userClipExtent: Rectangle2D? = null
+
+    override var scale
+        get() = super.scale
+        set(value) {
+            super.scale = value
+            reclip()
+        }
+
+    override var translateX
+        get() = super.translateX
+        set(value) {
+            super.translateX = value
+            reclip()
+        }
+
+    override var translateY
+        get() = super.translateY
+        set(value) {
+            super.translateY = value
+            reclip()
+        }
+
+    override var center
+        get() = super.center
+        set(value) {
+            super.center = value
+            reclip()
+        }
+
+    override var clipExtent
+        get() = userClipExtent
+        set(value) {
+            userClipExtent = value
+            reclip()
+        }
 
     private fun reclip() {
-        reclipping = true
-
         val k = PI * scale
         val t = invoke(rotation(rotateX, rotateY, rotateZ).invert(0.0, 0.0))
 
-        val e = clipExtent
+        val e = userClipExtent
         val extent = when {
-                    e == null -> Rectangle2D(t[0] - k, t[1] - k, k * 2, k * 2)
-                    projector is MercatorProjector -> Rectangle2D(max(t[0] - k, e.minX), e.minY, max(0.0, min(k * 2, e.width)), e.height)
-                    else -> Rectangle2D(e.minX, max(t[1] - k, e.minY), e.width, min(k * 2, e.height))
-                }
+            e == null -> Rectangle2D(t[0] - k, t[1] - k, k * 2, k * 2)
+            projector is MercatorProjector -> Rectangle2D(max(t[0] - k, e.minX), e.minY, max(0.0, min(k * 2, e.width)), e.height)
+            else -> Rectangle2D(e.minX, max(t[1] - k, e.minY), e.width, min(k * 2, e.height))
+        }
 
-        clipExtent = extent
-        reclipping = false
+        super.clipExtent = extent
     }
 }

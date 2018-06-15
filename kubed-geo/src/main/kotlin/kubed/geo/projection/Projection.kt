@@ -1,8 +1,5 @@
 package kubed.geo.projection
 
-import javafx.beans.property.DoubleProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleObjectProperty
 import javafx.geometry.Rectangle2D
 import kubed.geo.FilterGeometryStream
 import kubed.geo.GeoJson
@@ -20,16 +17,12 @@ fun projection(projector: Projector) = projection(projector) {}
 fun projection(projector: Projector, init: MutableProjection.() -> Unit) = MutableProjection(projector).apply(init)
 
 interface Projection {
-    val precisionProperty: DoubleProperty
     var precision: Double
 
-    val scaleProperty: DoubleProperty
     var scale: Double
 
-    val translateXProperty: DoubleProperty
     var translateX: Double
 
-    val translateYProperty: DoubleProperty
     var translateY: Double
 
     operator fun invoke(point: DoubleArray): DoubleArray
@@ -113,11 +106,15 @@ abstract class StreamCacheProjection : AbstractProjection() {
 
 abstract class ClippedProjection : StreamCacheProjection() {
     // Clip Angle
-    val clipAngleProperty = SimpleDoubleProperty(Double.NaN)
-    var clipAngle: Double
-        get() = clipAngleProperty.get()
-        set(theta) = clipAngleProperty.set(theta)
+    var clipAngle = Double.NaN
+        set(value) {
+            field = value
 
+            preclip = if(clipAngle.isNaN()) clipAntimeridian()
+            else clipCircle(clipAngle.toRadians())
+
+            invalidate()
+        }
 
     protected var preclip: (GeometryStream) -> GeometryStream = clipAntimeridian()
         set(value) {
@@ -128,74 +125,68 @@ abstract class ClippedProjection : StreamCacheProjection() {
     // Clip extent
     private val identity = { stream: GeometryStream -> stream }
     protected var postclip = identity
-    var clipExtentProperty = SimpleObjectProperty<Rectangle2D?>(null)
-    var clipExtent: Rectangle2D?
-        get() = clipExtentProperty.get()
-        set(value) = clipExtentProperty.set(value)
-
-    init {
-        clipAngleProperty.addListener { _ ->
-            preclip = if(clipAngle.isNaN()) clipAntimeridian()
-            else clipCircle(clipAngle.toRadians())
-
-            invalidate()
-        }
-
-        clipExtentProperty.addListener { _ ->
-            val extent = clipExtent
+    open var clipExtent: Rectangle2D? = null
+        set(extent) {
+            field = extent
             postclip = if(extent == null) identity
-                       else clipRectangle(extent.minX, extent.minY, extent.maxX, extent.maxY)
+            else clipRectangle(extent.minX, extent.minY, extent.maxX, extent.maxY)
 
             reset()
             invalidate()
         }
-    }
 }
 
 open class MutableProjection(protected var projector: Projector): ClippedProjection() {
     // Scale
-    final override val scaleProperty = SimpleDoubleProperty(150.0)
-    override var scale: Double
-        get() = scaleProperty.get()
-        set(value) = scaleProperty.set(value)
+    override var scale = 150.0
+        set(value) {
+            field = value
+            recenter()
+        }
 
     // Translate
-    final override val translateXProperty = SimpleDoubleProperty(0.0)
-    override var translateX: Double
-        get() = translateXProperty.get()
-        set(x) = translateXProperty.set(x)
+    override var translateX = 0.0
+        set(value) {
+            field = value
+            recenter()
+        }
 
-    final override val translateYProperty = SimpleDoubleProperty(0.0)
-    override var translateY: Double
-        get() = translateYProperty.get()
-        set(y) = translateYProperty.set(y)
+    override var translateY = 0.0
+        set(value) {
+            field = value
+            recenter()
+        }
 
     // Center
     private var dx = 0.0
     private var dy = 0.0
 
-    val centerProperty = SimpleObjectProperty<Position>(Position(0.0, 0.0))
-    var center: Position
-        get() = centerProperty.get()
-        set(p) = centerProperty.set(p)
+    open var center = Position(0.0, 0.0)
+        set(value) {
+            field = value
+            recenter()
+        }
 
     // Rotate
     private lateinit var rotator: Transform
 
-    val rotateXProperty = SimpleDoubleProperty(0.0)
-    var rotateX: Double
-        get() = rotateXProperty.get()
-        set(x) = rotateXProperty.set(x)
+    var rotateX = 0.0
+        set(value) {
+            field = value
+            recenter()
+        }
 
-    val rotateYProperty = SimpleDoubleProperty(0.0)
-    var rotateY: Double
-        get() = rotateYProperty.get()
-        set(y) = rotateYProperty.set(y)
+    var rotateY = 0.0
+        set(value) {
+            field = value
+            recenter()
+        }
 
-    val rotateZProperty = SimpleDoubleProperty(0.0)
-    var rotateZ: Double
-        get() = rotateZProperty.get()
-        set(z) = rotateZProperty.set(z)
+    var rotateZ = 0.0
+        set(value) {
+            field = value
+            recenter()
+        }
 
     private lateinit var projectRotate: Transform
 
@@ -209,32 +200,17 @@ open class MutableProjection(protected var projector: Projector): ClippedProject
     // Precision
     private var projectResample = resample(projectTransform, 0.5)
 
-    final override val precisionProperty = SimpleDoubleProperty(0.5)
-    override var precision: Double
-        get() = precisionProperty.get()
+    override var precision = 0.5
         set(value) {
-            precisionProperty.set(value)
+            field = value
+            projectResample = resample(projectTransform, value * value)
+            reset()
         }
 
     private val transformRadians = { stream: GeometryStream ->
         object : FilterGeometryStream(stream) {
             override fun point(x: Double, y: Double, z: Double) = stream.point(x.toRadians(), y.toRadians(), z.toRadians())
         }
-    }
-
-    init {
-        precisionProperty.addListener { _ ->
-            projectResample = resample(projectTransform, precision * precision)
-            reset()
-        }
-
-        translateXProperty.addListener { _ -> recenter() }
-        translateYProperty.addListener { _ -> recenter() }
-        scaleProperty.addListener { _ -> recenter() }
-        centerProperty.addListener { _ -> recenter() }
-        rotateXProperty.addListener { _ -> recenter() }
-        rotateYProperty.addListener { _ -> recenter() }
-        rotateZProperty.addListener { _ -> recenter() }
     }
 
     private fun transformRotate(rotate: Transform) = { stream: GeometryStream ->
@@ -269,6 +245,7 @@ open class MutableProjection(protected var projector: Projector): ClippedProject
     }
 
     protected open fun recenter() {
+
         val lambda = (center.longitude % 360).toRadians()
         val phi = (center.latitude % 360).toRadians()
         val deltaLambda = (rotateX % 360).toRadians()

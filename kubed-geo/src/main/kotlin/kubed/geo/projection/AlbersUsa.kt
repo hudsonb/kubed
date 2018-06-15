@@ -21,7 +21,7 @@ class AlbersUsa : StreamCacheProjection() {
         rotateX = 154.0
         center = Position(-2.0, 58.5)
         parallels = doubleArrayOf(55.0, 65.0)
-        scaleProperty.bind(lower48.scaleProperty.multiply(0.35))
+        scale - lower48.scale * .35
     }
     lateinit var alaskaPoint: GeometryStream
 
@@ -29,40 +29,37 @@ class AlbersUsa : StreamCacheProjection() {
         rotateX = 157.0
         center = Position(-3.0, 19.9)
         parallels = doubleArrayOf(8.0, 18.0)
-        scaleProperty.bind(lower48.scaleProperty)
+        scale = lower48.scale
     }
     lateinit var hawaiiPoint: GeometryStream
 
-    override val precisionProperty: DoubleProperty
-        get() = lower48.precisionProperty
     override var precision: Double
         get() = lower48.precision
         set(value) {
             lower48.precision = value
+            alaska.precision = value
+            hawaii.precision = value
         }
 
-    override val scaleProperty
-        get() = lower48.scaleProperty
     override var scale: Double
         get() = lower48.scale
         set(k) {
             lower48.scale = k
+            update()
         }
 
-    override val translateXProperty
-        get() = lower48.translateXProperty
     override var translateX: Double
         get() = lower48.translateX
         set(x) {
             lower48.translateX = x
+            update()
         }
 
-    override val translateYProperty
-        get() = lower48.translateYProperty
     override var translateY: Double
         get() = lower48.translateY
         set(y) {
             lower48.translateY = y
+            update()
         }
 
     private var point: DoubleArray? = null
@@ -73,15 +70,6 @@ class AlbersUsa : StreamCacheProjection() {
     }
 
     init {
-        precisionProperty.addListener { _ ->
-            alaska.precision = precision
-            hawaii.precision = precision
-        }
-
-        scaleProperty.addListener { _ -> update() }
-        translateXProperty.addListener { _ -> update() }
-        translateYProperty.addListener { _ -> update() }
-
         update()
     }
 

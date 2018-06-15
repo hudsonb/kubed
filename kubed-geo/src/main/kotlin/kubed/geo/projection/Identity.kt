@@ -12,31 +12,28 @@ class IdentityProjection : ClippedProjection() {
 
     private var transform = identity
 
-    override val precisionProperty = SimpleDoubleProperty(1.0)
-    override var precision: Double
-        get() = precisionProperty.get()
-        set(value) = precisionProperty.set(value)
+    override var precision = 1.0
 
-    override val scaleProperty = SimpleDoubleProperty(1.0)
-    override var scale: Double
-        get() = scaleProperty.get()
-        set(k) = scaleProperty.set(k)
+    override var scale = 1.0
+        set(value) {
+            field = value
+            transform = scaleTranslate(scale, scale, translateX, translateY)
+            reset()
+        }
 
-    override val translateXProperty = SimpleDoubleProperty(0.0)
-    override var translateX: Double
-        get() = translateXProperty.get()
-        set(value) = translateXProperty.set(value)
+    override var translateX = 0.0
+        set(value) {
+            field = value
+            transform = scaleTranslate(scale, scale, translateX, translateY)
+            reset()
+        }
 
-    override val translateYProperty = SimpleDoubleProperty(0.0)
-    override var translateY: Double
-        get() = translateYProperty.get()
-        set(value) = translateYProperty.set(value)
-
-    init {
-        scaleProperty.addListener { _ -> transform = scaleTranslate(scale, scale, translateX, translateY); reset() }
-        translateXProperty.addListener { _ -> transform = scaleTranslate(scale, scale, translateX, translateY); reset() }
-        scaleProperty.addListener { _ -> transform = scaleTranslate(scale, scale, translateX, translateY); reset() }
-    }
+    override var translateY = 0.0
+        set(value) {
+            field = value
+            transform = scaleTranslate(scale, scale, translateX, translateY)
+            reset()
+        }
 
     override fun invoke(point: DoubleArray) = point
 
