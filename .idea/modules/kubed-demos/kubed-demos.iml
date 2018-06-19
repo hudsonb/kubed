@@ -32,12 +32,8 @@
     <output-test url="file://$MODULE_DIR$/../../../kubed-demos/out/test/classes" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../kubed-demos">
-      <sourceFolder url="file://$MODULE_DIR$/../../../kubed-demos/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../../kubed-demos/src/main/kotlin" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../kubed-demos/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../kubed-demos/src/test/kotlin" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../../kubed-demos/src/main/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../kubed-demos/src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/../../../kubed-demos/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../../kubed-demos/build" />
       <excludeFolder url="file://$MODULE_DIR$/../../../kubed-demos/out" />
@@ -47,26 +43,20 @@
     <orderEntry type="module" module-name="kubed-core" />
     <orderEntry type="module" module-name="kubed-geo" />
     <orderEntry type="module" module-name="kubed-contour" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.30" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.2.30" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.50" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.2.50" level="project" />
     <orderEntry type="library" name="Gradle: no.tornado:tornadofx:1.7.15" level="project" />
     <orderEntry type="library" name="Gradle: com.univocity:univocity-parsers:2.5.9" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.30" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.30" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.2.50" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core:0.22.2" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-javafx:0.22.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.guava:guava:24.0-jre" level="project" />
     <orderEntry type="library" name="Gradle: org.glassfish:javax.json:1.1.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:1.3.9" level="project" />
-    <orderEntry type="library" name="Gradle: org.checkerframework:checker-compat-qual:2.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.errorprone:error_prone_annotations:2.1.3" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.j2objc:j2objc-annotations:1.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.codehaus.mojo:animal-sniffer-annotations:1.14" level="project" />
     <orderEntry type="library" name="Gradle: javax.json:javax.json-api:1.1.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.2.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.0" level="project" />
   </component>

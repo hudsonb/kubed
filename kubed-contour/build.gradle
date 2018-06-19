@@ -1,11 +1,56 @@
-apply plugin: 'kotlin'
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+    id "maven-publish"
+}
 
-group = 'org.kubed'
-version = '0.1-SNAPSHOT'
+apply plugin: "maven"
+apply plugin: "maven-publish"
 
-jar {
-    baseName = 'kubed-contour'
-    version = '0.1.0'
+version = '0.1.0'
+
+publishing {
+    publications {
+        kubedContour(MavenPublication) {
+            from components.java
+            artifact sourcesJar {
+                classifier = "sources"
+            }
+            groupId 'com.hudsonb.kubed'
+            artifactId 'kubed-contour'
+            version project.version
+        }
+    }
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+
+    publications = ['kubedContour']
+
+    pkg {
+        repo = 'kubed'
+        name = 'kubed-contour'
+
+        version {
+            name = project.version
+            desc = "kubed-contour"
+            licenses = ['Apache-2.0']
+            released = new Date()
+            vcsUrl = "https://github.com/hudsonb/kubed.git"
+        }
+
+        configurations = ['archives']
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
 }
 
 dependencies {

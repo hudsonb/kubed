@@ -1,18 +1,23 @@
 plugins {
     id "com.jfrog.bintray" version "1.7.3"
+    id "maven-publish"
 }
-
 
 apply plugin: "maven"
 apply plugin: "maven-publish"
 
+version = '0.1.0'
+
 publishing {
     publications {
-        KubedCore(MavenPublication) {
+        kubedCore(MavenPublication) {
             from components.java
-            groupId 'org.kubed'
+            artifact sourcesJar {
+                classifier = "sources"
+            }
+            groupId 'com.hudsonb.kubed'
             artifactId 'kubed-core'
-            version '0.1.0'
+            version project.version
         }
     }
 }
@@ -21,15 +26,16 @@ bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
 
-    publications = ['KubedCore']
+    publications = ['kubedCore']
 
     pkg {
-        repo = 'maven'
-        name = 'kubed'
+        repo = 'kubed'
+        name = 'kubed-core'
 
         version {
-            name = "0.1.0"
-            desc = "kubed 0.1.0"
+            name = project.version
+            desc = "kubed-core"
+            licenses = ['Apache-2.0']
             released = new Date()
             vcsUrl = "https://github.com/hudsonb/kubed.git"
         }
@@ -38,6 +44,11 @@ bintray {
     }
 }
 
-dependencies {
-    compile 'com.google.code.gson:gson:2.8.2'
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
 }
