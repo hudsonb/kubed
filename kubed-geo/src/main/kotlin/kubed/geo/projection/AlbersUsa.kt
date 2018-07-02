@@ -1,6 +1,5 @@
 package kubed.geo.projection
 
-import javafx.beans.property.DoubleProperty
 import javafx.geometry.Rectangle2D
 import kubed.geo.GeometryStream
 import kubed.geo.MultiplexStream
@@ -21,7 +20,7 @@ class AlbersUsa : StreamCacheProjection() {
         rotateX = 154.0
         center = Position(-2.0, 58.5)
         parallels = doubleArrayOf(55.0, 65.0)
-        scale - lower48.scale * .35
+        scale = lower48.scale * .35
     }
     lateinit var alaskaPoint: GeometryStream
 
@@ -45,7 +44,8 @@ class AlbersUsa : StreamCacheProjection() {
         get() = lower48.scale
         set(k) {
             lower48.scale = k
-            update()
+            alaska.scale = k * .35
+            hawaii.scale = k
         }
 
     override var translateX: Double
