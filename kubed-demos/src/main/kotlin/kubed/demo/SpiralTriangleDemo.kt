@@ -48,6 +48,7 @@ class SpiralTriangleDemo: Application() {
             height(squareSize)
             fill(Color.WHITE)
             stroke(Color.BLACK)
+            cache(true)
             cacheHint(CacheHint.ROTATE)
         }
 

@@ -1,6 +1,5 @@
 package kubed.demo
 
-import javafx.animation.AnimationTimer
 import javafx.application.Application
 import javafx.scene.CacheHint
 import javafx.scene.Group
@@ -15,7 +14,6 @@ import kubed.selection.selectAll
 import kubed.shape.rect
 import kubed.timer.timer
 import kubed.util.isTruthy
-import java.util.concurrent.TimeUnit
 
 class SpiralCircleDemo: Application() {
     override fun start(primaryStage: Stage) {
@@ -38,15 +36,18 @@ class SpiralCircleDemo: Application() {
             height(squareSize)
             fill(Color.WHITE)
             stroke(Color.BLACK)
+            cache(true)
             cacheHint(CacheHint.ROTATE)
         }
 
         val g1 = Group()
+        g1.cacheHint = CacheHint.ROTATE
         g1.clip = Rectangle(-480.0, -350.0, 960.0, 350.0)
         g1.transforms += Translate(480.0, 250.0)
         g.children += g1
 
         val g2 = Group()
+        g2.cacheHint = CacheHint.ROTATE
         g2.clip = Rectangle(-480.0, 0.0, 960.0, 250.0)
         g2.transforms += Translate(480.0, 250.0)
         g.children += g2
@@ -60,7 +61,7 @@ class SpiralCircleDemo: Application() {
                       .append { _, _, _ -> rect(Unit) }
                       .datum { _, i, _ -> i / squareCount.toDouble() }
 
-        g1.children.forEach { it as Group; it.children.forEach { it as Rectangle; it.stroke = Color.RED } }
+        //g1.children.forEach { it as Group; it.children.forEach { it as Rectangle; /*it.stroke = Color.RED*/ } }
 
         timer { elapsed ->
             square.transform { t, _, _ ->
