@@ -32,6 +32,7 @@ abstract class Shape<out S : Shape<S, T>, T> {
     var translateYProperty: ((T, Int) -> DoubleExpression)? = null
     var translateZ: ((T, Int) -> Double)? = null
     var translateZProperty: ((T, Int) -> DoubleExpression)? = null
+    var cache: ((T, Int) -> Boolean)? = null
     var cacheHint: ((T, Int) -> CacheHint)? = null
     var clip: ((T, Int) -> Node?)? = null
 
@@ -164,6 +165,13 @@ abstract class Shape<out S : Shape<S, T>, T> {
         return this as S
     }
 
+    fun cache(cache: Boolean) = cache { _, _ -> cache }
+    fun cache(cache: (T, Int) -> Boolean): S {
+        this.cache = cache
+        return this as S
+    }
+
+
     fun cacheHint(hint: CacheHint) = cacheHint { _, _ -> hint }
     fun cacheHint(hint: (T, Int) -> CacheHint): S {
         this.cacheHint = hint
@@ -224,6 +232,7 @@ abstract class Shape<out S : Shape<S, T>, T> {
         }
         else shape.translateZ = translateZ?.invoke(d, i) ?: shape.translateZ
 
+        if(cache != null) shape.isCache = cache?.invoke(d, i) ?: shape.isCache
         shape.cacheHint = cacheHint?.invoke(d, i) ?: shape.cacheHint
         shape.clip = clip?.invoke(d, i) ?: shape.clip
     }
