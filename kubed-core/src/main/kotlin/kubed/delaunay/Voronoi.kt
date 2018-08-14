@@ -1,5 +1,6 @@
 package kubed.delaunay
 
+import javafx.geometry.Point2D
 import javafx.geometry.Rectangle2D
 import kotlin.math.floor
 
@@ -17,7 +18,6 @@ class Voronoi<T> internal constructor(val delaunay: Delaunay<T>, val bounds: Rec
 
     private fun computeCellTopology() {
         var e = 0
-        val m = delaunay.halfedges.size
         for(i in delaunay.halfedges.indices) {
             val t = delaunay.triangles[i]
             if(index[t * 2] != index[t * 2 + 1]) continue
@@ -83,12 +83,171 @@ class Voronoi<T> internal constructor(val delaunay: Delaunay<T>, val bounds: Rec
     }
 
     private fun computeExteriorCellRays() {
+        var p0: Int
+        var p1 = delaunay.triangles[delaunay.hull.last()] * 2
+        var x0: Double
+        var x1 = delaunay.points[p1]
+        var y0: Double
+        var y1 = delaunay.points[p1 + 1]
+        var y01: Int
+        var x01: Int
+        for(i in 0 until delaunay.hull.size) {
+            p0 = p1
+            x0 = x1
+            y0 = y1
+            p1 = delaunay.triangles[delaunay.hull[i]] * 2
+            x1 = delaunay.points[p1]
+            y1 = delaunay.points[p1 + 1]
+            y01 = (y0 - y1).toInt()
+            x01 = (x0 - x1).toInt()
+            vectors[p1 * 2] = y01
+            vectors[p0 * 2 + 2] = y01
+            vectors[p1 * 2 + 1] = x01
+            vectors[p0 * 2 + 3] = x01
+        }
+    }
 
-//    for(let n = hull.length, p0, x0, y0, p1 = triangles[hull[n - 1]] * 2, x1 = points[p1], y1 = points[p1 + 1], i = 0; i < n; ++i) {
-//        p0 = p1, x0 = x1, y0 = y1, p1 = triangles[hull[i]] * 2, x1 = points[p1], y1 = points[p1 + 1];
-//        vectors[p0 * 2 + 2] = vectors[p1 * 2] = y0 - y1;
-//        vectors[p0 * 2 + 3] = vectors[p1 * 2 + 1] = x1 - x0;
-//    }
+    private fun edge(i: Int, e0: Int, e1: Int, p: MutableList<Double>, j: Int): Int {
+        var j = j
+        var e = e0
+        loop@ while(e != e1) {
+            var x = Double.NaN
+            var y = Double.NaN
+            when(e) {
+                0b0101 -> { // top-left
+                    e = 0b0100
+                    continue@loop
+                }
+                0b0100 -> { // top
+                    e = 0b0110
+                    x = bounds.maxX
+                    y = bounds.minY
+                    break@loop
+                }
+                0b0110 -> { // top-right
+                    e = 0b0010
+                    continue@loop
+                }
+                0b0010 -> { // right
+                    e = 0b1010
+                    x = bounds.maxX
+                    y = bounds.maxY
+                    break@loop
+                }
+                0b1010 -> { // bottom-right
+                    e = 0b1000
+                    continue@loop
+                }
+                0b1000 -> { // bottom
+                    e = 0b0001
+                    x = bounds.minX
+                    y = bounds.maxY
+                    break@loop
+                }
+                0b1001 -> { // bottom-left
+                    e = 0b0001
+                    continue@loop
+                }
+                0b0001 -> { // left
+                    e = 0b0101
+                    x = bounds.minX
+                    y = bounds.minY
+                    break@loop
+                }
+            }
+
+//            if((p[j] != x || p[j + 1] != y) && contains(i, x, y)) {
+//                p.add(j, y)
+//                p.add(j, x)
+//                j += 2
+//            }
+        }
+
+        return j
+    }
+
+    private fun project(x0: Double, y0: Double, vx: Double, vy: Double): Point2D? {
+        var t = Double.POSITIVE_INFINITY
+        var c: Double
+        var x = Double.NaN
+        var y = Double.NaN
+        if(vy < 0) { // top
+            if(y0 <= bounds.minY) return null
+            c = (bounds.minY - y0) / vy
+            if(c < t) {
+                t = c
+
+                y = bounds.minY
+                x = x0 + c * vx
+            }
+        }
+        else if(vy > 0) { // bottom
+            if(y0 >= bounds.maxY) return null
+            c = (bounds.maxY - y0) / vy
+            if(c < t) {
+                t = c
+
+                y = bounds.maxY
+                x = x0 + c * vx
+            }
+        }
+
+        if(vx > 0) { // right
+            if(x0 >= bounds.maxX) return null
+            c = (bounds.maxX - x0) / vx
+            if(c < t) {
+                t = c
+
+                x = bounds.maxX
+                y = y0 + t * vy
+            }
+        }
+        else if(vx < 0) { // left
+            if(x0 <= bounds.minX) return null
+            c = (bounds.minX - x0) / vx
+            if(c < t) {
+                t = c
+
+                x = bounds.minX
+                y = y0 + t * vy
+            }
+        }
+
+        if(x.isNaN() || y.isNaN()) return null
+
+        return Point2D(x, y)
+    }
+
+    private fun edgeCode(x: Double, y: Double): Int {
+        var code = when {
+            x == bounds.minX -> 0b0001
+            x == bounds.maxX -> 0b0010
+            else -> 0b0000
+        }
+
+        code = code or when {
+            y == bounds.minY -> 0b0100
+            y == bounds.maxY -> 0b1000
+            else -> 0b0000
+        }
+
+        return code
+    }
+
+    private fun regionCode(x: Double, y: Double): Int {
+        var code = when {
+            x < bounds.minX -> 0b0001
+            x > bounds.maxX -> 0b0010
+            else -> 0b0000
+        }
+
+        code = code or when {
+            y < bounds.minY -> 0b0100
+            y > bounds.maxY -> 0b1000
+            else -> 0b0000
+        }
+
+        return code
     }
 }
 
