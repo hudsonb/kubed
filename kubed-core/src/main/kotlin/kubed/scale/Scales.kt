@@ -7,7 +7,6 @@ import kubed.color.scheme.schemeCategory20
 import kubed.color.scheme.schemeCategory20b
 import kubed.color.scheme.schemeCategory20c
 import kubed.interpolate.color.interpolateRgb
-import java.lang.Double.isNaN
 import kotlin.reflect.full.isSubclassOf
 
 inline fun <reified R> scaleLinear(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
