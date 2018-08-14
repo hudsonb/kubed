@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package kubed.math
 
 import kubed.format.formatDecimal
@@ -15,6 +17,12 @@ const val EPSILON = 1e-6
 const val TAU_EPSILON = TAU - EPSILON
 
 val LN2 = ln(2.0)
+
+inline fun asin(x: Double) = when {
+    x > 1 -> HALF_PI
+    x < -1 -> -HALF_PI
+    else -> kotlin.math.asin(x)
+}
 
 inline fun haversin(x: Double): Double {
     val xs = sin(x / 2)

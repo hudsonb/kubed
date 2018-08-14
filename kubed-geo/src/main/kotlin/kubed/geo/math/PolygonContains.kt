@@ -6,6 +6,7 @@ import kubed.geo.cartesianNormalizeInPlace
 import kubed.math.EPSILON
 import kubed.math.QUARTER_PI
 import kubed.math.TAU
+import kubed.math.asin
 import kubed.util.isTruthy
 import kotlin.math.PI
 import kotlin.math.atan2

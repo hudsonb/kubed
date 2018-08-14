@@ -40,7 +40,7 @@ class Centroid : MutableGeometryStream() {
         return centroid
     }
 
-    private fun centroidPoint(x: Double, y: Double, z: Double) {
+    private fun centroidPoint(x: Double, y: Double, @Suppress("UNUSED_PARAMETER") z: Double) {
         X0 += x
         Y0 += y
         ++Z0
@@ -58,7 +58,7 @@ class Centroid : MutableGeometryStream() {
         centroidPoint(x, y, z)
     }
 
-    private fun centroidPointLine(x: Double, y: Double, z: Double) {
+    private fun centroidPointLine(x: Double, y: Double, @Suppress("UNUSED_PARAMETER") z: Double) {
         val dx = x - x0
         val dy = y - y0
         val z = sqrt(dx * dx + dy * dy)

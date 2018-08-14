@@ -1,7 +1,7 @@
 package kubed.geo.projection
 
-import kubed.geo.math.asin
 import kubed.geo.math.sqrt
+import kubed.math.asin
 import kubed.util.isTruthy
 import kotlin.math.atan2
 import kotlin.math.cos

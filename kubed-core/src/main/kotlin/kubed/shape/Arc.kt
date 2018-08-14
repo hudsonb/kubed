@@ -4,6 +4,7 @@ import javafx.geometry.Point2D
 import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kubed.math.TAU
+import kubed.math.asin
 import kubed.path.Context
 import kubed.path.PathContext
 import kubed.util.isTruthy
@@ -222,12 +223,6 @@ class Arc<T> : PathShape<Arc<T>, T>() {
         context.closePath()
 
         return context
-    }
-
-    private fun asin(x: Double): Double  = when {
-        x >= 1 -> HALF_PI
-        x <= -1 -> -HALF_PI
-        else -> Math.asin(x)
     }
 
     private fun intersect(x0: Double, y0: Double, x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double): DoubleArray {

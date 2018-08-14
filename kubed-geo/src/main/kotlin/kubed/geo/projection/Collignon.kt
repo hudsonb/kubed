@@ -2,7 +2,7 @@ package kubed.geo.projection
 
 import kubed.geo.Position
 import kubed.geo.math.SQRT_PI
-import kubed.geo.math.asin
+import kubed.math.asin
 import kotlin.math.PI
 import kotlin.math.sin
 import kotlin.math.sqrt

@@ -1,7 +1,7 @@
 package kubed.geo.projection
 
-import jdk.nashorn.internal.objects.NativeMath.SQRT2
-import kubed.geo.math.asin
+import kubed.geo.math.SQRT2
+import kubed.math.asin
 import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kotlin.math.*

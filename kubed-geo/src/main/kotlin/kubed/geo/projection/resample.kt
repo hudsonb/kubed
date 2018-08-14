@@ -5,7 +5,7 @@ import kubed.geo.GeometryStream
 import kubed.geo.MutableGeometryStream
 import kubed.geo.cartesian
 import kubed.math.EPSILON
-import kubed.geo.math.asin
+import kubed.math.asin
 import kubed.geo.math.sqrt
 import kubed.math.toRadians
 import kubed.util.isTruthy
@@ -94,7 +94,7 @@ private fun _resample(project: Projector, delta2: Double): Transformer {
                 polygonEnd = { stream.polygonEnd(); lineStart = ::defaultLineStart }
             }
 
-            private fun defaultPoint(x: Double, y: Double, z: Double) {
+            private fun defaultPoint(x: Double, y: Double, @Suppress("UNUSED_PARAMETER") z: Double) {
                 val p = project(x, y)
                 stream.point(p[0], p[1], 0.0)
             }
