@@ -107,7 +107,7 @@ class ManyBody : Force {
         }
     }
 
-    private fun accumulate(quad: QuadtreeNode<ForceNode>, extents: Rectangle2D) {
+    private fun accumulate(quad: QuadtreeNode<ForceNode>, @Suppress("UNUSED_PARAMETER") extents: Rectangle2D) {
         var strength = 0.0
         var weight = 0.0
 

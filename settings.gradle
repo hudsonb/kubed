@@ -3,5 +3,6 @@ rootProject.name = "kubed"
 include 'kubed-core',
         'kubed-geo',
         'kubed-contour',
+        'kubed-force',
         'kubed-demos'
 

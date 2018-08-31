@@ -13,7 +13,7 @@ import kubed.selection.datum
 import kubed.selection.selectAll
 import kubed.shape.circle
 import kubed.shape.lineSegment
-import kubed.util.isNotNaN
+import kotlinx.coroutines.experimental.javafx.JavaFx as UI
 
 class ForceDirectedLatticeDemo : Application() {
     override fun start(primaryStage: Stage?) {
@@ -51,6 +51,7 @@ class ForceDirectedLatticeDemo : Application() {
             startY = { d, _ -> d.source.y }
             endX = { d, _ -> d.target.x }
             endY = { d, _ -> d.target.y }
+            stroke(Color.LIGHTGREY)
         }
 
         val circle = circle<ForceNode> {

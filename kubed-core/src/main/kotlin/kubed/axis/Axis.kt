@@ -1,6 +1,5 @@
 package kubed.axis
 
-
 import javafx.geometry.Side
 import javafx.geometry.VPos
 import javafx.scene.Group
@@ -8,6 +7,7 @@ import javafx.scene.Node
 import javafx.scene.paint.Color
 import javafx.scene.shape.*
 import javafx.scene.text.Font
+import javafx.scene.text.Text
 import javafx.scene.transform.Translate
 import kubed.scale.BandScale
 import kubed.scale.Scale
@@ -77,25 +77,20 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
     private fun center(scale: BandScale<D>): (d: D) -> R {
         var offset = scale.bandwidth / 2.0
         if(scale.round)
-            offset = round(offset).toDouble()
+            offset = round(offset)
         return { d -> (scale(d) + offset) as R }
     }
 
-    private fun identity(scale: Scale<D, R>): (d: D) -> R = {
-        d ->
+    private fun identity(scale: Scale<D, R>): (d: D) -> R = { d ->
         scale(d)
     }
 
     operator fun <T> invoke(sel: Selection<T>) {
         val values = ArrayList<D>()
-        if(tickValues == null)
-        {
-            values.addAll(scale.ticks(tickCount))
-        }
+        if(tickValues == null) values.addAll(scale.ticks(tickCount))
         else values += tickValues!!
 
-        if(values.isEmpty())
-            throw IllegalStateException("Failed to determine tick values")
+        if(values.isEmpty()) throw IllegalStateException("Failed to determine tick values")
 
         val spacing = max(tickSizeInner, 0.0) + tickPadding
         val range = scale.range
@@ -103,7 +98,7 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
         val range1 = range.last().toDouble() + 0.5
         val position = if(scale is BandScale) center(scale) else identity(scale) // TODO: Pass copy of scale
         var path = sel.selectAll<Unit>(".domain").data(listOf(Unit)) // Well this is hideous
-        var tick = sel.selectAll<D>(".tick").data(values, { d, _, _ -> scale(d) })
+        var tick = sel.selectAll<D>(".tick").data(values) { d, _, _ -> scale(d) }
         val tickExit = tick.exit()
         val tickEnter = tick.enter().append(fun(): Node {
             val g = Group()
@@ -166,5 +161,19 @@ class Axis<D, R: Number>(val side: Side, val scale: Scale<D, R>) {
 
         tick.opacity(1.0)
             .transform { d, _, _ -> listOf(transform(position(d).toDouble())) }
+
+        line.forEach<Line> { _, _, _ ->
+            if(vertical)
+                endX = k * tickSizeInner
+            else
+                endY = k * tickSizeInner
+        }
+
+        text.forEach<Text> { _, _, _ ->
+            if(vertical)
+                x = k * spacing
+            else
+                y = k * spacing
+        }
     }
 }

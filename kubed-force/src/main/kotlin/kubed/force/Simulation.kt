@@ -9,6 +9,10 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+fun <T> forceSimulation(data: List<T>, initialX: (d: T) -> Double = { _ -> Double.NaN }, initialY: (d: T) -> Double = { _ -> Double.NaN }, init: Simulation.() -> Unit) {
+    forceSimulation(data.map { ForceNode(initialX(it), initialY(it)) }, init)
+}
+
 fun forceSimulation(n: Int, width: Double, height: Double, init: Simulation.() -> Unit) =
         forceSimulation((0 until n).map { ForceNode(random() * width, random() * height) }, init)
 
@@ -76,7 +80,8 @@ class Simulation {
         }
 
     var alphaTarget = 0.0
-        set(value) {
+        @Synchronized get
+        @Synchronized set(value) {
             require(value in 0.0..1.0)
             field = value
         }
@@ -130,7 +135,9 @@ class Simulation {
         }
     }
 
-    private fun tick() {
+    fun tick(): Boolean {
+        if(alpha < alphaMin) return false
+
         alpha += (alphaTarget - alpha) * alphaDecay
 
         forces.values.forEach { it(alpha) }
@@ -153,6 +160,8 @@ class Simulation {
                 node.vy = 0.0
             }
         }
+
+        return alpha < alphaMin
     }
 
     private fun step() {
