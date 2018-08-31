@@ -9,30 +9,41 @@ import kotlin.collections.ArrayList
 import kotlin.math.floor
 import kotlin.math.sqrt
 
-class Node<T>
-{
-    val children = Array<Node<T>?>(4) { null }
-    var data: T? = null
-    var next: Node<T>? = null
+sealed class QuadtreeNode<T> {
+    val properties = HashMap<String, Any>()
 
-    val length
-        get() = children.filter { it != null }.size
+    operator fun get(key: String): Any? {
+        return properties[key]
+    }
 
-    operator fun get(i: Int): Node<T>? = children[i]
-    operator fun set(i: Int, node: Node<T>?) {
+    operator fun set(key: String, value: Any) {
+        properties[key] = value
+    }
+}
+
+class InternalNode<T> : QuadtreeNode<T>() {
+    val children = Array<QuadtreeNode<T>?>(4) { null }
+
+    operator fun get(i: Int): QuadtreeNode<T>? = children[i]
+    operator fun set(i: Int, node: QuadtreeNode<T>?) {
         children[i] = node
     }
 }
 
-data class Quad<T>(val node: Node<T>, val x0: Double, val y0: Double, val x1: Double, val y1: Double)
+class LeafNode<T>(var data: T? = null) : QuadtreeNode<T>() {
+    var next: LeafNode<T>? = null
+}
 
-class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
+data class Quad<T>(val node: QuadtreeNode<T>, val x0: Double, val y0: Double, val x1: Double, val y1: Double)
+
+class Quadtree<T>(val x: (T) -> Double,
+                  val y: (T) -> Double, data: List<T>? = null) {
     private var x0 = Double.NaN
     private var y0 = Double.NaN
     private var x1 = Double.NaN
     private var y1 = Double.NaN
 
-    private var root: Node<T>? = null
+    private var root: QuadtreeNode<T>? = null
 
     val extents: Rectangle2D
         get() {
@@ -45,38 +56,43 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
     val size: Int
         get() {
             var size = 0
-            visit { node: Node<T>, _: Rectangle2D ->
-                @Suppress("NAME_SHADOWING")
-                var node: Node<T>? = node
-                if(node?.length ?: 0 > 0) {
+            visit { node: QuadtreeNode<T>, _: Rectangle2D ->
+                if(node is LeafNode<T>) {
+                    var leaf: LeafNode<T>? = node
                     do {
                         ++size
-                        node = node?.next
-                    } while(node != null)
+                        leaf = leaf?.next
+                    } while(leaf != null)
                 }
 
                 false
             }
+
             return size
         }
 
     val data: List<T>
         get() {
             val list = ArrayList<T>()
-            visit { node: Node<T>, _: Rectangle2D ->
-                @Suppress("NAME_SHADOWING")
-                var node: Node<T>? = node
-                if(node?.length ?: 0 > 0) {
+            visit { node: QuadtreeNode<T>, _: Rectangle2D ->
+                if(node is LeafNode<T>) {
+                    var leaf: LeafNode<T>? = node
                     do {
-                        list += node?.data!!
-                        node = node?.next
-                    } while(node != null)
+                        val d = leaf?.data
+                        if(d != null) list += d
+                        leaf = leaf?.next
+                    } while(leaf != null)
                 }
 
                 false
             }
+
             return list
         }
+
+    init {
+        if(data != null) addAll(data)
+    }
 
     fun add(d: T) {
         val x = x(d)
@@ -113,7 +129,7 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
         }
     }
 
-    fun visit(callback: (Node<T>, Rectangle2D) -> Boolean) {
+    fun visit(callback: (QuadtreeNode<T>, Rectangle2D) -> Boolean) {
         val quads = LinkedList<Quad<T>>()
         var node = root
         if(node != null) quads += Quad(node, this.x0, this.y0, this.x1, this.y1)
@@ -122,14 +138,15 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
         var y0: Double
         var x1: Double
         var y1: Double
-        var q = quads.pollLast()
-        while(q != null) {
+        var q: Quad<T>
+        while(quads.isNotEmpty()) {
+            q = quads.removeLast()
             node = q.node
             x0 = q.x0
             y0 = q.y0
             x1 = q.x1
             y1 = q.y1
-            if(!callback(node, Rectangle2D(x0, y0, x1 - x0, y1 - y0)) && node.length > 0) {
+            if(!callback(node, Rectangle2D(x0, y0, x1 - x0, y1 - y0)) && node is InternalNode<T>) {
                 val xm = (x0 + x1) / 2
                 val ym = (y0 + y1) / 2
                 if(node[3] != null) quads += Quad(node[3]!!, xm, ym, x1, y1)
@@ -137,11 +154,10 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
                 if(node[1] != null) quads += Quad(node[1]!!, xm, y0, x1, ym)
                 if(node[0] != null) quads += Quad(node[0]!!, x0, y0, xm, ym)
             }
-            q = quads.pollLast()
         }
     }
 
-    fun visitAfter(callback: (Node<T>, Rectangle2D) -> Unit) {
+    fun visitAfter(callback: (QuadtreeNode<T>, Rectangle2D) -> Unit) {
         val quads = LinkedList<Quad<T>>()
         val next = LinkedList<Quad<T>>()
         if(root != null) quads += Quad(root!!, this.x0, this.y0, this.x1, this.y1)
@@ -150,10 +166,10 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
         var y0: Double
         var x1: Double
         var y1: Double
-        var q = quads.pollLast()
-        while(q != null) {
+        while(quads.isNotEmpty()) {
+            val q = quads.removeLast()
             val node = q.node
-            if(node.length > 0) {
+            if(node is InternalNode<T>) {
                 x0 = q.x0
                 y0 = q.y0
                 x1 = q.x1
@@ -166,10 +182,9 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
                 if(node[3] != null) quads += Quad(node[3]!!, xm, ym, x1, y1)
             }
             next += q
-            q = quads.pollLast()
         }
 
-        next.forEach { callback(it.node, Rectangle2D(it.x0, it.y0, it.x1 - it.x0, it.y1 - it.y0)) }
+        next.asReversed().forEach { callback(it.node, Rectangle2D(it.x0, it.y0, it.x1 - it.x0, it.y1 - it.y0)) }
     }
 
     fun find(x: Double, y: Double, radius: Double = Double.POSITIVE_INFINITY): T? {
@@ -216,37 +231,40 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
             }
 
             // Bisect the current quadrant
-            if(node.length > 0) {
-                val xm = (x1 + x2) / 2
-                val ym = (y1 + y2) / 2
+            when(node) {
+                is InternalNode<T> -> {
+                    val xm = (x1 + x2) / 2
+                    val ym = (y1 + y2) / 2
 
-                if(node[3] != null) quads += Quad(node[3]!!, xm, ym, x2, y2)
-                if(node[2] != null) quads += Quad(node[2]!!, x1, ym, xm, y2)
-                if(node[1] != null) quads += Quad(node[1]!!, xm, y1, x2, ym)
-                if(node[0] != null) quads += Quad(node[0]!!, x1, y1, xm, ym)
+                    if(node[3] != null) quads += Quad(node[3]!!, xm, ym, x2, y2)
+                    if(node[2] != null) quads += Quad(node[2]!!, x1, ym, xm, y2)
+                    if(node[1] != null) quads += Quad(node[1]!!, xm, y1, x2, ym)
+                    if(node[0] != null) quads += Quad(node[0]!!, x1, y1, xm, ym)
 
-                // Visit the closest quadrant first
-                val i = (y >= ym) shl 1 or (x >= xm)
-                if(i != 0) {
-                    q = quads.last
-                    quads[quads.size - 1] = quads[quads.size - 1 - i]
-                    quads[quads.size - 1 - i] = q
+                    // Visit the closest quadrant first
+                    val i = (y >= ym) shl 1 or (x >= xm)
+                    if(i != 0) {
+                        q = quads.last
+                        quads[quads.size - 1] = quads[quads.size - 1 - i]
+                        quads[quads.size - 1 - i] = q
+                    }
+                }
+                is LeafNode<T> -> {
+                    val dx = x - x(node.data!!)
+                    val dy = y - y(node.data!!)
+                    val d2 = dx * dx + dy * dy
+                    if(d2 < radius) {
+                        radius = d2
+                        val d = sqrt(radius)
+                        x0 = x - d
+                        y0 = y - d
+                        x3 = x + d
+                        y3 = y + d
+                        data = node.data
+                    }
                 }
             }
-            else {
-                val dx = x - x(node.data!!)
-                val dy = y - y(node.data!!)
-                val d2 = dx * dx + dy * dy
-                if(d2 < radius) {
-                    radius = d2
-                    val d = sqrt(radius)
-                    x0 = x - d
-                    y0 = y - d
-                    x3 = x + d
-                    y3 = y + d
-                    data = node.data
-                }
-            }
+
             q = quads.pollLast()
         }
 
@@ -254,9 +272,9 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
     }
 
     private fun add(x: Double, y: Double, d: T) {
-        var parent: Node<T>? = null
+        var parent: QuadtreeNode<T>? = null
         var node = root
-        val leaf = Node<T>().apply { data = d }
+        val leaf = LeafNode(d)
         var x0 = this.x0
         var y0 = this.y0
         var x1 = this.x1
@@ -268,7 +286,7 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
         }
 
         var i = 0
-        while((node?.length ?: 0) > 0) {
+        while(node is InternalNode<T>) {
             val xm = (x0 + x1) / 2
             val right = x >= xm
             if(right) x0 = xm else x1 = xm
@@ -277,19 +295,20 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
             if(bottom) y0 = ym else y1 = ym
             parent = node
             i = (bottom shl 1) or right
-            node = node?.get(i)
+            node = node[i]
             if(node == null) {
-                parent?.children?.set(i, leaf)
+                parent.children[i] = leaf
                 return
             }
         }
 
         // Is the new point exactly coincident with the existing point?
-        val xp = node?.data?.let { x(it) } ?: 0.0
-        val yp = node?.data?.let { y(it) } ?: 0.0
+        node as LeafNode<T>
+        val xp = node.data?.let { x(it) } ?: 0.0
+        val yp = node.data?.let { y(it) } ?: 0.0
         if(x == xp && y == yp) {
             leaf.next = node
-            if(parent != null) parent[i] = leaf
+            if(parent != null && parent is InternalNode<T>) parent[i] = leaf
             else root = leaf
             return
         }
@@ -297,12 +316,12 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
         // Otherwise, split the lead node until the old and new points are separated
         var j: Int
         do {
-            if(parent != null) {
-                parent[i] = Node()
+            if(parent != null && parent is InternalNode<T>) {
+                parent[i] = InternalNode()
                 parent = parent[i]
             }
             else {
-                root = Node()
+                root = InternalNode()
                 parent = root
             }
 
@@ -316,8 +335,9 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
             j = (yp >= ym) shl 1 or (xp >= xm)
         } while(i == j)
 
-        parent?.set(j, node)
-        parent?.set(i, leaf)
+        parent as InternalNode<T>
+        parent[j] = node
+        parent[i] = leaf
     }
 
     private fun cover(x: Double, y: Double) {
@@ -335,12 +355,12 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
         else if(x0 > x || x > x1 || y0 > y || y > y1) {
             var z = x1 - x0
             var node = root
-            var parent: Node<T>?
+            var parent: QuadtreeNode<T>?
             val i: Int = (y < (y0 + y1) /  2) shl 1 or (x < (x0 + x1) / 2)
             when(i) {
                 0 -> {
                     do {
-                        parent = Node()
+                        parent = InternalNode()
                         parent[i] = node
                         node = parent
                         z *= 2
@@ -350,7 +370,7 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
                 }
                 1 -> {
                     do {
-                        parent = Node()
+                        parent = InternalNode()
                         parent[i] = node
                         node = parent
                         z *= 2
@@ -360,7 +380,7 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
                 }
                 2 -> {
                     do {
-                        parent = Node()
+                        parent = InternalNode()
                         parent[i] = node
                         node = parent
                         z *= 2
@@ -370,7 +390,7 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
                 }
                 3 -> {
                     do {
-                        parent = Node()
+                        parent = InternalNode()
                         parent[i] = node
                         node = parent
                         z *= 2
@@ -380,7 +400,7 @@ class Quadtree<T>(val x: (T) -> Double, val y: (T) -> Double) {
                 }
             }
 
-            if(root != null && (root?.length ?: 0) > 0) root = node
+            if(root != null && root is InternalNode<*>) root = node
         }
         else return
 
@@ -402,8 +422,8 @@ fun main(args: Array<String>) {
     println("maxX = ${extent.maxX}")
     println("maxY = ${extent.maxY}")
 
-    tree.visit { node: Node<Point2D>, extents: Rectangle2D ->
-        if(node.length > 0) {
+    tree.visit { node: QuadtreeNode<Point2D>, extents: Rectangle2D ->
+        if(node is InternalNode) {
             println("internal")
             println("\tminX = ${extents.minX}")
             println("\tminY = ${extents.minY}")
