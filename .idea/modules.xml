@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-force/kubed-force.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-force/kubed-force.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-geo/kubed-geo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-shapefile/kubed-shapefile.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-shapefile/kubed-shapefile.iml" />
     </modules>
   </component>
 </project>

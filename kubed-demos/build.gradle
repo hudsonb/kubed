@@ -3,6 +3,7 @@ dependencies {
 	compile project(':kubed-geo')
 	compile project(':kubed-contour')
 	compile project(':kubed-force')
+	compile project(':kubed-shapefile')
 
 	compile 'no.tornado:tornadofx:1.7.15'
 	compile group: 'com.univocity', name: 'univocity-parsers', version: '2.5.9'

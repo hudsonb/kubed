@@ -92,7 +92,7 @@ data class GeometryCollection(val geometries: List<Geometry<*>>) : GeoJson {
     override val type = "GeometryCollection"
 }
 
-data class Feature(val geometry: Geometry<*>, val properties: Map<String, *>) : GeoJson {
+data class Feature(val geometry: Geometry<*>, val properties: Map<String, *> = emptyMap<String, Any>()) : GeoJson {
     @JsonIgnore
     override val type = "Feature"
 

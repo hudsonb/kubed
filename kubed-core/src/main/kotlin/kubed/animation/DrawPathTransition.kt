@@ -7,8 +7,6 @@ import javafx.scene.shape.Path
 import javafx.util.Duration
 import kubed.shape.totalLength
 import kubed.transition.DEFAULT_DURATION
-import kotlin.math.ceil
-import kotlin.math.floor
 
 class DrawPathTransition(val path: Path) : Transition() {
     private val length = path.totalLength
@@ -23,7 +21,6 @@ class DrawPathTransition(val path: Path) : Transition() {
             durationProperty.set(value)
         }
     val durationProperty = SimpleObjectProperty(DEFAULT_DURATION)
-
 
     init {
         durationProperty.addListener({ _ -> cycleDuration = duration })

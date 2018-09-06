@@ -4,5 +4,6 @@ include 'kubed-core',
         'kubed-geo',
         'kubed-contour',
         'kubed-force',
+        'kubed-shapefile',
         'kubed-demos'
 

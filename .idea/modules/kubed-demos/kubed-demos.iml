@@ -44,6 +44,7 @@
     <orderEntry type="module" module-name="kubed-geo" />
     <orderEntry type="module" module-name="kubed-contour" />
     <orderEntry type="module" module-name="kubed-force" />
+    <orderEntry type="module" module-name="kubed-shapefile" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.2.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.2.50" level="project" />
     <orderEntry type="library" name="Gradle: no.tornado:tornadofx:1.7.15" level="project" />
