@@ -76,7 +76,7 @@ class ShpReader(input: InputStream) {
         val points = ArrayList<Position>(numPoints)
         repeat(numPoints) { points += parsePosition(stream) }
 
-        val polygons = ArrayList<List<List<Position>>>()
+        val polygons = ArrayList<MutableList<List<Position>>>()
         val holes = ArrayList<List<Position>>()
         parts.forEachIndexed { j, i ->
             val ring = points.slice(i, parts.getOrElse(j + 1) { points.size })
@@ -85,19 +85,12 @@ class ShpReader(input: InputStream) {
         }
 
         holes.forEach { hole ->
-            if(polygons.any { polygon ->
-                        var contains = false
-                        polygon as MutableList<List<Position>>
-                        if (ringContainsAny(polygon[0], hole)) {
-                            polygon.add(hole)
-                            contains = true
-                        }
-                        contains
-                    })
-            else polygons.add(listOf(hole))
+            val p = polygons.find { ringContainsAny(it[0], hole) }
+            if(p != null) p.add(hole)
+            else polygons.add(mutableListOf(hole))
         }
 
-        return when (polygons.size) {
+        return when(polygons.size) {
             1 -> Polygon(polygons[0])
             else -> MultiPolygon(polygons)
         }
