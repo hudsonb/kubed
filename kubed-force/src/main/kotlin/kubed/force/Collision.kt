@@ -39,7 +39,6 @@ class Collision(var radius: (ForceNode, Int, List<ForceNode>) -> Double = consta
             val tree = Quadtree(x, y, nodes)
             tree.visitAfter(::prepare)
 
-            nodes.filter { it.radius > 0.0 }.forEach { println(it) }
             for(node in nodes) {
                 val ri = node.radius
                 val ri2 = ri * ri
