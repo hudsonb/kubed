@@ -44,6 +44,8 @@ fun <T> Node.selectAll(): Selection<T> {
     val group = Group(this)
     sel += group
 
+    if(this is Parent) group.addAll(childrenUnmodifiable.sortedWith(compareBy(Node::depth, Node::pos)))
+
     return sel
 }
 
