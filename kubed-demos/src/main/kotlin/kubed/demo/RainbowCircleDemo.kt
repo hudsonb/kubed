@@ -22,8 +22,8 @@ class RainbowCircleDemo: Application() {
         val n = 500
 
         val root = Group()
-        root.translateXProperty().bind(primaryStage.widthProperty().divide(2))
-        root.translateYProperty().bind(primaryStage.heightProperty().divide(2))
+        //root.translateXProperty().bind(primaryStage.widthProperty().divide(2))
+        //root.translateYProperty().bind(primaryStage.heightProperty().divide(2))
 
         val arc = arc<Double> {
             startAngle { d, _ -> d }

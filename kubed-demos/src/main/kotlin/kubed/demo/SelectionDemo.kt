@@ -55,7 +55,7 @@ class SelectionDemo: Application() {
         val font = Font("Courier New", 32.0)
 
         val sel = root.selectAll<Char>()
-                      .data(randomChars(), { d, _, _ -> d })
+                .data(randomChars()) { d, _, _ -> d }
 
         // Exit
         sel.exit()

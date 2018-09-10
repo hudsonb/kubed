@@ -3,10 +3,13 @@ import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.control.Tooltip
 import javafx.scene.paint.Color
+import javafx.scene.shape.Shape
 import javafx.stage.Stage
 import kubed.geo.Feature
+import kubed.geo.Sphere
+import kubed.geo.graticule
 import kubed.geo.path.geoPath
-import kubed.geo.projection.orthographic
+import kubed.geo.projection.equalEarth
 import kubed.path.PathContext
 import kubed.selection.selectAll
 import kubed.shapefile.ShapefileReader
@@ -40,7 +43,9 @@ class ShapefileDemo : Application() {
             feature = reader.nextFeature()
         }
 
-        val path = geoPath(orthographic(), PathContext())
+        val path = geoPath(equalEarth(), PathContext())
+        map.children += path(Sphere())
+        map.children += path(graticule().graticule()).apply { this as Shape; stroke = Color.LIGHTGREY; strokeWidth = 0.5 }
         map.selectAll<Feature>()
                 .data(features)
                 .enter()

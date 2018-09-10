@@ -10,11 +10,11 @@ import javafx.stage.Stage
 import kubed.axis.axisBottom
 import kubed.axis.axisLeft
 import kubed.interpolate.interpolateRound
-import kubed.scale.LinearScale
 import kubed.scale.scaleBand
 import kubed.scale.scaleLinear
 import kubed.scale.scaleOrdinal
 import kubed.selection.selectAll
+import kubed.selection.selection
 import kubed.shape.*
 
 class StackedBarChartDemo: Application() {
@@ -80,7 +80,7 @@ class StackedBarChartDemo: Application() {
         val yAxis = axisLeft(yScale) {
             formatter { d -> (d / 1_000_000).toInt().toString() + "M" }
         }
-        yAxis(root.selectAll<Unit>()
+        yAxis(root.selection<Unit>()
                   .append { -> Group() }
                   .classed("axis", "yAxis"))
 
