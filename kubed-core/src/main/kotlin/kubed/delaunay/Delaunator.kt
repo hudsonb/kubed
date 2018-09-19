@@ -7,6 +7,9 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.sqrt
 
+/**
+ * A port of the Delaunator JavaScript library https://github.com/mapbox/delaunator.
+ */
 class Delaunator<T>(data: List<T>, x: (T) -> Double, y: (T) -> Double) {
     internal val points = Array(data.size * 2) { 0.0 }
 
