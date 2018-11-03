@@ -2,20 +2,25 @@ package kubed.scale
 
 import kubed.array.ticks
 import kubed.array.tickStep
+import kubed.interpolate.DeinterpolatorFactory
+import kubed.interpolate.ReinterpolatorFactory
 import kubed.interpolate.interpolateNumber
 
-open class LinearScale<R>(interpolate: (R, R) -> (Double) -> R,
-                          uninterpolate: ((R, R) -> (R) -> Double)? = null,
-                          rangeComparator: Comparator<R>? = null) : ContinuousScale<R>(interpolate, uninterpolate, rangeComparator) {
-    override fun deinterpolate(a: Double, b: Double): (Double) -> Double {
-        val b2 = b - a
+open class LinearScale<R>(
+    reinterpolatorFactory: ReinterpolatorFactory<R>,
+    deinterpolatorFactory: DeinterpolatorFactory<R>? = null,
+    rangeComparator: Comparator<R>? = null
+) : ContinuousScale<R>(reinterpolatorFactory, deinterpolatorFactory, rangeComparator) {
+
+    override fun deinterpolatorOf(a: Double, b: Double): (Double) -> Double {
+        val d = b - a
         return when {
-            b2 == -0.0 || b2 == +0.0 || b2.isNaN() -> { _ -> b2 }
-            else -> { x -> (x - a) / b2 }
+            d == -0.0 || d == +0.0 || d.isNaN() -> { _ -> d }
+            else -> { x -> (x - a) / d }
         }
     }
 
-    override fun reinterpolate(a: Double, b: Double): (Double) -> Double = interpolateNumber(a, b)
+    override fun reinterpolatorOf(a: Double, b: Double): (Double) -> Double = interpolateNumber(a, b)
 
     fun domain(vararg d: Double) = domain(d.toList())
     override fun domain(d: List<Double>) = super.domain(d) as LinearScale<R>
@@ -29,7 +34,7 @@ open class LinearScale<R>(interpolate: (R, R) -> (Double) -> R,
         val stop: Double = domain.last()
         var step = tickStep(start, stop, count)
 
-        if(step > 0) {
+        if (step > 0) {
             step = tickStep(Math.floor(start / step) * step, Math.ceil(stop / step) * step, count)
             domain[0] = Math.floor(start / step) * step
             domain[i] = Math.ceil(stop / step) * step
