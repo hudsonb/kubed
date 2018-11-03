@@ -2,16 +2,13 @@ package kubed.demo
 
 import javafx.animation.Timeline
 import javafx.application.Application
-import javafx.application.Application.launch
 import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.paint.Color
 import javafx.stage.Stage
 import javafx.util.Duration
-import kubed.color.Hsl
+import kubed.color.hsl
 import kubed.interpolate.color.interpolateHcl
-import kubed.scale.LinearScale
-import kubed.scale.PointScale
 import kubed.scale.scaleLinear
 import kubed.scale.scalePoint
 import kubed.selection.selectAll
@@ -38,7 +35,7 @@ class CyclingTransitionDemo : Application() {
 
         val z = scaleLinear(::interpolateHcl) {
             domain(listOf(10.0, 0.0))
-            range(listOf(Hsl(62.0, 1.0, 0.9).toColor(), Hsl(228.0, 0.3, 0.2).toColor()))
+            range(listOf(hsl(62.0, 1.0, 0.9), hsl(228.0, 0.3, 0.2)))
         }
 
         val c = circle<Double> {

@@ -3,6 +3,7 @@ package kubed.interpolate.color
 import javafx.scene.paint.Color
 import kubed.color.ColorSpace
 import kubed.color.Hsl
+import kubed.color.hsla
 
 private fun hsl(start: ColorSpace<*>, end: ColorSpace<*>,
                 hue: (Double, Double) -> (Double) -> Double = ::hue): (Double) -> Color {
@@ -13,7 +14,7 @@ private fun hsl(start: ColorSpace<*>, end: ColorSpace<*>,
     val l = nogamma(sc.l, sc.l)
     val opacity = nogamma(sc.opacity, sc.opacity)
 
-    return { t -> Hsl(h(t), s(t), l(t), opacity(t)).toColor() }
+    return { t -> hsla(h(t), s(t), l(t), opacity(t)) }
 }
 
 fun interpolateHsl(start: ColorSpace<*>, end: ColorSpace<*>) = hsl(start, end, ::hue)

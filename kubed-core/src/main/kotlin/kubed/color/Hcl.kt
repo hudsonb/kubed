@@ -12,7 +12,7 @@ fun Color.hcl(): Hcl = rgb().hcl()
 
 fun Rgb.hcl() = Hcl.convert(this)
 
-class Hcl(val h: Double, var c: Double, var l: Double, var opacity: Double = 1.0) : ColorSpace<Hcl> {
+data class Hcl(val h: Double, var c: Double, var l: Double, var opacity: Double = 1.0) : ColorSpace<Hcl> {
     companion object {
         @JvmStatic
         fun convert(value: Any) = when(value) {

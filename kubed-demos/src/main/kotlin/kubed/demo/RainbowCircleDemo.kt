@@ -8,6 +8,7 @@ import javafx.stage.Stage
 import kubed.ScalingPane
 import kubed.array.range
 import kubed.color.Hsl
+import kubed.color.hsl
 import kubed.selection.selectAll
 import kubed.shape.*
 import kotlin.math.PI
@@ -22,13 +23,11 @@ class RainbowCircleDemo: Application() {
         val n = 500
 
         val root = Group()
-        //root.translateXProperty().bind(primaryStage.widthProperty().divide(2))
-        //root.translateYProperty().bind(primaryStage.heightProperty().divide(2))
 
         val arc = arc<Double> {
             startAngle { d, _ -> d }
             endAngle { d, _ -> d + t / n * 1.1 }
-            fill { d, _ -> Hsl(d * 360 / t, 1.0, 0.5).toColor() }
+            fill { d, _ -> hsl(d * 360 / t, 1.0, 0.5) }
 
             stroke(null)
             outerRadius(outerRadius)

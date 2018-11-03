@@ -9,7 +9,7 @@ import java.lang.Math.pow
  */
 fun Color.rgb(): Rgb = Rgb(red * 255,green * 255, blue * 255, opacity)
 
-class Rgb(var r: Double, var g: Double, var b: Double, var opacity: Double = 1.0) : ColorSpace<Rgb> {
+data class Rgb(var r: Double, var g: Double, var b: Double, var opacity: Double = 1.0) : ColorSpace<Rgb> {
     companion object {
         @JvmStatic
         fun convert(value: Any): Rgb = when(value)  {

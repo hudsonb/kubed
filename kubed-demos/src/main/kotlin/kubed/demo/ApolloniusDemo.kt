@@ -19,8 +19,8 @@ import kotlin.math.sqrt
 
 
 class ApolloniusDemo: Application() {
-    var outerRings: Selection<() -> Data?>? = null
-    var innerRings: Selection<() -> Data?>? = null
+    private var outerRings: Selection<() -> Data?>? = null
+    private var innerRings: Selection<() -> Data?>? = null
 
     override fun start(primaryStage: Stage?) {
         val width = 960.0

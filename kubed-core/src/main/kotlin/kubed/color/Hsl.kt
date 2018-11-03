@@ -41,7 +41,7 @@ fun Rgb.hsl(): Hsl {
     return Hsl(h, s, l, opacity)
 }
 
-class Hsl(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0) : ColorSpace<Hsl> {
+data class Hsl(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0) : ColorSpace<Hsl> {
     companion object {
         @JvmStatic
         fun convert(value: Any): Hsl = when(value)  {

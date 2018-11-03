@@ -1,7 +1,6 @@
 package kubed.color
 
 import javafx.scene.paint.Color
-import kubed.util.isFalsy
 import kubed.util.isTruthy
 
 /**
@@ -11,7 +10,7 @@ fun Color.hcg(): Hcg = rgb().hcg()
 
 fun Rgb.hcg() = Hcg.convert(this)
 
-class Hcg(val h: Double, var c: Double, var g: Double, var opacity: Double = 1.0) : ColorSpace<Hcg> {
+data class Hcg(val h: Double, var c: Double, var g: Double, var opacity: Double = 1.0) : ColorSpace<Hcg> {
     companion object {
         @JvmStatic
         fun convert(value: Any) = when(value) {
@@ -70,4 +69,9 @@ class Hcg(val h: Double, var c: Double, var g: Double, var opacity: Double = 1.0
     private fun hcg2rgb(r: Double, g: Double, b: Double, m: Double, a: Double): Rgb {
         return Rgb((r + m) * 255, (g + m) * 255, (b + m) * 255, a)
     }
+}
+
+public fun getEnv(key: String) = when {
+    System.getenv().containsKey(key) -> System.getenv(key)
+    else -> throw Exception("w/e exception you want")
 }

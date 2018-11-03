@@ -38,11 +38,11 @@ fun Rgb.cubehelix(): Cubehelix {
     return Cubehelix(if(h < 0) h + 360 else h, s, l, opacity)
 }
 
-class Cubehelix(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0) : ColorSpace<Cubehelix> {
+data class Cubehelix(var h: Double, var s: Double, var l: Double, var opacity: Double = 1.0) : ColorSpace<Cubehelix> {
     companion object {
         @JvmStatic
         fun convert(value: Any): Cubehelix = when(value)  {
-            is Cubehelix -> Cubehelix(value.h, value.s, value.l, value.opacity)
+            is Cubehelix -> value.copy()
             is ColorSpace<*> -> value.rgb().cubehelix()
             is Color -> value.cubehelix()
             is String -> Color.web(value).cubehelix()

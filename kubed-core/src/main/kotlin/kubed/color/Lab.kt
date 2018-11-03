@@ -43,7 +43,6 @@ private fun rgb2lrgb(x: Double): Double {
     return if(x2 <= 0.04045) x2 / 12.92 else pow((x2 + 0.055) / 1.055, 2.4)
 }
 
-
 private fun xyz2lab(t: Double): Double {
     return when {
         t > T3 -> pow(t, 1.0 / 3.0)
@@ -51,7 +50,7 @@ private fun xyz2lab(t: Double): Double {
     }
 }
 
-class Lab(val l: Double, val a: Double, val b: Double, val opacity: Double = 1.0) : ColorSpace<Lab> {
+data class Lab(val l: Double, val a: Double, val b: Double, val opacity: Double = 1.0) : ColorSpace<Lab> {
     companion object {
         @JvmStatic
         fun convert(value: Any): Lab = when(value)  {
