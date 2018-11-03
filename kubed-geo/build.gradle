@@ -56,9 +56,6 @@ artifacts {
 dependencies {
     compile project(':kubed-core')
 
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.22.2'
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-javafx', version: '0.22.2'
-
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.2.1'
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.0"
 }

@@ -56,7 +56,4 @@ artifacts {
 dependencies {
     compile project(':kubed-core')
     compile project(':kubed-geo')
-
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.25.0'
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-javafx', version: '0.25.0'
 }

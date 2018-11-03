@@ -7,7 +7,4 @@ dependencies {
 
 	compile 'no.tornado:tornadofx:1.7.15'
 	compile group: 'com.univocity', name: 'univocity-parsers', version: '2.5.9'
-
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '0.25.0'
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-javafx', version: '0.25.0'
 }
