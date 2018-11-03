@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kubed.iml" filepath="$PROJECT_DIR$/kubed.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-contour/kubed-contour.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-contour/kubed-contour.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-core/kubed-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" filepath="$PROJECT_DIR$/.idea/modules/kubed-demos/kubed-demos.iml" />

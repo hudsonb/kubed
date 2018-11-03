@@ -13,7 +13,6 @@ import kubed.selection.datum
 import kubed.selection.selectAll
 import kubed.shape.circle
 import kubed.shape.lineSegment
-import kotlinx.coroutines.experimental.javafx.JavaFx as UI
 
 class ForceDirectedLatticeDemo : Application() {
     override fun start(primaryStage: Stage?) {
