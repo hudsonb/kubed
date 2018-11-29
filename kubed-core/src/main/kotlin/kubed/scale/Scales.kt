@@ -6,25 +6,21 @@ import kubed.color.scheme.schemeCategory10
 import kubed.color.scheme.schemeCategory20
 import kubed.color.scheme.schemeCategory20b
 import kubed.color.scheme.schemeCategory20c
+import kubed.interpolate.DeinterpolatorFactory
+import kubed.interpolate.ReinterpolatorFactory
 import kubed.interpolate.color.interpolateRgb
 import kotlin.reflect.full.isSubclassOf
 
-inline fun <reified R> scaleLinear(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
-                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
-                                   rangeComparator: Comparator<R>? = null): LinearScale<R> = scaleLinear {}
-inline fun <reified R> scaleLinear(noinline interpolate: ((R, R) -> (Double) -> R)? = null,
-                                   noinline uninterpolate: ((R, R) -> (R) -> Double)? = null,
+inline fun <reified R> scaleLinear(noinline interpolate: ReinterpolatorFactory<R>? = null,//((R, R) -> (Double) -> R)
+                                   noinline uninterpolate: DeinterpolatorFactory<R>? = null,
+                                   rangeComparator: Comparator<R>? = null): LinearScale<R> = scaleLinear(interpolate, uninterpolate, rangeComparator) {}
+inline fun <reified R> scaleLinear(noinline interpolate: ReinterpolatorFactory<R>? = null,
+                                   noinline uninterpolate: DeinterpolatorFactory<R>? = null,
                                    rangeComparator: Comparator<R>? = null,
                                    init: LinearScale<R>.() -> Unit): LinearScale<R> {
-    // TODO: Default comparators
-
-    val scale = LinearScale(interpolate ?: interpolator<R>() as (R, R) -> (Double) -> R,
-            when {
-                uninterpolate != null -> uninterpolate
-                interpolate != null -> null
-                else -> null
-            },
-            rangeComparator)
+    val scale = LinearScale(interpolate ?: interpolator(),
+                                            uninterpolate ?: uninterpolator(),
+                                    rangeComparator ?: defaultComparator())
     scale.init()
     return scale
 }
@@ -56,10 +52,11 @@ fun <D> scaleCategory20() = OrdinalScale<D, Color>().apply { range(schemeCategor
 fun <D> scaleCategory20b() = OrdinalScale<D, Color>().apply { range(schemeCategory20b()) }
 fun <D> scaleCategory20c() = OrdinalScale<D, Color>().apply { range(schemeCategory20c()) }
 
+@Suppress("UNCHECKED_CAST")
 inline fun <reified R> interpolator() = when {
-    R::class.isSubclassOf(Number::class) -> ::interpolateNumber
-    R::class == Color::class -> ::interpolateRgb
-    else -> throw IllegalArgumentException()
+    R::class.isSubclassOf(Number::class) -> ::interpolateNumber as ReinterpolatorFactory<R>
+    R::class == Color::class -> ::interpolateRgb as ReinterpolatorFactory<R>
+    else -> throw IllegalArgumentException("No default ReinterpolatorFactory for ${R::class.qualifiedName}")
 }
 
 inline fun <reified R> uninterpolator(): ((R, R) -> (R) -> Double)? {
@@ -75,4 +72,9 @@ inline fun <reified R> uninterpolator(): ((R, R) -> (R) -> Double)? {
         }
         else -> null
     }
+}
+
+inline fun <reified R> defaultComparator(): Comparator<R>? = when {
+    R::class.isSubclassOf(Comparable::class) -> naturalOrder<Nothing>() as Comparator<R>
+    else -> null
 }
