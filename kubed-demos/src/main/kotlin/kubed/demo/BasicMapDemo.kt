@@ -110,7 +110,7 @@ class BasicMapDemo : Application() {
 //        }
 
         val path = geoPath(projection, PathContext())
-       // val url = javaClass.getResource("/world.json")
+       // val url = javaClass.getResource("/data/countries.json")
 
         val graticule = graticule()
         val url = File("/Users/hudsonb/Downloads/us-states.json").toURI().toURL()

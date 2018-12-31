@@ -35,8 +35,8 @@ class ShapefileDemo : Application() {
         val map = Group()
 
         val features = ArrayList<Feature>()
-        val reader = ShapefileReader(javaClass.getResourceAsStream("data/TM_WORLD_BORDERS_SIMPL-0.3.shp"),
-                                     javaClass.getResourceAsStream("data/TM_WORLD_BORDERS_SIMPL-0.3.dbf"))
+        val reader = ShapefileReader(javaClass.getResourceAsStream("/data/TM_WORLD_BORDERS_SIMPL-0.3.shp"),
+                                     javaClass.getResourceAsStream("/data/TM_WORLD_BORDERS_SIMPL-0.3.dbf"))
         var feature = reader.nextFeature()
         while(feature != null) {
             features += feature

@@ -1,7 +1,6 @@
 package kubed.demo
 
 import javafx.application.Application
-import javafx.application.Application.launch
 import javafx.geometry.Insets
 import javafx.scene.Group
 import javafx.scene.Scene
@@ -10,7 +9,6 @@ import javafx.stage.Stage
 import kubed.axis.axisBottom
 import kubed.axis.axisLeft
 import kubed.interpolate.interpolateRound
-import kubed.scale.LinearScale
 import kubed.scale.scaleLinear
 import kubed.selection.selectAll
 import kubed.shape.area

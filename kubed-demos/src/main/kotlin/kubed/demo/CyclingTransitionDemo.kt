@@ -14,8 +14,8 @@ import kubed.scale.scalePoint
 import kubed.selection.selectAll
 import kubed.shape.circle
 import kubed.transition.transition
+import java.io.ByteArrayOutputStream
 import kotlin.math.abs
-
 
 class CyclingTransitionDemo : Application() {
     override fun start(primaryStage: Stage?) {
@@ -46,15 +46,20 @@ class CyclingTransitionDemo : Application() {
             fill { d, _ -> z(abs(d % 20 - 10)) }
         }
 
+        val a = arrayOf(1, 2, 3)
+        for(i in a.indices) {
+
+        }
+
         root.selectAll<Double>("Circle")
-             .data(y.domain)
-             .enter().append { d, _, _ -> c(d) }
-             .transition()
-             .delay { d, _, _ -> Duration.millis(d * 40) }
-             .duration(Duration.millis(2500.0))
-             .cycleCount(Timeline.INDEFINITE)
-             .autoReverse(true)
-             .translateX(width)
+                .data(y.domain)
+                .enter().append { d, _, _ -> c(d) }
+                .transition()
+                .delay { d, _, _ -> Duration.millis(d * 40) }
+                .duration(Duration.millis(2500.0))
+                .cycleCount(Timeline.INDEFINITE)
+                .autoReverse(true)
+                .translateX(width)
 
         val scene = Scene(root)
         primaryStage?.width = width + margin * 2
@@ -62,13 +67,6 @@ class CyclingTransitionDemo : Application() {
 
         primaryStage?.scene = scene
         primaryStage?.show()
-    }
-
-    companion object {
-        @JvmStatic
-        fun main(vararg args: String) {
-            launch(CyclingTransitionDemo::class.java, *args)
-        }
     }
 }
 

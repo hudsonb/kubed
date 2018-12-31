@@ -9,6 +9,7 @@ import kubed.shape.circle
 import kubed.axis.axisBottom
 import kubed.axis.axisLeft
 import kubed.scale.scaleLinear
+import kubed.selection.selection
 
 class AxisDemo: Application() {
     override fun start(primaryStage: Stage?) {
@@ -74,7 +75,7 @@ class AxisDemo: Application() {
             formatter = { d -> d.toInt().toString() }
         }
 
-        yAxis(root.selectAll<Unit>()
+        yAxis(root.selection<Unit>()
                 .append { -> Group() }
                 .classed("axis", "yAxis")
                 .translateX(padding))

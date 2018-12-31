@@ -32,7 +32,7 @@ class SeeThroughGlobeDemo : Application() {
         val path = geoPath(projection, PathContext())
 
         val graticule = graticule().graticule()
-        val url = javaClass.getResource("/world.json")
+        val url = javaClass.getResource("/data/countries.json")
         geoJson(url) { geo: GeoJson ->
             geo as FeatureCollection
 

@@ -29,15 +29,16 @@ class ContourDensityDemo : Application() {
         val innerWidth = outerWidth - margin.left - margin.right
         val innerHeight = outerHeight - margin.top - margin.bottom
 
-        var x = scaleLog<Double> {
+        val x = scaleLog<Double> {
             domain(listOf(2e-1, 5e0))
             range(listOf(margin.left, innerWidth))
         }
 
-        var y = scaleLog<Double> {
+        val y = scaleLog<Double> {
             domain(listOf(3e2, 2e4))
             range(listOf(innerHeight, margin.top))
         }
+
         val color = scaleSequential(interpolateYlGnBu()) {
             domain(listOf(0.0, 1.8))
         }
@@ -81,7 +82,7 @@ class ContourDensityDemo : Application() {
         settings.setProcessor(processor)
 
         val parser = TsvParser(settings)
-        parser.parse(this.javaClass.getResourceAsStream("/data/diamonds.tsv"))
+        parser.parse(javaClass.getResourceAsStream("/data/diamonds.tsv"))
 
         return data
     }

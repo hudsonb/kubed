@@ -35,7 +35,7 @@ class AzimuthalEquidistantDemo : Application() {
         }
 
         val path = geoPath(projection, PathContext())
-        val url = javaClass.getResource("/world.json")
+        val url = javaClass.getResource("/data/countries.json")
         geoJson(url) { geo: GeoJson ->
             root.children += path(geo).apply {
                 this as Path

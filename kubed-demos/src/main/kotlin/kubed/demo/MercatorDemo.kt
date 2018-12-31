@@ -9,24 +9,19 @@ import javafx.stage.Stage
 import kubed.geo.*
 import kubed.geo.path.geoPath
 import kubed.geo.projection.airy
+import kubed.geo.projection.mercator
 import kubed.path.PathContext
 
-class AiryDemo : Application() {
+class MercatorDemo : Application() {
     override fun start(primaryStage: Stage?) {
         val root = Group()
 
         val width = 960.0
         val height = 960.0
 
-        val projection = airy {
-            rotateX = 90.0
-            rotateY = -40.0
-            scale = 340.0
+        val projection = mercator {
             translateX = width / 2
             translateY = height / 2
-            precision = 0.1
-            clipAngle = 90.0
-            radius = 90.0
         }
 
         val path = geoPath(projection, PathContext())
@@ -61,6 +56,5 @@ class AiryDemo : Application() {
 }
 
 fun main(vararg args: String) {
-    Application.launch(AiryDemo::class.java, *args)
+    Application.launch(MercatorDemo::class.java, *args)
 }
-

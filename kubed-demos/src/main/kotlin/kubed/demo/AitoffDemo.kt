@@ -1,5 +1,6 @@
 package kubed.demo
 
+import com.apple.eio.FileManager.getResource
 import javafx.application.Application
 import javafx.scene.Group
 import javafx.scene.Scene
@@ -26,7 +27,7 @@ class AitoffDemo : Application() {
         }
 
         val path = geoPath(projection, PathContext())
-        val url = javaClass.getResource("/world.json")
+        val url = javaClass.getResource("/data/countries.json")
         geoJson(url) { geo: GeoJson ->
             root.children += path(geo).apply {
                 this as Path
