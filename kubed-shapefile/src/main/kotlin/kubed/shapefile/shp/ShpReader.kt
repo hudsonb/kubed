@@ -61,7 +61,7 @@ class ShpReader(input: InputStream) {
         return when (numParts) {
             1 -> LineString(points.toList())
             else -> MultiLineString(parts.mapIndexed { j, i ->
-                points.slice(i, parts.getOrElse(j + 1) { points.size })
+                points.slice(i, parts.getOrElse(j + 1) { points.size - 1 })
             })
         }
     }
