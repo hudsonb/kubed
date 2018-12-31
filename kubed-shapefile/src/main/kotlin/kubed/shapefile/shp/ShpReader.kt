@@ -79,7 +79,7 @@ class ShpReader(input: InputStream) {
         val polygons = ArrayList<MutableList<List<Position>>>()
         val holes = ArrayList<List<Position>>()
         parts.forEachIndexed { j, i ->
-            val ring = points.slice(i, parts.getOrElse(j + 1) { points.size })
+            val ring = points.slice(i, parts.getOrElse(j + 1) { points.size - 1 })
             if(ringClockwise(ring)) polygons.add(mutableListOf(ring))
             else holes.add(ring)
         }
