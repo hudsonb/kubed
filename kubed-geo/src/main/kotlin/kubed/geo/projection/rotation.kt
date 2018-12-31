@@ -5,14 +5,10 @@ import kubed.math.asin
 import kubed.math.toDegrees
 import kubed.math.toRadians
 import kubed.util.isTruthy
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.*
 
 private fun identity(x: Double, y: Double) = when {
-    x > PI -> doubleArrayOf(x - TAU, y)
-    x < -PI -> doubleArrayOf(x + TAU, y)
+    abs(x) > PI -> doubleArrayOf(x + round(-x / TAU) * TAU, y)
     else -> doubleArrayOf(x, y)
 }
 
