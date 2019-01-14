@@ -87,7 +87,7 @@ class AlbersUsa : StreamCacheProjection() {
             translateX = x - 0.307 * k
             translateY = y + 0.201 * k
             clipExtent = Rectangle2D(x - 0.425 * k + EPSILON, y + 0.120 * k + EPSILON,
-                    0.211 * k - EPSILON * 2, 0.354 * k - EPSILON * 2)
+                    0.211 * k - 2 * EPSILON, 0.114 * k - 2 * EPSILON)
             alaskaPoint = stream(pointStream)
         }
 
@@ -95,7 +95,7 @@ class AlbersUsa : StreamCacheProjection() {
             translateX = x - 0.205 * k
             translateY = y + 0.212 * k
             clipExtent = Rectangle2D(x - 0.214 * k + EPSILON, y + 0.166 * k + EPSILON,
-                                 0.099 * k - EPSILON * 2, 0.068 * k - EPSILON * 2)
+                                 0.099 * k - 2 * EPSILON, 0.06 * k - 2 * EPSILON)
             hawaiiPoint = stream(pointStream)
         }
 
