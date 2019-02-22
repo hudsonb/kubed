@@ -2,12 +2,8 @@ package kubed.force
 
 import kubed.timer.Timer
 import kubed.timer.timer
-import java.lang.Math.pow
 import java.lang.Math.random
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 
 fun <T> forceSimulation(data: List<T>, initialX: (d: T) -> Double = { _ -> Double.NaN }, initialY: (d: T) -> Double = { _ -> Double.NaN }, init: Simulation.() -> Unit) {
     forceSimulation(data.map { ForceNode(initialX(it), initialY(it)) }, init)
@@ -73,7 +69,7 @@ class Simulation {
             field = value
         }
 
-    var alphaDecay = 1 - pow(alphaMin, 1 / 300.0)
+    var alphaDecay = 1 - alphaMin.pow(1 / 300.0)
         set(value) {
             require(value in 0.0..1.0)
             field = value

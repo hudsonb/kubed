@@ -4,8 +4,6 @@ import kubed.array.range
 import kubed.array.tickStep
 import kubed.geo.MultiPolygon
 import kubed.geo.Position
-import java.lang.Math.pow
-import java.lang.Math.round
 import kotlin.math.*
 
 fun <T> contourDensity(x: (T, Int, List<T>) -> Double, y: (T, Int, List<T>) -> Double) = contourDensity(x, y) {}
@@ -87,7 +85,7 @@ class ContourDensityEstimator<T>(var x: (T, Int, List<T>) -> Double, var y: (T, 
             }
         }
 
-        val k2 = Math.pow(2.0, k.toDouble())
+        val k2 = 2.0.pow(k)
         return contours(values0) {
             columns = n
             rows = m
@@ -101,7 +99,7 @@ class ContourDensityEstimator<T>(var x: (T, Int, List<T>) -> Double, var y: (T, 
                     }
                 }
             })
-            Contour(c.value * pow(2.0, -2.0 * k), geo)
+            Contour(c.value * 2.0.pow( -2 * k), geo)
         }
     }
 

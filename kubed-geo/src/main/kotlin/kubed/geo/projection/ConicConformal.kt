@@ -5,8 +5,6 @@ import kubed.geo.math.tany
 import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kubed.util.isFalsy
-import java.lang.Math.cos
-import java.lang.Math.pow
 import kotlin.math.*
 
 fun conicConformal() = conicConformal {}
@@ -24,7 +22,7 @@ fun conicConformalRaw(y0: Double, y1: Double): Projector {
     return when {
         n.isFalsy() -> MercatorProjector()
         else -> {
-            val f = cy0 * pow(tany(y0), n) / n
+            val f = cy0 * tany(y0).pow(n) / n
             object : InvertableProjector {
                 override fun invoke(lambda: Double, phi: Double): DoubleArray {
                     var y = phi
@@ -33,14 +31,14 @@ fun conicConformalRaw(y0: Double, y1: Double): Projector {
                     }
                     else if(y > HALF_PI - EPSILON) y = HALF_PI - EPSILON
 
-                    val r = f / pow(tany(y), n)
+                    val r = f / tany(y).pow(n)
                     return doubleArrayOf(r * sin(n * lambda), f - r * cos(n * lambda))
                 }
 
                 override fun invert(x: Double, y: Double): DoubleArray {
                     val fy = f - y
                     val r = sign(n) * sqrt(x * x + fy * fy)
-                    return doubleArrayOf(atan2(x, abs(fy)) / n * sign(fy), 2 * atan(pow(f / r, 1 / n)) - HALF_PI)
+                    return doubleArrayOf(atan2(x, abs(fy)) / n * sign(fy), 2 * atan(f / r).pow(1 / n) - HALF_PI)
                 }
             }
         }

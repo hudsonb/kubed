@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleDoubleProperty
 import kubed.math.EPSILON
 import kubed.math.HALF_PI
 import kubed.util.isTruthy
-import java.lang.Math.pow
 import kotlin.math.*
 
 fun lagrange() = lagrange {}
@@ -21,7 +20,7 @@ class LagrangeProjector(private val spacing: Double) : InvertableProjector {
         }
 
         val sinPhi = sin(phi)
-        val v = pow((1 + sinPhi) / (1 - sinPhi), spacing / 2)
+        val v = ((1 + sinPhi) / (1 - sinPhi)).pow(spacing / 2)
         val lambdaSpacing = lambda * spacing
         val c = 0.5 * (v + 1 / v) + cos(lambdaSpacing)
 
@@ -43,7 +42,7 @@ class LagrangeProjector(private val spacing: Double) : InvertableProjector {
         val x2 = x * x
         val y2 = y * y
         var t = 2 * y / (1 + x2 + y2)
-        t = pow((1 + t) / (1 - t), 1 / spacing)
+        t = ((1 + t) / (1 - t)).pow(1 / spacing)
 
         return doubleArrayOf(atan2(2 * x, 1 - x2 - y2) / spacing,
                              asin((t - 1) / (t + 1)))

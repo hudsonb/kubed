@@ -2,7 +2,6 @@ package kubed.geo.tile
 
 import javafx.geometry.Rectangle2D
 import kubed.array.range
-import java.lang.Math.pow
 import kotlin.math.*
 
 fun tile(init: Tiler.() -> Unit) = Tiler().apply(init)
@@ -28,7 +27,7 @@ class Tiler {
         val z = max(ln(scale) / ln2 - log2tileSize, 0.0)
         val z0 = (z + zoomDelta).roundToInt()
         val j = 1 shl z0
-        val k = pow(2.0, z - z0 + log2tileSize)
+        val k = 2.0.pow( z - z0 + log2tileSize)
         val x = translateX - scale / 2
         val y = translateY - scale / 2
 

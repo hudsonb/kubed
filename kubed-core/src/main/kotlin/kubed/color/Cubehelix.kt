@@ -3,7 +3,6 @@ package kubed.color
 import javafx.scene.paint.Color
 import kubed.math.toRadians
 import kubed.util.isTruthy
-import java.lang.Math.pow
 import kotlin.math.*
 
 private const val A = -0.14861
@@ -64,12 +63,12 @@ data class Cubehelix(var h: Double, var s: Double, var l: Double, var opacity: D
     }
 
     override fun brighter(k: Double): Cubehelix {
-        val t = if(k == BRIGHTER) BRIGHTER else pow(BRIGHTER, k)
+        val t = if(k == BRIGHTER) BRIGHTER else BRIGHTER.pow(k)
         return Cubehelix(h, s, l * t, opacity)
     }
 
     override fun darker(k: Double): Cubehelix {
-        val t = if(k == DARKER) DARKER else pow(DARKER, k)
+        val t = if(k == DARKER) DARKER else DARKER.pow(k)
         return Cubehelix(h, s, l * t, opacity)
     }
 }
