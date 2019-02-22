@@ -150,15 +150,16 @@ class Arc<T> : PathShape<Arc<T>, T>() {
             if(rc > EPSILON) {
                 // Restrict the corner radius according to the sector angle.
                 if(da < Math.PI) {
-                    val oc = if(da0 > EPSILON) intersect(x01, y01, x00, y00, x11, y11, x10, y10) else doubleArrayOf(x10, y10)
-                    val ax = x01 - oc[0]
-                    val ay = y01 - oc[1]
-                    val bx = x11 - oc[0]
-                    val by = y11 - oc[1]
-                    val kc = 1 / sin(acos((ax * bx + ay * by) / (sqrt(ax * ax + ay * ay) * sqrt(bx * bx + by * by))) / 2)
-                    val lc = Math.sqrt(oc[0] * oc[0] + oc[1] * oc[1])
-                    rc0 = Math.min(rc, (r0 - lc) / (kc - 1))
-                    rc1 = Math.min(rc, (r1 - lc) / (kc + 1))
+                    intersect(x01, y01, x00, y00, x11, y11, x10, y10)?.let { oc ->
+                        val ax = x01 - oc[0]
+                        val ay = y01 - oc[1]
+                        val bx = x11 - oc[0]
+                        val by = y11 - oc[1]
+                        val kc = 1 / sin(acos((ax * bx + ay * by) / (sqrt(ax * ax + ay * ay) * sqrt(bx * bx + by * by))) / 2)
+                        val lc = Math.sqrt(oc[0] * oc[0] + oc[1] * oc[1])
+                        rc0 = Math.min(rc, (r0 - lc) / (kc - 1))
+                        rc1 = Math.min(rc, (r1 - lc) / (kc + 1))
+                    }
                 }
             }
 
@@ -209,7 +210,7 @@ class Arc<T> : PathShape<Arc<T>, T>() {
 
                 // Otherwise, draw the two corners and the ring.
                 else {
-                    context.arc(t0.cx, t0.cy, rc0, atan2(t0.y01, t0.x01), atan2(t0.y11, t0.x11), !cw);
+                    context.arc(t0.cx, t0.cy, rc0, atan2(t0.y01, t0.x01), atan2(t0.y11, t0.x11), !cw)
                     context.arc(0.0, 0.0, r0, atan2(t0.cy + t0.y11, t0.cx + t0.x11), atan2(t1.cy + t1.y11, t1.cx + t1.x11), cw)
                     context.arc(t1.cx, t1.cy, rc0, atan2(t1.y11, t1.x11), atan2(t1.y01, t1.x01), !cw)
                 }
@@ -225,12 +226,14 @@ class Arc<T> : PathShape<Arc<T>, T>() {
         return context
     }
 
-    private fun intersect(x0: Double, y0: Double, x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double): DoubleArray {
+    private fun intersect(x0: Double, y0: Double, x1: Double, y1: Double, x2: Double, y2: Double, x3: Double, y3: Double): DoubleArray? {
         val x10 = x1 - x0
         val y10 = y1 - y0
         val x32 = x3 - x2
         val y32 = y3 - y2
-        val t = (x32 * (y0 - y2) - y32 * (x0 - x2)) / (y32 * x10 - x32 * y10)
+        var t = y32 * x10 - x32 * y10
+        if(t * t < EPSILON) return null
+        t = (x32 * (y0 - y2) - y32 * (x0 - x2)) / t
         return doubleArrayOf(x0 + t * x10, y0 + t * y10)
     }
 
