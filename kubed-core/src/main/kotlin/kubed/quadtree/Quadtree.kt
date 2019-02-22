@@ -101,7 +101,7 @@ class Quadtree<T>(val x: (T) -> Double,
         add(x, y, d)
     }
 
-    fun addAll(data: Collection<T>) {
+    fun addAll(data: List<T>) {
         var x: Double
         var y: Double
         var x0 = Double.POSITIVE_INFINITY
@@ -111,9 +111,11 @@ class Quadtree<T>(val x: (T) -> Double,
         val xz = DoubleArray(data.size)
         val yz = DoubleArray(data.size)
 
-        data.forEachIndexed { i, d ->
+        for(i in data.indices) {
+            val d = data[i]
             x = x(d)
             y = y(d)
+            if(x.isNaN() || y.isNaN()) continue
             xz[i] = x
             yz[i] = y
             if(x < x0) x0 = x
@@ -122,10 +124,12 @@ class Quadtree<T>(val x: (T) -> Double,
             else if(y > y1) y1 = y
         }
 
-        cover(x0, y0)
-        cover(x1, y1)
-        data.forEachIndexed { i, d ->
-            add(xz[i], yz[i], d)
+        if(x0 < x1 && y0 < y1) {
+            cover(x0, y0)
+            cover(x1, y1)
+            data.forEachIndexed { i, d ->
+                add(xz[i], yz[i], d)
+            }
         }
     }
 
@@ -341,6 +345,8 @@ class Quadtree<T>(val x: (T) -> Double,
     }
 
     private fun cover(x: Double, y: Double) {
+        if(x.isNaN() || y.isNaN()) return
+
         var x0 = this.x0
         var y0 = this.y0
         var x1 = this.x1
@@ -352,57 +358,27 @@ class Quadtree<T>(val x: (T) -> Double,
             x1 = x0 + 1
             y1 = y0 + 1
         }
-        else if(x0 > x || x > x1 || y0 > y || y > y1) {
+        else {
             var z = x1 - x0
             var node = root
             var parent: QuadtreeNode<T>?
-            val i: Int = (y < (y0 + y1) /  2) shl 1 or (x < (x0 + x1) / 2)
-            when(i) {
-                0 -> {
-                    do {
-                        parent = InternalNode()
-                        parent[i] = node
-                        node = parent
-                        z *= 2
-                        x1 = x0 + z
-                        y1 = y0 + z
-                    } while(x > x1 || y > y1)
-                }
-                1 -> {
-                    do {
-                        parent = InternalNode()
-                        parent[i] = node
-                        node = parent
-                        z *= 2
-                        x0 = x1 - z
-                        y1 = y0 + z
-                    } while(x0 > x || y > y1)
-                }
-                2 -> {
-                    do {
-                        parent = InternalNode()
-                        parent[i] = node
-                        node = parent
-                        z *= 2
-                        x1 = x0 + z
-                        y0 = y1 - z
-                    } while(x > x1 || y0 > y)
-                }
-                3 -> {
-                    do {
-                        parent = InternalNode()
-                        parent[i] = node
-                        node = parent
-                        z *= 2
-                        x0 = x1 - z
-                        y0 = y1 - z
-                    } while(x0 > x || y0 > y)
+            var i: Int
+            while(x0 > x || x >= x1 || y0 > y || y >= y1) {
+                i = ((y < y0) shl 1) or (x < x0)
+                parent = node
+                node = parent
+                z *= 2
+
+                when(i) {
+                    0 -> { x1 = x0 + z; y1 = y0 + z }
+                    1 -> { x0 = x1 - z; y1 = y0 + z }
+                    2 -> { x1 = x0 + z; y0 = y1 - z }
+                    3 -> { x0 = x1 - z; y0 = y1 - z }
                 }
             }
 
             if(root != null && root is InternalNode<*>) root = node
         }
-        else return
 
         this.x0 = x0
         this.y0 = y0
