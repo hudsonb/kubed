@@ -14,6 +14,7 @@ const val DEGREES = 180.0 / PI
 const val RADIANS = PI / 180.0
 
 const val EPSILON = 1e-6
+const val EPSILON2 = 1e-12
 const val TAU_EPSILON = TAU - EPSILON
 
 val LN2 = ln(2.0)

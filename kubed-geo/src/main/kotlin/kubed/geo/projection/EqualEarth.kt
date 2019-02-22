@@ -1,6 +1,7 @@
 package kubed.geo.projection
 
 import kubed.math.EPSILON
+import kubed.math.EPSILON2
 import kubed.math.asin
 import kotlin.math.abs
 import kotlin.math.cos
@@ -38,14 +39,14 @@ class EqualEarthProjector : InvertableProjector {
         var l2 = l * l
         var l6 = l2 * l2 * l2
 
-        for(i in 0..iterations) {
+        for(i in 0 until iterations) {
             val fy = l * (A1 + A2 * l2 + l6 * (A3 + A4 * l2)) - y
             val fpy = A1 + 3 * A2 * l2 + l6 * (7 * A3 + 9 * A4 * l2)
             val delta = fy / fpy
             l -= delta
             l2 = l * l
             l6 = l2 * l2 * l2
-            if(abs(delta) < EPSILON) break
+            if(abs(delta) < EPSILON2) break
         }
 
         return doubleArrayOf(M * x * (A1 + 3 * A2 * l2 + l6 * (7 * A3 + 9 * A4 * l2)) / cos(l),
