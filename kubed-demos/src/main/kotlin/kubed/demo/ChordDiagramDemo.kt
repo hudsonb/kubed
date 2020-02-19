@@ -1,9 +1,7 @@
 package kubed.demo
 
 import javafx.application.Application
-import javafx.embed.swing.SwingFXUtils
 import javafx.scene.Scene
-import javafx.scene.SnapshotParameters
 import javafx.scene.layout.StackPane
 import javafx.stage.Stage
 import kubed.ScalingPane
