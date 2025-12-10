@@ -1,0 +1,23 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: kubed
+  description: A Kotlin DSL for data visualization inspired by D3.js
+  annotations:
+    github.com/project-slug: hudsonb/kubed
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - kotlin
+    - visualization
+    - dsl
+    - javafx
+    - d3
+  links:
+    - url: https://github.com/hudsonb/kubed
+      title: GitHub Repository
+      icon: github
+spec:
+  type: library
+  lifecycle: experimental
+  owner: user:default/bhudson
+  system: data-visualization
